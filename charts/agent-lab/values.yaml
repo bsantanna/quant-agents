@@ -1,0 +1,108 @@
+replicaCount: 1
+
+secretName: agent-lab-secret
+
+image:
+  repository: bsantanna/agent-lab
+  pullPolicy: Always
+  tag: "latest"
+
+imagePullSecrets: []
+
+nameOverride: ""
+
+fullnameOverride: ""
+
+config:
+  ollama_endpoint: ""
+  telemetry_endpoint: ""
+
+serviceAccount:
+  create: true
+  automount: true
+
+service:
+  type: ClusterIP
+  port: 8000
+
+podAnnotations: { }
+
+podLabels: { }
+
+podSecurityContext: { }
+
+securityContext: { }
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+     kubernetes.io/ingress.class: nginx
+     nginx.ingress.kubernetes.io/proxy-connect-timeout: "180"
+     nginx.ingress.kubernetes.io/proxy-send-timeout: "180"
+     nginx.ingress.kubernetes.io/proxy-read-timeout: "180"
+    # cert-manager.io/issuer: "letsencrypt-prod"
+  hosts:
+    - host: agentlab.cluster.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName:agent-lab-tls
+  #    hosts:
+  #      - agentlab.cluster.local
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /status/liveness
+    port: http
+readinessProbe:
+  httpGet:
+    path: /status/readiness
+    port: http
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+volumes: []
+
+volumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+cdp:
+  enabled: true
+  image: chromedp/headless-shell:latest
+  port: 9222
+  livenessProbe:
+    httpGet:
+      path: /json/version
+      port: 9222
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /json/version
+      port: 9222
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi

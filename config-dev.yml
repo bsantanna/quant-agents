@@ -1,0 +1,13 @@
+api_base_url: "http://localhost:8000"
+cdp_url: "http://localhost:9222"
+auth:
+  enabled: False
+broker:
+  url: "redis://localhost:6379/0"
+db:
+  url: "postgresql://postgres:postgres@localhost:5432/agent_lab"
+  vectors: "postgresql://postgres:postgres@localhost:5432/agent_lab_vectors"
+  checkpoints: "postgresql://postgres:postgres@localhost:5432/agent_lab_checkpoints"
+vault:
+  url: "http://localhost:8200"
+  token: "dev-only-token"
