@@ -24,7 +24,7 @@ resource "elasticstack_elasticsearch_index_lifecycle" "quant-agents_stocks-eod_p
   }
 
   delete {
-    min_age = "7d"
+    min_age = "365d"
     delete {}
   }
 }
