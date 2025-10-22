@@ -63,30 +63,6 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-eod_te
         tech_sma = {
           type = "double"
         }
-        tech_ema = {
-          type = "double"
-        }
-        tech_rsi = {
-          type = "double"
-        }
-        tech_adx = {
-          type = "double"
-        }
-        tech_cci = {
-          type = "double"
-        }
-        tech_chaikin_ad = {
-          type = "double"
-        }
-        tech_obv = {
-          type = "double"
-        }
-        tech_mama = {
-          type = "double"
-        }
-        tech_fama = {
-          type = "double"
-        }
       }
     })
 
