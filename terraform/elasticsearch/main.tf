@@ -37,17 +37,29 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-eod_te
   template {
     mappings = jsonencode({
       properties = {
-        ticker = {
+        key_ticker = {
           type = "keyword"
         }
-        date = {
+        date_reference = {
           type   = "date"
           format = "yyyy-MM-dd"
         }
-        eod_value = {
+        val_open = {
           type = "double"
         }
-        financial_data = {
+        val_close = {
+          type = "double"
+        }
+        val_high = {
+          type = "double"
+        }
+        val_low = {
+          type = "double"
+        }
+        val_volume = {
+          type = "double"
+        }
+        obj_financial_data = {
           type    = "object"
           enabled = false
         }
