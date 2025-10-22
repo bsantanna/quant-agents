@@ -32,10 +32,11 @@ resource "elasticstack_elasticsearch_index_lifecycle" "quant-agents_stocks-eod_p
 resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-eod_template" {
   name = "quant-agents_stocks-eod_template"
 
-  index_patterns = ["quant-agents_stocks-eod-*"]
+  index_patterns = ["quant-agents_stocks-eod_*"]
 
   template {
     mappings = jsonencode({
+      dynamic = "strict"
       properties = {
         key_ticker = {
           type = "keyword"
@@ -59,9 +60,32 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-eod_te
         val_volume = {
           type = "double"
         }
-        obj_financial_data = {
-          type    = "object"
-          enabled = false
+        tech_sma = {
+          type = "double"
+        }
+        tech_ema = {
+          type = "double"
+        }
+        tech_rsi = {
+          type = "double"
+        }
+        tech_adx = {
+          type = "double"
+        }
+        tech_cci = {
+          type = "double"
+        }
+        tech_chaikin_ad = {
+          type = "double"
+        }
+        tech_obv = {
+          type = "double"
+        }
+        tech_mama = {
+          type = "double"
+        }
+        tech_fama = {
+          type = "double"
         }
       }
     })
@@ -69,6 +93,7 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-eod_te
     settings = jsonencode({
       number_of_shards   = 1
       number_of_replicas = 1
+
       lifecycle = {
         name = elasticstack_elasticsearch_index_lifecycle.quant-agents_stocks-eod_policy.name
       }
