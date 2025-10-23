@@ -184,40 +184,105 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-fundam
     mappings = jsonencode({
       dynamic = "strict"
       properties = {
-        key_ticker                             = { type = "keyword" }
-        fiscal_date_ending                     = { type = "date", format = "yyyy-MM-dd" }
-        reported_currency                      = { type = "keyword" }
+        key_ticker         = { type = "keyword" }
+        fiscal_date_ending = { type = "date", format = "yyyy-MM-dd" }
+        reported_currency  = { type = "keyword" }
 
-        gross_profit                           = { type = "long" }
-        total_revenue                          = { type = "long" }
-        cost_of_revenue                        = { type = "long" }
-        cost_of_goods_and_services_sold        = { type = "long" }
+        gross_profit                    = { type = "long" }
+        total_revenue                   = { type = "long" }
+        cost_of_revenue                 = { type = "long" }
+        cost_of_goods_and_services_sold = { type = "long" }
 
-        operating_income                       = { type = "long" }
-        selling_general_and_administrative     = { type = "long" }
-        research_and_development               = { type = "long" }
-        operating_expenses                     = { type = "long" }
+        operating_income                   = { type = "long" }
+        selling_general_and_administrative = { type = "long" }
+        research_and_development           = { type = "long" }
+        operating_expenses                 = { type = "long" }
 
-        investment_income_net                  = { type = "double" }
-        net_interest_income                    = { type = "long" }
-        interest_income                        = { type = "long" }
-        interest_expense                       = { type = "long" }
+        investment_income_net = { type = "double" }
+        net_interest_income   = { type = "long" }
+        interest_income       = { type = "long" }
+        interest_expense      = { type = "long" }
 
-        non_interest_income                    = { type = "double" }
-        other_non_operating_income             = { type = "double" }
-        depreciation                           = { type = "double" }
-        depreciation_and_amortization          = { type = "long" }
+        non_interest_income           = { type = "double" }
+        other_non_operating_income    = { type = "double" }
+        depreciation                  = { type = "double" }
+        depreciation_and_amortization = { type = "long" }
 
-        income_before_tax                      = { type = "long" }
-        income_tax_expense                     = { type = "long" }
-        interest_and_debt_expense              = { type = "double" }
+        income_before_tax         = { type = "long" }
+        income_tax_expense        = { type = "long" }
+        interest_and_debt_expense = { type = "double" }
 
-        net_income_from_continuing_operations  = { type = "long" }
-        comprehensive_income_net_of_tax        = { type = "double" }
+        net_income_from_continuing_operations = { type = "long" }
+        comprehensive_income_net_of_tax       = { type = "double" }
 
-        ebit                                   = { type = "long" }
-        ebitda                                 = { type = "long" }
-        net_income                             = { type = "long" }
+        ebit       = { type = "long" }
+        ebitda     = { type = "long" }
+        net_income = { type = "long" }
+      }
+    })
+
+    settings = jsonencode({
+      number_of_shards   = 1
+      number_of_replicas = 1
+
+      lifecycle = {
+        name = elasticstack_elasticsearch_index_lifecycle.quant-agents_policy.name
+      }
+    })
+  }
+}
+
+resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-fundamental-balance-sheet_template" {
+  name = "quant-agents_stocks-fundamental-balance-sheet_template"
+
+  index_patterns = ["quant-agents_stocks-fundamental-balance-sheet_*"]
+
+  template {
+    mappings = jsonencode({
+      dynamic = "strict"
+      properties = {
+        key_ticker         = { type = "keyword" }
+        fiscal_date_ending = { type = "date", format = "yyyy-MM-dd" }
+        reported_currency  = { type = "keyword" }
+
+        total_assets                                = { type = "long" }
+        total_current_assets                        = { type = "long" }
+        cash_and_cash_equivalents_at_carrying_value = { type = "long" }
+        cash_and_short_term_investments             = { type = "long" }
+        inventory                                   = { type = "long" }
+        current_net_receivables                     = { type = "long" }
+        total_non_current_assets                    = { type = "long" }
+        property_plant_equipment                    = { type = "long" }
+        accumulated_depreciation_amortization_ppe   = { type = "long" }
+        intangible_assets                           = { type = "long" }
+        intangible_assets_excluding_goodwill        = { type = "long" }
+        goodwill                                    = { type = "long" }
+        investments                                 = { type = "long" }
+        long_term_investments                       = { type = "long" }
+        short_term_investments                      = { type = "long" }
+        other_current_assets                        = { type = "long" }
+        other_non_current_assets                    = { type = "long" }
+
+        total_liabilities             = { type = "long" }
+        total_current_liabilities     = { type = "long" }
+        current_accounts_payable      = { type = "long" }
+        deferred_revenue              = { type = "long" }
+        current_debt                  = { type = "long" }
+        short_term_debt               = { type = "long" }
+        total_non_current_liabilities = { type = "long" }
+        capital_lease_obligations     = { type = "long" }
+        long_term_debt                = { type = "long" }
+        current_long_term_debt        = { type = "long" }
+        long_term_debt_noncurrent     = { type = "long" }
+        short_long_term_debt_total    = { type = "long" }
+        other_current_liabilities     = { type = "long" }
+        other_non_current_liabilities = { type = "long" }
+
+        total_shareholder_equity        = { type = "long" }
+        treasury_stock                  = { type = "long" }
+        retained_earnings               = { type = "long" }
+        common_stock                    = { type = "long" }
+        common_stock_shares_outstanding = { type = "long" }
       }
     })
 
