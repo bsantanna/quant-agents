@@ -296,3 +296,103 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-fundam
     })
   }
 }
+
+
+resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-fundamental-cash-flow_template" {
+  name = "quant-agents_stocks-fundamental-cash-flow_template"
+
+  index_patterns = ["quant-agents_stocks-fundamental-cash-flow_*"]
+
+  template {
+    mappings = jsonencode({
+      dynamic = "strict"
+      properties = {
+        key_ticker                                                          = { type = "keyword" }
+        fiscal_date_ending                                                  = { type = "date", format = "yyyy-MM-dd" }
+        reported_currency                                                   = { type = "keyword" }
+        operating_cashflow                                                  = { type = "long" }
+        payments_for_operating_activities                                   = { type = "long" }
+        proceeds_from_operating_activities                                  = { type = "long" }
+        change_in_operating_liabilities                                     = { type = "long" }
+        change_in_operating_assets                                          = { type = "long" }
+        depreciation_depletion_and_amortization                             = { type = "long" }
+        capital_expenditures                                                = { type = "long" }
+        change_in_receivables                                               = { type = "long" }
+        change_in_inventory                                                 = { type = "long" }
+        profit_loss                                                         = { type = "long" }
+        cashflow_from_investment                                            = { type = "long" }
+        cashflow_from_financing                                             = { type = "long" }
+        proceeds_from_repayments_of_short_term_debt                         = { type = "long" }
+        payments_for_repurchase_of_common_stock                             = { type = "long" }
+        payments_for_repurchase_of_equity                                   = { type = "long" }
+        payments_for_repurchase_of_preferred_stock                          = { type = "long" }
+        dividend_payout                                                     = { type = "long" }
+        dividend_payout_common_stock                                        = { type = "long" }
+        dividend_payout_preferred_stock                                     = { type = "long" }
+        proceeds_from_issuance_of_common_stock                              = { type = "long" }
+        proceeds_from_issuance_of_long_term_debt_and_capital_securities_net = { type = "long" }
+        proceeds_from_issuance_of_preferred_stock                           = { type = "long" }
+        proceeds_from_repurchase_of_equity                                  = { type = "long" }
+        proceeds_from_sale_of_treasury_stock                                = { type = "long" }
+        change_in_cash_and_cash_equivalents                                 = { type = "long" }
+        change_in_exchange_rate                                             = { type = "long" }
+        net_income                                                          = { type = "long" }
+
+      }
+    })
+
+    settings = jsonencode({
+      number_of_shards   = 1
+      number_of_replicas = 1
+
+      lifecycle = {
+        name = elasticstack_elasticsearch_index_lifecycle.quant-agents_policy.name
+      }
+    })
+  }
+}
+
+
+
+resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-fundamental-estimated-earnings_template" {
+  name = "quant-agents_stocks-fundamental-estimated-earnings_template"
+
+  index_patterns = ["quant-agents_stocks-fundamental-estimated-earnings_*"]
+
+  template {
+    mappings = jsonencode({
+      dynamic = "strict"
+      properties = {
+        key_ticker                                  = { type = "keyword" }
+        date                                        = { type = "date", format = "yyyy-MM-dd" }
+        horizon                                     = { type = "keyword" }
+        eps_estimate_average                        = { type = "double" }
+        eps_estimate_high                           = { type = "double" }
+        eps_estimate_low                            = { type = "double" }
+        eps_estimate_analyst_count                  = { type = "double" }
+        eps_estimate_average_7_days_ago             = { type = "double" }
+        eps_estimate_average_30_days_ago            = { type = "double" }
+        eps_estimate_average_60_days_ago            = { type = "double" }
+        eps_estimate_average_90_days_ago            = { type = "double" }
+        eps_estimate_revision_up_trailing_7_days    = { type = "double" }
+        eps_estimate_revision_down_trailing_7_days  = { type = "double" }
+        eps_estimate_revision_up_trailing_30_days   = { type = "double" }
+        eps_estimate_revision_down_trailing_30_days = { type = "double" }
+        revenue_estimate_average                    = { type = "double" }
+        revenue_estimate_high                       = { type = "double" }
+        revenue_estimate_low                        = { type = "double" }
+        revenue_estimate_analyst_count              = { type = "double" }
+
+      }
+    })
+
+    settings = jsonencode({
+      number_of_shards   = 1
+      number_of_replicas = 1
+
+      lifecycle = {
+        name = elasticstack_elasticsearch_index_lifecycle.quant-agents_policy.name
+      }
+    })
+  }
+}
