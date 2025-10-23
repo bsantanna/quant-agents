@@ -60,9 +60,6 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-eod_te
         val_volume = {
           type = "double"
         }
-        tech_sma = {
-          type = "double"
-        }
       }
     })
 
