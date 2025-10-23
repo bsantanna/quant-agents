@@ -91,7 +91,7 @@ def format_bulk_stocks_insider_trades(ticker: str, df: pd.DataFrame) -> bytes:
 
     return (("\n".join(lines)) + "\n").encode("utf-8")
 
-def ingest_stocks_insider_trades(ticker: str, cutoff_days=100) -> Response:
+def ingest_stocks_insider_trades(ticker: str, cutoff_days=365) -> Response:
     es_url = os.environ.get('ELASTICSEARCH_URL')
     es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
     alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
