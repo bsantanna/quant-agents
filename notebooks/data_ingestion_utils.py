@@ -5,9 +5,9 @@ import pandas as pd
 from datetime import datetime
 from requests import Response
 
-def format_bulk_stocks_eod(ticker: str, df: pd.DataFrame) -> bytes:
-    today = datetime.now().strftime('%Y-%m-%d')
-    index_name = f"quant-agents_stocks-eod_{today}"
+
+def format_bulk_stocks_eod(ticker: str, df: pd.DataFrame, index_suffix: str) -> bytes:
+    index_name = f"quant-agents_stocks-eod_{index_suffix}"
     lines = []
 
     for _, row in df.iterrows():
@@ -40,7 +40,8 @@ def format_bulk_stocks_eod(ticker: str, df: pd.DataFrame) -> bytes:
 
     return (("\n".join(lines)) + "\n").encode("utf-8")
 
-def ingest_stocks_eod(ticker: str) -> Response:
+
+def ingest_stocks_eod(ticker: str, index_suffix="latest") -> Response:
     es_url = os.environ.get('ELASTICSEARCH_URL')
     es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
     alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
@@ -54,22 +55,20 @@ def ingest_stocks_eod(ticker: str) -> Response:
             'Authorization': f'ApiKey {es_api_key}',
             'Content-Type': 'application/x-ndjson'
         },
-        data=format_bulk_stocks_eod(ticker, ticker_daily_time_series)
+        data=format_bulk_stocks_eod(ticker, ticker_daily_time_series, index_suffix)
     )
 
 
-def format_bulk_stocks_insider_trades(ticker: str, df: pd.DataFrame) -> bytes:
-    today = datetime.now().strftime('%Y-%m-%d')
-    index_name = f"quant-agents_stocks-insider-trades_{today}"
+def format_bulk_stocks_insider_trades(ticker: str, df: pd.DataFrame, index_suffix: str) -> bytes:
+    index_name = f"quant-agents_stocks-insider-trades_{index_suffix}"
     lines = []
 
     for _, row in df.iterrows():
-
         date_reference = row.get('transaction_date').strftime('%Y-%m-%d')
         executive = row.get('executive')
         executive_title = row.get('executive_title')
         acquisition_or_disposal = row.get('acquisition_or_disposal')
-        shares= row.get('shares')
+        shares = row.get('shares')
         share_price = row.get('share_price')
 
         id_str = f"{ticker}_{date_reference}"
@@ -91,7 +90,8 @@ def format_bulk_stocks_insider_trades(ticker: str, df: pd.DataFrame) -> bytes:
 
     return (("\n".join(lines)) + "\n").encode("utf-8")
 
-def ingest_stocks_insider_trades(ticker: str, cutoff_days=365) -> Response:
+
+def ingest_stocks_insider_trades(ticker: str, cutoff_days=365, index_suffix="latest") -> Response:
     es_url = os.environ.get('ELASTICSEARCH_URL')
     es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
     alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
@@ -109,13 +109,13 @@ def ingest_stocks_insider_trades(ticker: str, cutoff_days=365) -> Response:
             'Authorization': f'ApiKey {es_api_key}',
             'Content-Type': 'application/x-ndjson'
         },
-        data=format_bulk_stocks_insider_trades(ticker, ticker_recent_insider_trades)
+        data=format_bulk_stocks_insider_trades(ticker, ticker_recent_insider_trades, index_suffix)
     )
 
-def format_bulk_stocks_metadata(ticker: str, df: pd.DataFrame) -> bytes:
-    import json
+
+def format_bulk_stocks_metadata(ticker: str, df: pd.DataFrame, index_suffix: str) -> bytes:
     today = datetime.now().strftime('%Y-%m-%d')
-    index_name = f"quant-agents_stocks-metadata_{today}"
+    index_name = f"quant-agents_stocks-metadata_{index_suffix}"
     lines = []
 
     for _, row in df.iterrows():
@@ -254,7 +254,8 @@ def format_bulk_stocks_metadata(ticker: str, df: pd.DataFrame) -> bytes:
 
     return (("\n".join(lines)) + "\n").encode("utf-8")
 
-def ingest_stocks_metadata(ticker: str) -> Response:
+
+def ingest_stocks_metadata(ticker: str, index_suffix="latest") -> Response:
     es_url = os.environ.get('ELASTICSEARCH_URL')
     es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
     alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
@@ -269,13 +270,13 @@ def ingest_stocks_metadata(ticker: str) -> Response:
             'Authorization': f'ApiKey {es_api_key}',
             'Content-Type': 'application/x-ndjson'
         },
-        data=format_bulk_stocks_metadata(ticker, ticker_metadata)
+        data=format_bulk_stocks_metadata(ticker, ticker_metadata, index_suffix)
     )
 
-def format_bulk_stocks_fundamental_income_statement(ticker: str, df: pd.DataFrame) -> bytes:
 
+def format_bulk_stocks_fundamental_income_statement(ticker: str, df: pd.DataFrame, index_suffix: str) -> bytes:
     today = datetime.now().strftime('%Y-%m-%d')
-    index_name = f"quant-agents_stocks-fundamental-income-statement_{today}"
+    index_name = f"quant-agents_stocks-fundamental-income-statement_{index_suffix}"
     lines = []
 
     for _, row in df.iterrows():
@@ -352,7 +353,8 @@ def format_bulk_stocks_fundamental_income_statement(ticker: str, df: pd.DataFram
 
     return (("\n".join(lines)) + "\n").encode("utf-8")
 
-def ingest_stocks_fundamental_income_statement(ticker: str, cutoff_days=3650) -> Response:
+
+def ingest_stocks_fundamental_income_statement(ticker: str, cutoff_days=3650, index_suffix="latest") -> Response:
     es_url = os.environ.get('ELASTICSEARCH_URL')
     es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
     alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
@@ -372,13 +374,13 @@ def ingest_stocks_fundamental_income_statement(ticker: str, cutoff_days=3650) ->
             'Authorization': f'ApiKey {es_api_key}',
             'Content-Type': 'application/x-ndjson'
         },
-        data=format_bulk_stocks_fundamental_income_statement(ticker, ticker_recent_income_statement)
+        data=format_bulk_stocks_fundamental_income_statement(ticker, ticker_recent_income_statement, index_suffix)
     )
 
-def format_bulk_stocks_fundamental_balance_sheet(ticker: str, df: pd.DataFrame) -> bytes:
 
+def format_bulk_stocks_fundamental_balance_sheet(ticker: str, df: pd.DataFrame, index_suffix: str) -> bytes:
     today = datetime.now().strftime('%Y-%m-%d')
-    index_name = f"quant-agents_stocks-fundamental-balance-sheet_{today}"
+    index_name = f"quant-agents_stocks-fundamental-balance-sheet_{index_suffix}"
     lines = []
 
     for _, row in df.iterrows():
@@ -386,40 +388,61 @@ def format_bulk_stocks_fundamental_balance_sheet(ticker: str, df: pd.DataFrame) 
         reported_currency = row.get('reportedCurrency')
         total_assets = int(row.get('totalAssets')) if row.get('totalAssets') != "None" else None
         total_current_assets = int(row.get('totalCurrentAssets')) if row.get('totalCurrentAssets') != "None" else None
-        cash_and_cash_equivalents_at_carrying_value = int(row.get('cashAndCashEquivalentsAtCarryingValue')) if row.get('cashAndCashEquivalentsAtCarryingValue') != "None" else None
-        cash_and_short_term_investments = int(row.get('cashAndShortTermInvestments')) if row.get('cashAndShortTermInvestments') != "None" else None
+        cash_and_cash_equivalents_at_carrying_value = int(row.get('cashAndCashEquivalentsAtCarryingValue')) if row.get(
+            'cashAndCashEquivalentsAtCarryingValue') != "None" else None
+        cash_and_short_term_investments = int(row.get('cashAndShortTermInvestments')) if row.get(
+            'cashAndShortTermInvestments') != "None" else None
         inventory = int(row.get('inventory')) if row.get('inventory') != "None" else None
-        current_net_receivables = int(row.get('currentNetReceivables')) if row.get('currentNetReceivables') != "None" else None
-        total_non_current_assets = int(row.get('totalNonCurrentAssets')) if row.get('totalNonCurrentAssets') != "None" else None
-        property_plant_equipment = int(row.get('propertyPlantEquipment')) if row.get('propertyPlantEquipment') != "None" else None
-        accumulated_depreciation_amortization_ppe = int(row.get('accumulatedDepreciationAmortizationPPE')) if row.get('accumulatedDepreciationAmortizationPPE') != "None" else None
+        current_net_receivables = int(row.get('currentNetReceivables')) if row.get(
+            'currentNetReceivables') != "None" else None
+        total_non_current_assets = int(row.get('totalNonCurrentAssets')) if row.get(
+            'totalNonCurrentAssets') != "None" else None
+        property_plant_equipment = int(row.get('propertyPlantEquipment')) if row.get(
+            'propertyPlantEquipment') != "None" else None
+        accumulated_depreciation_amortization_ppe = int(row.get('accumulatedDepreciationAmortizationPPE')) if row.get(
+            'accumulatedDepreciationAmortizationPPE') != "None" else None
         intangible_assets = int(row.get('intangibleAssets')) if row.get('intangibleAssets') != "None" else None
-        intangible_assets_excluding_goodwill = int(row.get('intangibleAssetsExcludingGoodwill')) if row.get('intangibleAssetsExcludingGoodwill') != "None" else None
+        intangible_assets_excluding_goodwill = int(row.get('intangibleAssetsExcludingGoodwill')) if row.get(
+            'intangibleAssetsExcludingGoodwill') != "None" else None
         goodwill = int(row.get('goodwill')) if row.get('goodwill') != "None" else None
         investments = int(row.get('investments')) if row.get('investments') != "None" else None
-        long_term_investments = int(row.get('longTermInvestments')) if row.get('longTermInvestments') != "None" else None
-        short_term_investments = int(row.get('shortTermInvestments')) if row.get('shortTermInvestments') != "None" else None
+        long_term_investments = int(row.get('longTermInvestments')) if row.get(
+            'longTermInvestments') != "None" else None
+        short_term_investments = int(row.get('shortTermInvestments')) if row.get(
+            'shortTermInvestments') != "None" else None
         other_current_assets = int(row.get('otherCurrentAssets')) if row.get('otherCurrentAssets') != "None" else None
-        other_non_current_assets = int(row.get('otherNonCurrentAssets')) if row.get('otherNonCurrentAssets') != "None" else None
+        other_non_current_assets = int(row.get('otherNonCurrentAssets')) if row.get(
+            'otherNonCurrentAssets') != "None" else None
         total_liabilities = int(row.get('totalLiabilities')) if row.get('totalLiabilities') != "None" else None
-        total_current_liabilities = int(row.get('totalCurrentLiabilities')) if row.get('totalCurrentLiabilities') != "None" else None
-        current_accounts_payable = int(row.get('currentAccountsPayable')) if row.get('currentAccountsPayable') != "None" else None
+        total_current_liabilities = int(row.get('totalCurrentLiabilities')) if row.get(
+            'totalCurrentLiabilities') != "None" else None
+        current_accounts_payable = int(row.get('currentAccountsPayable')) if row.get(
+            'currentAccountsPayable') != "None" else None
         deferred_revenue = int(row.get('deferredRevenue')) if row.get('deferredRevenue') != "None" else None
         current_debt = int(row.get('currentDebt')) if row.get('currentDebt') != "None" else None
         short_term_debt = int(row.get('shortTermDebt')) if row.get('shortTermDebt') != "None" else None
-        total_non_current_liabilities = int(row.get('totalNonCurrentLiabilities')) if row.get('totalNonCurrentLiabilities') != "None" else None
-        capital_lease_obligations = int(row.get('capitalLeaseObligations')) if row.get('capitalLeaseObligations') != "None" else None
+        total_non_current_liabilities = int(row.get('totalNonCurrentLiabilities')) if row.get(
+            'totalNonCurrentLiabilities') != "None" else None
+        capital_lease_obligations = int(row.get('capitalLeaseObligations')) if row.get(
+            'capitalLeaseObligations') != "None" else None
         long_term_debt = int(row.get('longTermDebt')) if row.get('longTermDebt') != "None" else None
-        current_long_term_debt = int(row.get('currentLongTermDebt')) if row.get('currentLongTermDebt') != "None" else None
-        long_term_debt_noncurrent = int(row.get('longTermDebtNoncurrent')) if row.get('longTermDebtNoncurrent') != "None" else None
-        short_long_term_debt_total = int(row.get('shortLongTermDebtTotal')) if row.get('shortLongTermDebtTotal') != "None" else None
-        other_current_liabilities = int(row.get('otherCurrentLiabilities')) if row.get('otherCurrentLiabilities') != "None" else None
-        other_non_current_liabilities = int(row.get('otherNonCurrentLiabilities')) if row.get('otherNonCurrentLiabilities') != "None" else None
-        total_shareholder_equity = int(row.get('totalShareholderEquity')) if row.get('totalShareholderEquity') != "None" else None
+        current_long_term_debt = int(row.get('currentLongTermDebt')) if row.get(
+            'currentLongTermDebt') != "None" else None
+        long_term_debt_noncurrent = int(row.get('longTermDebtNoncurrent')) if row.get(
+            'longTermDebtNoncurrent') != "None" else None
+        short_long_term_debt_total = int(row.get('shortLongTermDebtTotal')) if row.get(
+            'shortLongTermDebtTotal') != "None" else None
+        other_current_liabilities = int(row.get('otherCurrentLiabilities')) if row.get(
+            'otherCurrentLiabilities') != "None" else None
+        other_non_current_liabilities = int(row.get('otherNonCurrentLiabilities')) if row.get(
+            'otherNonCurrentLiabilities') != "None" else None
+        total_shareholder_equity = int(row.get('totalShareholderEquity')) if row.get(
+            'totalShareholderEquity') != "None" else None
         treasury_stock = int(row.get('treasuryStock')) if row.get('treasuryStock') != "None" else None
         retained_earnings = int(row.get('retainedEarnings')) if row.get('retainedEarnings') != "None" else None
         common_stock = int(row.get('commonStock')) if row.get('commonStock') != "None" else None
-        common_stock_shares_outstanding = int(row.get('commonStockSharesOutstanding')) if row.get('commonStockSharesOutstanding') != "None" else None
+        common_stock_shares_outstanding = int(row.get('commonStockSharesOutstanding')) if row.get(
+            'commonStockSharesOutstanding') != "None" else None
 
         id_suffix = fiscal_date_ending or today
         id_str = f"{ticker}_{id_suffix}"
@@ -474,7 +497,7 @@ def format_bulk_stocks_fundamental_balance_sheet(ticker: str, df: pd.DataFrame) 
     return (("\n".join(lines)) + "\n").encode("utf-8")
 
 
-def ingest_stocks_fundamental_balance_sheet(ticker: str, cutoff_days=3650) -> Response:
+def ingest_stocks_fundamental_balance_sheet(ticker: str, cutoff_days=3650, index_suffix="latest") -> Response:
     es_url = os.environ.get('ELASTICSEARCH_URL')
     es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
     alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
@@ -494,45 +517,66 @@ def ingest_stocks_fundamental_balance_sheet(ticker: str, cutoff_days=3650) -> Re
             'Authorization': f'ApiKey {es_api_key}',
             'Content-Type': 'application/x-ndjson'
         },
-        data=format_bulk_stocks_fundamental_balance_sheet(ticker, ticker_recent_balance_sheet)
+        data=format_bulk_stocks_fundamental_balance_sheet(ticker, ticker_recent_balance_sheet, index_suffix)
     )
 
 
-def format_bulk_stocks_fundamental_cash_flow(ticker: str, df: pd.DataFrame) -> bytes:
-
+def format_bulk_stocks_fundamental_cash_flow(ticker: str, df: pd.DataFrame, index_suffix: str) -> bytes:
     today = datetime.now().strftime('%Y-%m-%d')
-    index_name = f"quant-agents_stocks-fundamental-cash-flow_{today}"
+    index_name = f"quant-agents_stocks-fundamental-cash-flow_{index_suffix}"
     lines = []
 
     for _, row in df.iterrows():
         fiscal_date_ending = row.get('fiscalDateEnding').strftime('%Y-%m-%d')
         reported_currency = row.get('reportedCurrency')
         operating_cashflow = int(row.get('operatingCashflow')) if row.get('operatingCashflow') != "None" else None
-        payments_for_operating_activities = int(row.get('paymentsForOperatingActivities')) if row.get('paymentsForOperatingActivities') != "None" else None
-        proceeds_from_operating_activities = int(row.get('proceedsFromOperatingActivities')) if row.get('proceedsFromOperatingActivities') != "None" else None
-        change_in_operating_liabilities = int(row.get('changeInOperatingLiabilities')) if row.get('changeInOperatingLiabilities') != "None" else None
-        change_in_operating_assets = int(row.get('changeInOperatingAssets')) if row.get('changeInOperatingAssets') != "None" else None
-        depreciation_depletion_and_amortization = int(row.get('depreciationDepletionAndAmortization')) if row.get('depreciationDepletionAndAmortization') != "None" else None
+        payments_for_operating_activities = int(row.get('paymentsForOperatingActivities')) if row.get(
+            'paymentsForOperatingActivities') != "None" else None
+        proceeds_from_operating_activities = int(row.get('proceedsFromOperatingActivities')) if row.get(
+            'proceedsFromOperatingActivities') != "None" else None
+        change_in_operating_liabilities = int(row.get('changeInOperatingLiabilities')) if row.get(
+            'changeInOperatingLiabilities') != "None" else None
+        change_in_operating_assets = int(row.get('changeInOperatingAssets')) if row.get(
+            'changeInOperatingAssets') != "None" else None
+        depreciation_depletion_and_amortization = int(row.get('depreciationDepletionAndAmortization')) if row.get(
+            'depreciationDepletionAndAmortization') != "None" else None
         capital_expenditures = int(row.get('capitalExpenditures')) if row.get('capitalExpenditures') != "None" else None
-        change_in_receivables = int(row.get('changeInReceivables')) if row.get('changeInReceivables') != "None" else None
+        change_in_receivables = int(row.get('changeInReceivables')) if row.get(
+            'changeInReceivables') != "None" else None
         change_in_inventory = int(row.get('changeInInventory')) if row.get('changeInInventory') != "None" else None
         profit_loss = int(row.get('profitLoss')) if row.get('profitLoss') != "None" else None
-        cashflow_from_investment = int(row.get('cashflowFromInvestment')) if row.get('cashflowFromInvestment') != "None" else None
-        cashflow_from_financing = int(row.get('cashflowFromFinancing')) if row.get('cashflowFromFinancing') != "None" else None
-        proceeds_from_repayments_of_short_term_debt = int(row.get('proceedsFromRepaymentsOfShortTermDebt')) if row.get('proceedsFromRepaymentsOfShortTermDebt') != "None" else None
-        payments_for_repurchase_of_common_stock = int(row.get('paymentsForRepurchaseOfCommonStock')) if row.get('paymentsForRepurchaseOfCommonStock') != "None" else None
-        payments_for_repurchase_of_equity = int(row.get('paymentsForRepurchaseOfEquity')) if row.get('paymentsForRepurchaseOfEquity') != "None" else None
-        payments_for_repurchase_of_preferred_stock = int(row.get('paymentsForRepurchaseOfPreferredStock')) if row.get('paymentsForRepurchaseOfPreferredStock') != "None" else None
+        cashflow_from_investment = int(row.get('cashflowFromInvestment')) if row.get(
+            'cashflowFromInvestment') != "None" else None
+        cashflow_from_financing = int(row.get('cashflowFromFinancing')) if row.get(
+            'cashflowFromFinancing') != "None" else None
+        proceeds_from_repayments_of_short_term_debt = int(row.get('proceedsFromRepaymentsOfShortTermDebt')) if row.get(
+            'proceedsFromRepaymentsOfShortTermDebt') != "None" else None
+        payments_for_repurchase_of_common_stock = int(row.get('paymentsForRepurchaseOfCommonStock')) if row.get(
+            'paymentsForRepurchaseOfCommonStock') != "None" else None
+        payments_for_repurchase_of_equity = int(row.get('paymentsForRepurchaseOfEquity')) if row.get(
+            'paymentsForRepurchaseOfEquity') != "None" else None
+        payments_for_repurchase_of_preferred_stock = int(row.get('paymentsForRepurchaseOfPreferredStock')) if row.get(
+            'paymentsForRepurchaseOfPreferredStock') != "None" else None
         dividend_payout = int(row.get('dividendPayout')) if row.get('dividendPayout') != "None" else None
-        dividend_payout_common_stock = int(row.get('dividendPayoutCommonStock')) if row.get('dividendPayoutCommonStock') != "None" else None
-        dividend_payout_preferred_stock = int(row.get('dividendPayoutPreferredStock')) if row.get('dividendPayoutPreferredStock') != "None" else None
-        proceeds_from_issuance_of_common_stock = int(row.get('proceedsFromIssuanceOfCommonStock')) if row.get('proceedsFromIssuanceOfCommonStock') != "None" else None
-        proceeds_from_issuance_of_long_term_debt_and_capital_securities_net = int(row.get('proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet')) if row.get('proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet') != "None" else None
-        proceeds_from_issuance_of_preferred_stock = int(row.get('proceedsFromIssuanceOfPreferredStock')) if row.get('proceedsFromIssuanceOfPreferredStock') != "None" else None
-        proceeds_from_repurchase_of_equity = int(row.get('proceedsFromRepurchaseOfEquity')) if row.get('proceedsFromRepurchaseOfEquity') != "None" else None
-        proceeds_from_sale_of_treasury_stock = int(row.get('proceedsFromSaleOfTreasuryStock')) if row.get('proceedsFromSaleOfTreasuryStock') != "None" else None
-        change_in_cash_and_cash_equivalents = int(row.get('changeInCashAndCashEquivalents')) if row.get('changeInCashAndCashEquivalents') != "None" else None
-        change_in_exchange_rate = int(row.get('changeInExchangeRate')) if row.get('changeInExchangeRate') != "None" else None
+        dividend_payout_common_stock = int(row.get('dividendPayoutCommonStock')) if row.get(
+            'dividendPayoutCommonStock') != "None" else None
+        dividend_payout_preferred_stock = int(row.get('dividendPayoutPreferredStock')) if row.get(
+            'dividendPayoutPreferredStock') != "None" else None
+        proceeds_from_issuance_of_common_stock = int(row.get('proceedsFromIssuanceOfCommonStock')) if row.get(
+            'proceedsFromIssuanceOfCommonStock') != "None" else None
+        proceeds_from_issuance_of_long_term_debt_and_capital_securities_net = int(
+            row.get('proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet')) if row.get(
+            'proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet') != "None" else None
+        proceeds_from_issuance_of_preferred_stock = int(row.get('proceedsFromIssuanceOfPreferredStock')) if row.get(
+            'proceedsFromIssuanceOfPreferredStock') != "None" else None
+        proceeds_from_repurchase_of_equity = int(row.get('proceedsFromRepurchaseOfEquity')) if row.get(
+            'proceedsFromRepurchaseOfEquity') != "None" else None
+        proceeds_from_sale_of_treasury_stock = int(row.get('proceedsFromSaleOfTreasuryStock')) if row.get(
+            'proceedsFromSaleOfTreasuryStock') != "None" else None
+        change_in_cash_and_cash_equivalents = int(row.get('changeInCashAndCashEquivalents')) if row.get(
+            'changeInCashAndCashEquivalents') != "None" else None
+        change_in_exchange_rate = int(row.get('changeInExchangeRate')) if row.get(
+            'changeInExchangeRate') != "None" else None
         net_income = int(row.get('netIncome')) if row.get('netIncome') != "None" else None
 
         id_suffix = fiscal_date_ending or today
@@ -578,7 +622,8 @@ def format_bulk_stocks_fundamental_cash_flow(ticker: str, df: pd.DataFrame) -> b
 
     return (("\n".join(lines)) + "\n").encode("utf-8")
 
-def ingest_stocks_fundamental_cash_flow(ticker: str, cutoff_days=3650) -> Response:
+
+def ingest_stocks_fundamental_cash_flow(ticker: str, cutoff_days=3650, index_suffix="latest") -> Response:
     es_url = os.environ.get('ELASTICSEARCH_URL')
     es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
     alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
@@ -598,34 +643,52 @@ def ingest_stocks_fundamental_cash_flow(ticker: str, cutoff_days=3650) -> Respon
             'Authorization': f'ApiKey {es_api_key}',
             'Content-Type': 'application/x-ndjson'
         },
-        data=format_bulk_stocks_fundamental_cash_flow(ticker, ticker_recent_cash_flow)
+        data=format_bulk_stocks_fundamental_cash_flow(ticker, ticker_recent_cash_flow, index_suffix)
     )
 
-def format_bulk_stocks_fundamental_earnings_estimates(ticker: str, df: pd.DataFrame) -> bytes:
 
+def format_bulk_stocks_fundamental_earnings_estimates(ticker: str, df: pd.DataFrame, index_suffix:str) -> bytes:
     today = datetime.now().strftime('%Y-%m-%d')
-    index_name = f"quant-agents_stocks-fundamental-estimated-earnings_{today}"
+    index_name = f"quant-agents_stocks-fundamental-estimated-earnings_{index_suffix}"
     lines = []
 
     for _, row in df.iterrows():
         date = row.get('date').strftime('%Y-%m-%d')
         horizon = row.get('horizon')
-        eps_estimate_average = float(row.get('eps_estimate_average')) if row.get('eps_estimate_average') is not None else None
+        eps_estimate_average = float(row.get('eps_estimate_average')) if row.get(
+            'eps_estimate_average') is not None else None
         eps_estimate_high = float(row.get('eps_estimate_high')) if row.get('eps_estimate_high') is not None else None
         eps_estimate_low = float(row.get('eps_estimate_low')) if row.get('eps_estimate_low') is not None else None
-        eps_estimate_analyst_count = float(row.get('eps_estimate_analyst_count')) if row.get('eps_estimate_analyst_count') is not None else None
-        eps_estimate_average_7_days_ago = float(row.get('eps_estimate_average_7_days_ago')) if row.get('eps_estimate_average_7_days_ago') is not None else None
-        eps_estimate_average_30_days_ago = float(row.get('eps_estimate_average_30_days_ago')) if row.get('eps_estimate_average_30_days_ago') is not None else None
-        eps_estimate_average_60_days_ago = float(row.get('eps_estimate_average_60_days_ago')) if row.get('eps_estimate_average_60_days_ago') is not None else None
-        eps_estimate_average_90_days_ago = float(row.get('eps_estimate_average_90_days_ago')) if row.get('eps_estimate_average_90_days_ago') is not None else None
-        eps_estimate_revision_up_trailing_7_days = float(row.get('eps_estimate_revision_up_trailing_7_days')) if row.get('eps_estimate_revision_up_trailing_7_days') is not None else None
-        eps_estimate_revision_down_trailing_7_days = float(row.get('eps_estimate_revision_down_trailing_7_days')) if row.get('eps_estimate_revision_down_trailing_7_days') is not None else None
-        eps_estimate_revision_up_trailing_30_days = float(row.get('eps_estimate_revision_up_trailing_30_days')) if row.get('eps_estimate_revision_up_trailing_30_days') is not None else None
-        eps_estimate_revision_down_trailing_30_days = float(row.get('eps_estimate_revision_down_trailing_30_days')) if row.get('eps_estimate_revision_down_trailing_30_days') is not None else None
-        revenue_estimate_average = float(row.get('revenue_estimate_average')) if row.get('revenue_estimate_average') is not None else None
-        revenue_estimate_high = float(row.get('revenue_estimate_high')) if row.get('revenue_estimate_high') is not None else None
-        revenue_estimate_low = float(row.get('revenue_estimate_low')) if row.get('revenue_estimate_low') is not None else None
-        revenue_estimate_analyst_count = float(row.get('revenue_estimate_analyst_count')) if row.get('revenue_estimate_analyst_count') is not None else None
+        eps_estimate_analyst_count = float(row.get('eps_estimate_analyst_count')) if row.get(
+            'eps_estimate_analyst_count') is not None else None
+        eps_estimate_average_7_days_ago = float(row.get('eps_estimate_average_7_days_ago')) if row.get(
+            'eps_estimate_average_7_days_ago') is not None else None
+        eps_estimate_average_30_days_ago = float(row.get('eps_estimate_average_30_days_ago')) if row.get(
+            'eps_estimate_average_30_days_ago') is not None else None
+        eps_estimate_average_60_days_ago = float(row.get('eps_estimate_average_60_days_ago')) if row.get(
+            'eps_estimate_average_60_days_ago') is not None else None
+        eps_estimate_average_90_days_ago = float(row.get('eps_estimate_average_90_days_ago')) if row.get(
+            'eps_estimate_average_90_days_ago') is not None else None
+        eps_estimate_revision_up_trailing_7_days = float(
+            row.get('eps_estimate_revision_up_trailing_7_days')) if row.get(
+            'eps_estimate_revision_up_trailing_7_days') is not None else None
+        eps_estimate_revision_down_trailing_7_days = float(
+            row.get('eps_estimate_revision_down_trailing_7_days')) if row.get(
+            'eps_estimate_revision_down_trailing_7_days') is not None else None
+        eps_estimate_revision_up_trailing_30_days = float(
+            row.get('eps_estimate_revision_up_trailing_30_days')) if row.get(
+            'eps_estimate_revision_up_trailing_30_days') is not None else None
+        eps_estimate_revision_down_trailing_30_days = float(
+            row.get('eps_estimate_revision_down_trailing_30_days')) if row.get(
+            'eps_estimate_revision_down_trailing_30_days') is not None else None
+        revenue_estimate_average = float(row.get('revenue_estimate_average')) if row.get(
+            'revenue_estimate_average') is not None else None
+        revenue_estimate_high = float(row.get('revenue_estimate_high')) if row.get(
+            'revenue_estimate_high') is not None else None
+        revenue_estimate_low = float(row.get('revenue_estimate_low')) if row.get(
+            'revenue_estimate_low') is not None else None
+        revenue_estimate_analyst_count = float(row.get('revenue_estimate_analyst_count')) if row.get(
+            'revenue_estimate_analyst_count') is not None else None
 
         id_suffix = date or today
         id_str = f"{ticker}_{id_suffix}"
@@ -659,7 +722,8 @@ def format_bulk_stocks_fundamental_earnings_estimates(ticker: str, df: pd.DataFr
 
     return (("\n".join(lines)) + "\n").encode("utf-8")
 
-def ingest_stocks_fundamental_earnings_estimates(ticker: str, cutoff_days=3650) -> Response:
+
+def ingest_stocks_fundamental_earnings_estimates(ticker: str, cutoff_days=3650, index_suffix="latest") -> Response:
     es_url = os.environ.get('ELASTICSEARCH_URL')
     es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
     alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
@@ -679,5 +743,5 @@ def ingest_stocks_fundamental_earnings_estimates(ticker: str, cutoff_days=3650) 
             'Authorization': f'ApiKey {es_api_key}',
             'Content-Type': 'application/x-ndjson'
         },
-        data=format_bulk_stocks_fundamental_earnings_estimates(ticker, ticker_recent_earnings_estimates)
+        data=format_bulk_stocks_fundamental_earnings_estimates(ticker, ticker_recent_earnings_estimates, index_suffix)
     )
