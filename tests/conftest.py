@@ -56,10 +56,6 @@ def setup_postgres():
         "?", "agent_lab_checkpoints"
     )
     vectors_db_command = create_database_command.replace("?", "agent_lab_vectors")
-    copy_dump_command = "cp /mnt/integration/pgvector_dump.sql.gz /tmp/ && gunzip /tmp/pgvector_dump.sql.gz"
-    restore_dump_command = (
-        f"{psql_command} -d agent_lab_vectors < /tmp/pgvector_dump.sql"
-    )
 
     postgres.exec(
         [
@@ -68,10 +64,8 @@ def setup_postgres():
             f"""
                 {main_db_command} &&
                 {checkpoints_db_command} &&
-                {vectors_db_command} &&
-                {copy_dump_command} &&
-                {restore_dump_command}
-                """,
+                {vectors_db_command}
+            """,
         ]
     )
 

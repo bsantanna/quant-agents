@@ -7,3 +7,6 @@ test:
 
 lint:
 	python -m flake8 .
+
+setup:
+	bash -c 'cd terraform/elasticsearch && terraform init && terraform plan && terraform apply'
