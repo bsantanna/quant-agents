@@ -140,3 +140,99 @@ def get_adx(
     df_adx['returns'] = np.log(df_adx['val_close'] / df_adx['val_close'].shift(1))
     df_adx['strategy'] = df_adx['position'].shift(1) * df_adx['returns']
     return df_adx, get_crossovers(df_adx)
+
+
+def get_cci(
+        df: pd.DataFrame,
+        period: int = 14,
+        constant: float = 0.015
+) -> (pd.DataFrame, pd.DataFrame):
+    # Reference: https://www.fmlabs.com/reference/default.htm?url=CCI.htm
+    df_cci = df.copy()
+
+    # Calculate Typical Price (TP)
+    df_cci['tp'] = (df_cci['val_high'] + df_cci['val_low'] + df_cci['val_close']) / 3
+
+    # Calculate ATP (Simple Moving Average of TP)
+    df_cci['atp'] = df_cci['tp'].rolling(window=period).mean()
+
+    # Calculate Mean Deviation (MD)
+    df_cci['dev'] = abs(df_cci['tp'] - df_cci['atp'])
+    df_cci['md'] = df_cci['dev'].rolling(window=period).mean()
+
+    # Calculate CCI
+    df_cci['cci'] = (df_cci['tp'] - df_cci['atp']) / (constant * df_cci['md'])
+    df_cci['position'] = np.where(df_cci['cci'] < -100, 1, np.where(df_cci['cci'] > 100, -1, 1))
+    df_cci['returns'] = np.log(df_cci['val_close'] / df_cci['val_close'].shift(1))
+    df_cci['strategy'] = df_cci['position'].shift(1) * df_cci['returns']
+    df_cci.dropna(inplace=True)
+    return df_cci, get_crossovers(df_cci)
+
+
+def get_aroon(
+        df: pd.DataFrame,
+        period: int = 14,
+) -> (pd.DataFrame, pd.DataFrame):
+    # Reference https://www.fmlabs.com/reference/default.htm?url=Aroon.htm
+    df_aroon = df.copy()
+    # Calculate Periods Since Highest High
+    df_aroon['periods_since_hh'] = df_aroon['val_high'].rolling(window=period).apply(
+        lambda x: len(x) - 1 - np.argmax(x), raw=True
+    )
+
+    # Calculate Periods Since Lowest Low
+    df_aroon['periods_since_ll'] = df_aroon['val_low'].rolling(window=period).apply(lambda x: len(x) - 1 - np.argmin(x),
+                                                                                    raw=True)
+    # Calculate Aroon Up and Aroon Down
+    df_aroon['aroon_up'] = 100 * (period - df_aroon['periods_since_hh']) / period
+    df_aroon['aroon_down'] = 100 * (period - df_aroon['periods_since_ll']) / period
+    df_aroon['position'] = np.where(
+        (df_aroon['aroon_up'] > 70) & (df_aroon['aroon_down'] < 30), 1,
+        np.where((df_aroon['aroon_down'] > 70) & (df_aroon['aroon_up'] < 30), -1, 1)
+    )
+    df_aroon['returns'] = np.log(df_aroon['val_close'] / df_aroon['val_close'].shift(1))
+    df_aroon['strategy'] = df_aroon['position'].shift(1) * df_aroon['returns']
+    df_aroon.dropna(inplace=True)
+    return df_aroon, get_crossovers(df_aroon)
+
+
+def get_bbands(
+        df: pd.DataFrame,
+        period: int = 14,
+        std_dev: int = 2
+) -> pd.DataFrame:
+    # Reference: https://www.fmlabs.com/reference/default.htm?url=Bollinger.htm
+    df_bbands = df.copy()
+    # Calculate Typical Price (TP)
+    df_bbands['tp'] = (df_bbands['val_high'] + df_bbands['val_low'] + df_bbands['val_close']) / 3
+
+    # Calculate Middle Band (SMA of TP)
+    df_bbands['middle_band'] = df_bbands['tp'].rolling(window=period).mean()
+
+    # Calculate Standard Deviation of TP
+    df_bbands['sd'] = df_bbands['tp'].rolling(window=period).std()
+
+    # Calculate Upper and Lower Bands
+    df_bbands['upper_band'] = df_bbands['middle_band'] + (std_dev * df_bbands['sd'])
+    df_bbands['lower_band'] = df_bbands['middle_band'] - (std_dev * df_bbands['sd'])
+
+    # Calculate Band Width (%)
+    df_bbands['band_width'] = ((df_bbands['upper_band'] - df_bbands['lower_band']) / df_bbands['middle_band']) * 100
+    df_bbands['prev_close'] = df_bbands['val_close'].shift(1)
+    df_bbands['prev_middle'] = df_bbands['middle_band'].shift(1)
+    df_bbands['position'] = 0
+    # Bullish: Price was below lower, now crosses above middle
+    df_bbands['position'] = np.where(
+        (df_bbands['prev_close'] < df_bbands['lower_band']) &
+        (df_bbands['prev_close'] < df_bbands['prev_middle']) &
+        (df_bbands['val_close'] > df_bbands['middle_band']), 1, df_bbands['position']
+    )
+    # Bearish: Price was above upper, now crosses below middle
+    df_bbands['position'] = np.where(
+        (df_bbands['prev_close'] > df_bbands['upper_band']) &
+        (df_bbands['prev_close'] > df_bbands['prev_middle']) &
+        (df_bbands['val_close'] < df_bbands['middle_band']), -1, df_bbands['position']
+    )
+    df_bbands.dropna(inplace=True)
+
+    return df_bbands
