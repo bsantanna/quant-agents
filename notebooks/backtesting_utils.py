@@ -236,3 +236,29 @@ def get_bbands(
     df_bbands.dropna(inplace=True)
 
     return df_bbands
+
+
+def get_ad(
+        df: pd.DataFrame,
+) -> (pd.DataFrame, pd.DataFrame):
+    # Reference: https://www.fmlabs.com/reference/default.htm?url=AccumDist.htm
+    df_ad = df.copy()
+    # Calculate Close Location Value (CLV)
+    df_ad['clv'] = ((df_ad['val_close'] - df_ad['val_low']) - (df_ad['val_high'] - df_ad['val_close'])) / (
+            df_ad['val_high'] - df_ad['val_low'])
+
+    # Handle division by zero or NaN (if high == low)
+    df_ad['clv'] = df_ad['clv'].fillna(0)
+
+    # Calculate daily A/D contribution (CLV * volume)
+    df_ad['ad_contrib'] = df_ad['clv'] * df_ad['val_volume']
+
+    # Calculate Accumulation/Distribution Line (cumulative sum)
+    df_ad['ad_line'] = df_ad['ad_contrib'].cumsum()
+    df_ad['ad_change'] = df_ad['ad_line'].diff()
+    df_ad['position'] = np.where(df_ad['ad_change'] > 0, 1, np.where(df_ad['ad_change'] < 0, -1, 0))
+    df_ad['returns'] = np.log(df_ad['val_close'] / df_ad['val_close'].shift(1))
+    df_ad['strategy'] = df_ad['position'].shift(1) * df_ad['returns']
+    # Drop NaN rows (if any from initial data)
+    df_ad.dropna(inplace=True)
+    return df_ad, get_crossovers(df_ad)
