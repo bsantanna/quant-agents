@@ -1,6 +1,9 @@
 
 # Run before apply:
 # terraform import kubectl_manifest.kibana "kibana.k8s.elastic.co/v1//Kibana//kibana//default"
+#
+# Access with:
+# https://<kibana_fqdn>/app/dashboards?auth_provider_hint=anonymous1#/view/<dashboard>
 
 terraform {
   required_providers {
@@ -69,7 +72,7 @@ resource "elasticstack_elasticsearch_security_role" "anonymous_dashboard_role" {
 
   applications {
     application = "kibana-.kibana"
-    privileges  = ["feature_dashboard.read", "feature_visualize.read"]  # Read-only for dashboards and visualizations
+    privileges  = ["feature_dashboard.read"]
     resources   = ["*"]
   }
 
