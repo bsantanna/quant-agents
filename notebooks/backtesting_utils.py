@@ -262,3 +262,32 @@ def get_ad(
     # Drop NaN rows (if any from initial data)
     df_ad.dropna(inplace=True)
     return df_ad, get_crossovers(df_ad)
+
+def get_obv(
+        df: pd.DataFrame,
+) -> (pd.DataFrame, pd.DataFrame):
+    # Reference https://www.fmlabs.com/reference/default.htm?url=OBV.htm
+    df_obv = df.copy()
+
+    # Calculate daily close change
+    df_obv['prev_close'] = df_obv['val_close'].shift(1)
+    df_obv['close_change'] = df_obv['val_close'] - df_obv['prev_close']
+
+    # Calculate signed volume: +volume if up, -volume if down, 0 if flat
+    df_obv['signed_volume'] = np.where(
+        df_obv['close_change'] > 0, df_obv['val_volume'],
+        np.where(df_obv['close_change'] < 0, -df_obv['val_volume'], 0)
+    )
+
+    # Calculate OBV (cumulative sum of signed volume)
+    df_obv['obv'] = df_obv['signed_volume'].cumsum()
+
+    # Generate positions for the strategy (1 for up OBV, -1 for down, 0 flat)
+    df_obv['obv_change'] = df_obv['obv'].diff()
+    df_obv['position'] = np.where(df_obv['obv_change'] > 0, 1, np.where(df_obv['obv_change'] < 0, -1, 0))
+    df_obv['returns'] = np.log(df_obv['val_close'] / df_obv['val_close'].shift(1))
+    df_obv['strategy'] = df_obv['position'].shift(1) * df_obv['returns']
+    # Drop NaN rows (initial prev_close is NaN)
+    df_obv.dropna(inplace=True)
+
+    return df_obv, get_crossovers(df_obv)
