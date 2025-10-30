@@ -263,6 +263,7 @@ def get_ad(
     df_ad.dropna(inplace=True)
     return df_ad, get_crossovers(df_ad)
 
+
 def get_obv(
         df: pd.DataFrame,
 ) -> (pd.DataFrame, pd.DataFrame):
@@ -291,3 +292,40 @@ def get_obv(
     df_obv.dropna(inplace=True)
 
     return df_obv, get_crossovers(df_obv)
+
+
+def get_macd(
+        df: pd.DataFrame,
+        short_period=7,
+        long_period=20,
+        signal_period=6
+) -> (pd.DataFrame, pd.DataFrame):
+    # Reference: https://www.fmlabs.com/reference/default.htm?url=MACD.htm
+    df_macd = df.copy()
+
+    # Calculate Short EMA (12-period)
+    df_macd['short_ema'] = df_macd['val_close'].ewm(span=short_period, adjust=False).mean()
+
+    # Calculate Long EMA (26-period)
+    df_macd['long_ema'] = df_macd['val_close'].ewm(span=long_period, adjust=False).mean()
+
+    # Calculate MACD Line
+    df_macd['macd'] = df_macd['short_ema'] - df_macd['long_ema']
+
+    # Calculate Signal Line (9-period EMA of MACD)
+    df_macd['signal'] = df_macd['macd'].ewm(span=signal_period, adjust=False).mean()
+
+    # Calculate Histogram
+    df_macd['histogram'] = df_macd['macd'] - df_macd['signal']
+
+    df_macd['prev_macd'] = df_macd['macd'].shift(1)
+    df_macd['prev_signal'] = df_macd['signal'].shift(1)
+    df_macd['position'] = np.where(
+        (df_macd['prev_macd'] < df_macd['prev_signal']) & (df_macd['macd'] > df_macd['signal']), 1,
+        np.where((df_macd['prev_macd'] > df_macd['prev_signal']) & (df_macd['macd'] < df_macd['signal']), -1, 1))
+    df_macd['returns'] = np.log(df_macd['val_close'] / df_macd['val_close'].shift(1))
+    df_macd['strategy'] = df_macd['position'].shift(1) * df_macd['returns']
+
+    # Drop NaN rows (due to ewm)
+    df_macd.dropna(inplace=True)
+    return df_macd, get_crossovers(df_macd)
