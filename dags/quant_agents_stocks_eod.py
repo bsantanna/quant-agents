@@ -25,7 +25,6 @@ def load_stocks_eod():
     import requests
     import json
     import pandas as pd
-    from datetime import datetime
 
     def format_bulk_stocks_eod(ticker: str, df: pd.DataFrame, index_suffix: str) -> bytes:
         index_name = f"quant-agents_stocks-eod_{index_suffix}"
