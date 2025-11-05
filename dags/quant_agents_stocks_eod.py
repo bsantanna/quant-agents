@@ -17,8 +17,9 @@ dag = DAG(
 )
 
 @task.kubernetes(
-    image="bsantanna/compute-document-utils",
-    namespace="compute",
+    image="bsantanna/java-python-dev",
+    namespace="quant-agents",
+    secrets="quant-agents-secrets",
 )
 def load_stocks_eod():
     import os
