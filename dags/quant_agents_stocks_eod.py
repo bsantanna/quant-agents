@@ -33,12 +33,12 @@ def load_stocks_eod():
 
         for _, row in df.iterrows():
 
-            date_reference = row.get('timestamp')
-            open_ = row.get('open')
-            close = row.get('close')
-            high = row.get('high')
-            low = row.get('low')
-            volume = row.get('volume')
+            date_reference = row.get('t').split('T')[0]
+            open_ = row.get('o')
+            close = row.get('c')
+            high = row.get('h')
+            low = row.get('l')
+            volume = row.get('v')
 
             if open_ is None or close is None:
                 continue
@@ -64,10 +64,17 @@ def load_stocks_eod():
     def ingest_stocks_eod(ticker: str, index_suffix="latest") -> requests.Response:
         es_url = os.environ.get('ELASTICSEARCH_URL')
         es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
-        alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
-        alpha_vantage_time_series_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={alpha_vantage_api_key}&datatype=csv"
 
-        ticker_daily_time_series = pd.read_csv(alpha_vantage_time_series_url)
+        now = datetime.now()
+        end = now.replace(day=now.day - 1)
+        start = now.replace(year=now.year - 1)
+        alpaca_time_series_url = f"https://data.alpaca.markets/v2/stocks/{ticker}/bars?timeframe=1D&start={start.strftime('%Y-%m-%d')}&end={end.strftime('%Y-%m-%d')}&adjustment=all"
+        response = requests.get(alpaca_time_series_url, headers={
+            "accept": "application/json",
+            "APCA-API-KEY-ID": os.environ.get('APCA-API-KEY-ID'),
+            "APCA-API-SECRET-KEY": os.environ.get('APCA-API-SECRET-KEY')
+        })
+        ticker_daily_time_series = pd.json_normalize(response.json().get('bars'))
 
         return requests.post(
             url=f"{es_url}/_bulk",
@@ -91,5 +98,5 @@ def load_stocks_eod():
 
 
 with dag:
-    load_stocks_eod
+    load_stocks_eod()
 
