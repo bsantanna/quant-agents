@@ -1,5 +1,5 @@
-from airflow import DAG
-from airflow.decorators import task
+from airflow.sdk import DAG, task  # Updated for Airflow 3.0+ compatibility
+from airflow.kubernetes.secret import Secret
 from datetime import datetime
 
 default_args = {
@@ -19,7 +19,7 @@ dag = DAG(
 @task.kubernetes(
     image="bsantanna/java-python-dev",
     namespace="quant-agents",
-    secrets="quant-agents-secrets",
+    secrets=[Secret('env', None, 'quant-agents-secrets')],
 )
 def load_stocks_eod():
     import os
@@ -99,4 +99,3 @@ def load_stocks_eod():
 
 with dag:
     load_stocks_eod()
-
