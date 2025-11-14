@@ -1,5 +1,5 @@
-from airflow.sdk import DAG, task  # Updated for Airflow 3.0+ compatibility
-from airflow.kubernetes.secret import Secret
+from airflow.sdk import DAG, task
+from airflow.providers.cncf.kubernetes.secret import Secret
 from datetime import datetime
 
 default_args = {
