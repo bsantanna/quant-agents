@@ -10,7 +10,7 @@ ENV WORKERS=1
 
 WORKDIR /agent-lab
 
-COPY requirements.txt /agent-lab/
+COPY ../../requirements.txt /agent-lab/
 RUN apt update -q && apt install -yq ffmpeg build-essential \
     && pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt \
@@ -21,7 +21,7 @@ RUN apt update -q && apt install -yq ffmpeg build-essential \
     && chown -R agent-lab:agent-lab /agent-lab
 
 USER agent-lab
-COPY app/ /agent-lab/app/
-COPY config-docker.yml /agent-lab/
+COPY ../../app /agent-lab/app/
+COPY ../../config-docker.yml /agent-lab/
 
 CMD ["/bin/bash", "-x", "-c", "python -m uvicorn app.main:app --host ${HOST} --port ${PORT} --workers ${WORKERS}"]

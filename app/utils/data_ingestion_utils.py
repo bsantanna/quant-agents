@@ -6,18 +6,18 @@ from datetime import datetime
 from requests import Response
 
 
-def format_bulk_stocks_eod(ticker: str, df: pd.DataFrame, index_suffix: str) -> bytes:
+def format_bulk_stocks_eod(ticker: str, df: pd.DataFrame, index_suffix: str, source: str) -> bytes:
     index_name = f"quant-agents_stocks-eod_{index_suffix}"
     lines = []
 
     for _, row in df.iterrows():
 
-        date_reference = row.get('timestamp')
-        open_ = row.get('open')
-        close = row.get('close')
-        high = row.get('high')
-        low = row.get('low')
-        volume = row.get('volume')
+        date_reference = row.get('timestamp') if source == "alphavantage" else row.get('t').split('T')[0]
+        open_ = row.get('open') if source == "alphavantage" else row.get('o')
+        close = row.get('close') if source == "alphavantage" else row.get('c')
+        high = row.get('high') if source == "alphavantage" else row.get('h')
+        low = row.get('low') if source == "alphavantage" else row.get('l')
+        volume = row.get('volume') if source == "alphavantage" else row.get('v')
 
         if open_ is None or close is None:
             continue
@@ -41,13 +41,30 @@ def format_bulk_stocks_eod(ticker: str, df: pd.DataFrame, index_suffix: str) -> 
     return (("\n".join(lines)) + "\n").encode("utf-8")
 
 
-def ingest_stocks_eod(ticker: str, index_suffix="latest") -> Response:
+def ingest_stocks_eod(ticker: str, index_suffix="latest", source="alpaca") -> Response:
     es_url = os.environ.get('ELASTICSEARCH_URL')
     es_api_key = os.environ.get('ELASTICSEARCH_API_KEY')
-    alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
-    alpha_vantage_time_series_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={alpha_vantage_api_key}&datatype=csv"
 
-    ticker_daily_time_series = pd.read_csv(alpha_vantage_time_series_url)
+    ticker_daily_time_series = None
+
+    if source == "alpaca":
+        now = datetime.now()
+        yesterday = now.replace(day=now.day - 1)
+        back_one_year = now.replace(year=now.year - 1)
+        alpaca_api_key = os.environ.get('APCA-API-KEY-ID')
+        alpaca_api_secret = os.environ.get('APCA-API-SECRET-KEY')
+        alpaca_time_series_url = f"https://data.alpaca.markets/v2/stocks/{ticker}/bars?timeframe=1D&start={back_one_year.strftime('%Y-%m-%d')}&end={yesterday.strftime('%Y-%m-%d')}&adjustment=all"
+        response = requests.get(alpaca_time_series_url, headers={
+            "accept": "application/json",
+            "APCA-API-KEY-ID": alpaca_api_key,
+            "APCA-API-SECRET-KEY": alpaca_api_secret
+        })
+        ticker_daily_time_series = pd.json_normalize(response.json().get('bars'))
+
+    elif source == "alphavantage":
+        alpha_vantage_api_key = os.environ.get('ALPHAVANTAGE_API_KEY')
+        alpha_vantage_time_series_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={alpha_vantage_api_key}&datatype=csv"
+        ticker_daily_time_series = pd.read_csv(alpha_vantage_time_series_url)
 
     return requests.post(
         url=f"{es_url}/_bulk",
@@ -55,7 +72,7 @@ def ingest_stocks_eod(ticker: str, index_suffix="latest") -> Response:
             'Authorization': f'ApiKey {es_api_key}',
             'Content-Type': 'application/x-ndjson'
         },
-        data=format_bulk_stocks_eod(ticker, ticker_daily_time_series, index_suffix)
+        data=format_bulk_stocks_eod(ticker, ticker_daily_time_series, index_suffix, source)
     )
 
 
@@ -647,7 +664,7 @@ def ingest_stocks_fundamental_cash_flow(ticker: str, cutoff_days=3650, index_suf
     )
 
 
-def format_bulk_stocks_fundamental_earnings_estimates(ticker: str, df: pd.DataFrame, index_suffix:str) -> bytes:
+def format_bulk_stocks_fundamental_earnings_estimates(ticker: str, df: pd.DataFrame, index_suffix: str) -> bytes:
     today = datetime.now().strftime('%Y-%m-%d')
     index_name = f"quant-agents_stocks-fundamental-estimated-earnings_{index_suffix}"
     lines = []
