@@ -103,3 +103,22 @@ resource "elasticstack_kibana_import_saved_objects" "data_view" {
   overwrite = true
 }
 
+data "local_file" "stocks_eod_visualizations_ndjson" {
+  filename = "${path.module}/stocks_eod_visualizations.ndjson"
+}
+
+resource "elasticstack_kibana_import_saved_objects" "visualizations" {
+  file_contents = data.local_file.stocks_eod_visualizations_ndjson.content
+  space_id  = "default"
+  overwrite = true
+}
+
+data "local_file" "stocks_eod_dashboard_ndjson" {
+  filename = "${path.module}/stocks_eod_dashboard.ndjson"
+}
+
+resource "elasticstack_kibana_import_saved_objects" "dashboard" {
+  file_contents = data.local_file.stocks_eod_dashboard_ndjson.content
+  space_id  = "default"
+  overwrite = true
+}
