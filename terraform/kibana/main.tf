@@ -111,6 +111,7 @@ resource "elasticstack_kibana_import_saved_objects" "visualizations" {
   file_contents = data.local_file.stocks_eod_visualizations_ndjson.content
   space_id  = "default"
   overwrite = true
+  depends_on = [elasticstack_kibana_import_saved_objects.data_view]
 }
 
 data "local_file" "stocks_eod_dashboard_ndjson" {
@@ -121,4 +122,5 @@ resource "elasticstack_kibana_import_saved_objects" "dashboard" {
   file_contents = data.local_file.stocks_eod_dashboard_ndjson.content
   space_id  = "default"
   overwrite = true
+  depends_on = [elasticstack_kibana_import_saved_objects.visualizations]
 }
