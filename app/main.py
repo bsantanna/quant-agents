@@ -7,7 +7,8 @@ from fastapi.security import HTTPBearer
 from fastapi_keycloak_middleware import KeycloakConfiguration, setup_keycloak_middleware
 from fastapi_mcp import FastApiMCP, AuthConfig
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, FileResponse
+from starlette.staticfiles import StaticFiles
 
 from app.core.container import Container
 from app.infrastructure.auth.user import map_user
@@ -42,6 +43,7 @@ def create_app():
     setup_mcp(container, application)
     setup_exception_handlers(application)
     setup_middleware(application)
+    setup_static_files(application)
 
     return application
 
@@ -150,5 +152,11 @@ def setup_middleware(application: FastAPI):
         LoggingMiddleware,
     )
 
+def setup_static_files(application: FastAPI):
+    application.mount(
+        path="/",
+        app=StaticFiles(directory="app/static/frontend/browser", html=True),
+        name="angular"
+    )
 
 app = create_app()

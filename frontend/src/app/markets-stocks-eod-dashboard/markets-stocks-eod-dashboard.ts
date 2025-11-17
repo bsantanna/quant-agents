@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import {Component, computed, inject} from '@angular/core';
+import {ActivatedRoute, ParamMap} from '@angular/router';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
 
@@ -28,7 +27,7 @@ export class MarketsStocksEodDashboard {
       'show-time-filter': 'true',
       'hide-filter-bar': 'true',
       '_g': '(refreshInterval:(pause:!t,value:60000),time:(from:now-100d,to:now))',
-      '_a':`(query:(language:kuery,query:'key_ticker:${symbol}'))`
+      '_a': `(query:(language:kuery,query:'key_ticker:${symbol}'))`
     });
 
     const fullUrl = `${baseUrl}?auth_provider_hint=anonymous1#/view/${dashboardId}?${queryParams.toString()}`;

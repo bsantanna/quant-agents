@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "rm -fr ../app/static/frontend || true && ng build && mv dist/frontend ../app/static/frontend",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
