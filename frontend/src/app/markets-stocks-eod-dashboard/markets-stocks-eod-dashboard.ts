@@ -2,11 +2,12 @@ import {Component, computed, inject, signal} from '@angular/core';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import { StockInfoHeader } from './stock-info-header/stock-info-header';
 
 
 @Component({
   selector: 'app-markets-stocks-eod-dashboard',
-  imports: [],
+  imports: [StockInfoHeader],
   templateUrl: './markets-stocks-eod-dashboard.html',
   styleUrl: './markets-stocks-eod-dashboard.scss',
 })
