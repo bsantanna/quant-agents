@@ -16,17 +16,19 @@ export class MarketsStocksEodDashboard {
 
   private readonly paramMap = toSignal<ParamMap>(this.route.paramMap);
   readonly keyTicker = computed(() => this.paramMap()?.get('keyTicker') ?? '');
+  readonly interval = computed(() => this.paramMap()?.get('interval') ?? '');
 
   readonly kibanaUrl = computed<SafeResourceUrl>(() => {
     const symbol = encodeURIComponent(this.keyTicker());
+    const intervalInDays = this.interval();
     const baseUrl = 'https://kibana.bsantanna.me/app/dashboards';
     const dashboardId = '7d9d4835-fa56-4fd4-97e0-c74399045209';
 
     const queryParams = new URLSearchParams({
       embed: 'true',
-      'show-time-filter': 'true',
+      'show-time-filter': 'false',
       'hide-filter-bar': 'true',
-      '_g': '(refreshInterval:(pause:!t,value:60000),time:(from:now-100d,to:now))',
+      '_g': `(refreshInterval:(pause:!t,value:60000),time:(from:now-${intervalInDays}d,to:now))`,
       '_a': `(query:(language:kuery,query:'key_ticker:${symbol}'))`
     });
 
