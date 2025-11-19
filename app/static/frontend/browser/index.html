@@ -1,13 +1,38 @@
 <!doctype html>
 <html lang="en" data-beasties-container>
 <head>
-  <meta charset="utf-8">
-  <title>Frontend</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-<style>html,body{background-color:#07101f}</style><link rel="stylesheet" href="styles-RJ2YPUGJ.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles-RJ2YPUGJ.css"></noscript></head>
+    <meta charset="utf-8">
+    <title>Frontend</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.tailwindcss.com?@4"></script>
+
+    <script>
+        tailwind.config = {
+            content: [],
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'hsl(var(--primary))',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+                    }
+                }
+            },
+            plugins: [
+                '@tailwindcss/forms',
+                '@tailwindcss/typography',
+                '@tailwindcss/aspect-ratio',
+                '@tailwindcss/ui'
+            ]
+        }
+    </script>
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+<style>html,body{background-color:#191c2d}</style><link rel="stylesheet" href="styles-ICE2SCNY.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles-ICE2SCNY.css"></noscript></head>
 <body>
-  <app-root></app-root>
-<script src="main-WGPH624B.js" type="module"></script></body>
+<app-root></app-root>
+<script src="main-2GW4PTAZ.js" type="module"></script></body>
 </html>

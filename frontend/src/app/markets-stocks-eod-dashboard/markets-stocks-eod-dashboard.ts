@@ -1,4 +1,4 @@
-import {Component, computed, inject} from '@angular/core';
+import {Component, computed, inject, signal} from '@angular/core';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
@@ -16,7 +16,7 @@ export class MarketsStocksEodDashboard {
 
   private readonly paramMap = toSignal<ParamMap>(this.route.paramMap);
   readonly keyTicker = computed(() => this.paramMap()?.get('keyTicker') ?? '');
-  readonly interval = computed(() => this.paramMap()?.get('interval') ?? '');
+  readonly interval = signal<number>(100);
 
   readonly kibanaUrl = computed<SafeResourceUrl>(() => {
     const symbol = encodeURIComponent(this.keyTicker());
