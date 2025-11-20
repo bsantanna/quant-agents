@@ -27,6 +27,10 @@ async def get_most_recent_close(
     response = StatsClose(
         key_ticker=key_ticker,
         most_recent_close=result.get('most_recent_close'),
+        most_recent_open=result.get('most_recent_open'),
+        most_recent_high=result.get('most_recent_high'),
+        most_recent_low=result.get('most_recent_low'),
+        most_recent_volume=result.get('most_recent_volume'),
         most_recent_date=result.get('most_recent_date'),
         percent_variance=result.get('percent_variance'),
     )
