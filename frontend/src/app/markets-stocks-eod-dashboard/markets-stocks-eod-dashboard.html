@@ -1,16 +1,20 @@
 <main class="mx-auto max-w-7xl sm:px-6 lg:px-8">
   <section>
-    <app-stock-info-header></app-stock-info-header>
+    <app-stock-info-header
+        [indexName]="'quant-agents_stocks-eod_latest'"
+        [keyTicker]="keyTicker()"
+    ></app-stock-info-header>
   </section>
 
-  <section class="grid grid-cols-1 lg:grid-cols-[80%_20%] gap-4 overflow-hidden">
+<!--  <section class="grid grid-cols-1 lg:grid-cols-[80%_20%] gap-4 overflow-hidden">-->
     <div>
       @if (kibanaUrl()) {
         <iframe [src]="kibanaUrl()" class="w-full border-none"></iframe>
       }
     </div>
-    <div>
-      <p>Additional content goes here.</p>
-    </div>
-  </section>
+<!--    <div>-->
+<!--      <p>Additional content goes here.</p>-->
+<!--    </div>-->
+<!--  </section>-->
+
 </main>

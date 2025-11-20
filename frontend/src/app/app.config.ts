@@ -2,11 +2,13 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessC
 import {provideRouter, withHashLocation} from '@angular/router';
 
 import { routes } from './app.routes';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes, withHashLocation())
+    provideRouter(routes, withHashLocation()),
+    provideHttpClient(withInterceptorsFromDi()),
   ]
 };
