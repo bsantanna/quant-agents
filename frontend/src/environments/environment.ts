@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:18000'
+  apiBaseUrl: 'http://moon.btech.software:18000'
 };

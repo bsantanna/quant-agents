@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'http://moon.btech.software:18000'
+  apiBaseUrl: 'https://finance.bsantanna.me'
 };

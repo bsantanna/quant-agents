@@ -3,10 +3,11 @@ import {MarketsStatsService} from '../../services/markets-stats.service';
 import {StatsClose} from '../../models/markets.model';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {combineLatest, switchMap} from 'rxjs';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-stock-info-header',
-  imports: [],
+  imports: [DecimalPipe],
   templateUrl: './stock-info-header.html',
   styleUrl: './stock-info-header.scss',
 })
