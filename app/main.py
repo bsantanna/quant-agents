@@ -68,6 +68,7 @@ def setup_auth(container, application):
                 "/openapi.json",
                 "/status/*",
                 ".well-known/*",
+                "/markets/*",
             ],
             user_mapper=map_user,
         )
