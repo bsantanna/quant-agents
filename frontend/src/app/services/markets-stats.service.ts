@@ -16,7 +16,7 @@ export class MarketsStatsService {
     most_recent_close: 0,
     most_recent_date: '',
     percent_variance: 0,
-  } as StatsClose;
+  };
 
   constructor(private http: HttpClient) {
   }
