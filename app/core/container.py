@@ -2,6 +2,7 @@ import os
 
 import hvac
 from dependency_injector import containers, providers
+from elasticsearch import Elasticsearch
 
 from app.domain.repositories.agents import AgentRepository, AgentSettingRepository
 from app.domain.repositories.attachments import AttachmentRepository
@@ -48,6 +49,7 @@ class Container(containers.DeclarativeContainer):
             "app.interface.api.auth.endpoints",
             "app.interface.api.integrations.endpoints",
             "app.interface.api.language_models.endpoints",
+            "app.interface.api.markets.endpoints",
             "app.interface.api.messages.endpoints",
         ]
     )
@@ -91,6 +93,12 @@ class Container(containers.DeclarativeContainer):
         os.environ["TAVILY_API_KEY"] = app_secrets["data"]["data"]["tavily_api_key"]
 
     db = providers.Singleton(Database, db_url=config.db.url)
+
+    es = providers.Singleton(
+        Elasticsearch,
+        hosts=[os.getenv("ELASTICSEARCH_URL")],
+        api_key=os.getenv("ELASTICSEARCH_API_KEY"),
+    )
 
     graph_persistence_factory = providers.Singleton(
         GraphPersistenceFactory, db_checkpoints=config.db.checkpoints

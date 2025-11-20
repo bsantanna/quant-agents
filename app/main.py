@@ -18,6 +18,7 @@ from app.interface.api.attachments.endpoints import router as attachments_router
 from app.interface.api.auth.endpoints import router as auth_router
 from app.interface.api.integrations.endpoints import router as integrations_router
 from app.interface.api.language_models.endpoints import router as language_models_router
+from app.interface.api.markets.endpoints import router as markets_router
 from app.interface.api.messages.endpoints import router as messages_router
 from app.interface.api.status.endpoints import router as status_router
 
@@ -114,6 +115,7 @@ def setup_routers(container: Container, application: FastAPI):
         integrations_router, prefix="/integrations", tags=["integrations"]
     )
     application.include_router(language_models_router, prefix="/llms", tags=["llms"])
+    application.include_router(markets_router, prefix="/markets", tags=["markets"])
     application.include_router(messages_router, prefix="/messages", tags=["messages"])
     application.include_router(status_router, prefix="/status", tags=["status"])
 
