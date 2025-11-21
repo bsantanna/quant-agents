@@ -4,15 +4,18 @@ import { PageTerms } from './page-terms/page-terms';
 
 export const routes: Routes = [
   {
+    title: 'Markets',
     path: 'markets',
     children: [
       {
+        title: 'Performance Charts',
         path: 'stocks-eod-dashboard/:keyTicker',
         component: MarketsStocksEodDashboard
       }
     ]
   },
-  { 
+  {
+    title: 'Terms of Service',
     path: 'terms',
     component: PageTerms
   },
