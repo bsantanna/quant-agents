@@ -22,7 +22,9 @@ export class MarketsStocksEodDashboard {
   readonly kibanaUrl = computed<SafeResourceUrl>(() => {
     const symbol = encodeURIComponent(this.keyTicker());
     const baseUrl = 'https://kibana.bsantanna.me/app/dashboards';
-    const dashboardId = '7d9d4835-fa56-4fd4-97e0-c74399045209';
+    const dashboardId = this.intervalInDays() > 30 
+    ? '16c3228b-0831-442d-ae18-3a2cf4700792' 
+    : 'f24f0eea-d8e5-4721-9057-9395daf7c931';
 
     const queryParams = new URLSearchParams({
       embed: 'true',
