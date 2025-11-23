@@ -2,10 +2,11 @@ import {Component, inject, Signal} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {filter, map} from 'rxjs';
 import {NavigationEnd, Router} from '@angular/router';
+import {StockAutocompleteComponent} from '../components/stock-autocomplete/stock-autocomplete';
 
 @Component({
   selector: 'app-navigation-header',
-  imports: [],
+  imports: [StockAutocompleteComponent],
   templateUrl: './navigation-header.html',
   styleUrl: './navigation-header.scss',
 })
@@ -42,6 +43,11 @@ export class NavigationHeader {
       { initialValue: '' }
     );
   
+  }
+
+  onStockSelected(stock: any): void {
+    console.log('Stock selected:', stock);
+    // Handle stock selection here (e.g., navigate to stock page, fetch data, etc.)
   }
 
 }

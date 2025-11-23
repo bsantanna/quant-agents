@@ -1,0 +1,75 @@
+<div class="relative w-full">
+  <!-- Search Input -->
+  <div class="relative flex items-center">
+    <!-- Search Icon -->
+    <svg
+      class="pointer-events-none absolute left-3 size-5 text-white/50"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
+        clip-rule="evenodd"
+        fill-rule="evenodd"
+      />
+    </svg>
+
+    <!-- Input Field -->
+    <input
+      type="text"
+      [value]="searchQuery()"
+      (input)="onSearch($event)"
+      (focus)="onInputFocus()"
+      (blur)="onInputBlur()"
+      placeholder="Search stocks (e.g., NVDA, GOOG)"
+      class="block w-full rounded-md bg-slate-700/50 py-1.5 pr-10 pl-10 text-base text-white outline-1 -outline-offset-1 outline-slate-400/25 placeholder:text-white/50 focus:outline-2 focus:-outline-offset-2 focus:outline-white sm:text-sm/6 transition-all duration-150"
+    />
+
+    <!-- Clear Button -->
+    @if (searchQuery().length > 0) {
+      <button
+        (click)="onClearSearch()"
+        class="absolute right-3 inline-flex items-center justify-center rounded-full p-0.5 text-white/50 hover:text-white hover:bg-slate-600/50 transition-all duration-150"
+        aria-label="Clear search"
+      >
+        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            d="M6.707 6.707a1 1 0 0 0-1.414 1.414L8.586 10l-3.293 3.293a1 1 0 1 0 1.414 1.414L10 11.414l3.293 3.293a1 1 0 0 0 1.414-1.414L11.414 10l3.293-3.293a1 1 0 0 0-1.414-1.414L10 8.586 6.707 6.707Z"
+          />
+        </svg>
+      </button>
+    }
+  </div>
+
+  <!-- Dropdown Menu -->
+  @if (isOpen() && filteredStocks().length > 0) {
+    <div
+      class="absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-md border border-slate-400/25 bg-slate-800 shadow-lg z-50"
+    >
+      @for (stock of filteredStocks(); track stock.key_ticker) {
+        <button
+          (click)="onSelectStock(stock)"
+          class="block w-full px-4 py-2.5 text-left text-sm text-white hover:bg-slate-700/75 focus:bg-slate-700/75 focus:outline-none transition-colors duration-100 first:rounded-t-md last:rounded-b-md border-b border-slate-700/50 last:border-b-0"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex flex-col">
+              <span class="font-semibold text-white">{{ stock.key_ticker }}</span>
+              <span class="text-xs text-white/60">{{ stock.name }}</span>
+            </div>
+            <span class="text-xs text-white/40 ml-2">{{ stock.index }}</span>
+          </div>
+        </button>
+      }
+    </div>
+  }
+
+  <!-- No Results Message -->
+  @if (isOpen() && searchQuery().length > 0 && filteredStocks().length === 0) {
+    <div
+      class="absolute top-full left-0 right-0 mt-1 rounded-md border border-slate-400/25 bg-slate-800 px-4 py-3 text-center text-sm text-white/60"
+    >
+      No stocks found for "{{ searchQuery() }}"
+    </div>
+  }
+</div>
