@@ -15,6 +15,8 @@ export class NavigationHeader {
 
   readonly title!: Signal<string>;
 
+  readonly path!: Signal<string>;
+
   constructor() {
     this.title = toSignal(
       this.router.events.pipe(
@@ -27,6 +29,19 @@ export class NavigationHeader {
       ),
       { initialValue: '' }
     );
+
+    this.path = toSignal(
+      this.router.events.pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        map(() => {
+          let route = this.router.routerState.root;
+          while (route.firstChild) route = route.firstChild!;
+          return (route.snapshot.url.join('/') as string) || '';
+        })
+      ),
+      { initialValue: '' }
+    );
+  
   }
 
 }
