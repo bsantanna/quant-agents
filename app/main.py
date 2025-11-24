@@ -7,7 +7,8 @@ from fastapi.security import HTTPBearer
 from fastapi_keycloak_middleware import KeycloakConfiguration, setup_keycloak_middleware
 from fastapi_mcp import FastApiMCP, AuthConfig
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, FileResponse
+from starlette.staticfiles import StaticFiles
 
 from app.core.container import Container
 from app.infrastructure.auth.user import map_user
@@ -17,6 +18,7 @@ from app.interface.api.attachments.endpoints import router as attachments_router
 from app.interface.api.auth.endpoints import router as auth_router
 from app.interface.api.integrations.endpoints import router as integrations_router
 from app.interface.api.language_models.endpoints import router as language_models_router
+from app.interface.api.markets.endpoints import router as markets_router
 from app.interface.api.messages.endpoints import router as messages_router
 from app.interface.api.status.endpoints import router as status_router
 
@@ -42,6 +44,7 @@ def create_app():
     setup_mcp(container, application)
     setup_exception_handlers(application)
     setup_middleware(application)
+    setup_static_files(application)
 
     return application
 
@@ -65,6 +68,7 @@ def setup_auth(container, application):
                 "/openapi.json",
                 "/status/*",
                 ".well-known/*",
+                "/markets/*",
             ],
             user_mapper=map_user,
         )
@@ -112,6 +116,7 @@ def setup_routers(container: Container, application: FastAPI):
         integrations_router, prefix="/integrations", tags=["integrations"]
     )
     application.include_router(language_models_router, prefix="/llms", tags=["llms"])
+    application.include_router(markets_router, prefix="/markets", tags=["markets"])
     application.include_router(messages_router, prefix="/messages", tags=["messages"])
     application.include_router(status_router, prefix="/status", tags=["status"])
 
@@ -150,5 +155,11 @@ def setup_middleware(application: FastAPI):
         LoggingMiddleware,
     )
 
+def setup_static_files(application: FastAPI):
+    application.mount(
+        path="/",
+        app=StaticFiles(directory="app/static/frontend/browser", html=True),
+        name="angular"
+    )
 
 app = create_app()

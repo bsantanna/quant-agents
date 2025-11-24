@@ -1,12 +1,16 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
     networks:
       - agent-lab
     ports:
       - "18000:8000"
     environment:
       DOCKER: 1
+      ELASTICSEARCH_URL: ${ELASTICSEARCH_URL}
+      ELASTICSEARCH_API_KEY: ${ELASTICSEARCH_API_KEY}
       LANGWATCH_API_KEY: ${LANGWATCH_API_KEY}
       LANGWATCH_ENDPOINT: ${LANGWATCH_ENDPOINT}
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"

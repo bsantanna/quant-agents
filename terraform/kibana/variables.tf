@@ -3,6 +3,11 @@ variable "es_url" {
   type        = string
 }
 
+variable "kb_url" {
+  description = "The endpoint URL for the Kibana UI"
+  type        = string
+}
+
 variable "es_api_key" {
   description = "The API key for authenticating to the Elasticsearch cluster"
   type        = string

@@ -1,5 +1,5 @@
 <h2 align="center"><a href="https://github.com/bsantanna/quant-agents">Quant-Agents | 🤖📈</a></h2>
-<h3 align="center">Backend supporting <a href="https://finance.bsantanna.me">finance.bsantanna.me</a></h3>
+<h3 align="center">Code behind <a href="https://finance.bsantanna.me">finance.bsantanna.me</a></h3>
 
 <div align="center">
 

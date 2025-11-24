@@ -1,0 +1,53 @@
+<div class="bg-slate-800 pb-32">
+
+    @if (path() !== '') {
+        <nav class="border-b border-slate-400/25 bg-slate-800 lg:border-none">
+            <div class="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
+                <div class="relative flex h-16 items-center justify-between lg:border-b lg:border-slate-400/25">
+                    <div class="flex items-center px-2 lg:px-0">
+
+                        <div class="shrink-0">
+                            <a href="#/">
+                                <img src="/logo.svg" alt="Bsantanna Finance Research" class="block size-14"/>
+                            </a>
+                        </div>
+
+                        <!-- <div class="hidden lg:ml-10 lg:block">
+                            <div class="flex space-x-4">
+                                <a href="#" aria-current="page"
+                                class="rounded-md bg-slate-950/40 px-3 py-2 text-sm font-medium text-white">Dashboard</a>
+                                <a href="#"
+                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Team</a>
+                                <a href="#"
+                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Projects</a>
+                                <a href="#"
+                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Calendar</a>
+                                <a href="#"
+                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Reports</a>
+                            </div>
+                        </div> -->
+
+                    </div>
+
+                    <div class="flex flex-1 justify-center px-2 lg:ml-6 lg:justify-end">
+
+                        <div class="w-full max-w-lg lg:max-w-xs">
+                            <app-stock-autocomplete (stockSelected)="onKeyTickerSelected($event)"></app-stock-autocomplete>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+    }
+
+    <header class="py-10">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-bold tracking-tight text-white">{{ title() }}</h1>
+        </div>
+    </header>
+
+</div>
+
+

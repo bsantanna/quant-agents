@@ -1,0 +1,507 @@
+[
+  {
+    "key_ticker": "NVDA",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "NVIDIA Corporation"
+  },
+  {
+    "key_ticker": "AAPL",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Apple Inc."
+  },
+  {
+    "key_ticker": "MSFT",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Microsoft Corporation"
+  },
+  {
+    "key_ticker": "GOOG",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Alphabet Inc."
+  },
+  {
+    "key_ticker": "GOOGL",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Alphabet Inc."
+  },
+  {
+    "key_ticker": "AMZN",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Amazon.com, Inc."
+  },
+  {
+    "key_ticker": "AVGO",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Broadcom Inc."
+  },
+  {
+    "key_ticker": "META",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Meta Platforms, Inc."
+  },
+  {
+    "key_ticker": "TSLA",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Tesla, Inc."
+  },
+  {
+    "key_ticker": "NFLX",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Netflix, Inc."
+  },
+  {
+    "key_ticker": "PLTR",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Palantir Technologies Inc."
+  },
+  {
+    "key_ticker": "COST",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Costco Wholesale Corporation"
+  },
+  {
+    "key_ticker": "AMD",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Advanced Micro Devices, Inc."
+  },
+  {
+    "key_ticker": "ASML",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "ASML Holding N.V."
+  },
+  {
+    "key_ticker": "CSCO",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Cisco Systems, Inc."
+  },
+  {
+    "key_ticker": "MU",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Micron Technology, Inc."
+  },
+  {
+    "key_ticker": "AZN",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "AstraZeneca PLC"
+  },
+  {
+    "key_ticker": "TMUS",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "T-Mobile US, Inc."
+  },
+  {
+    "key_ticker": "PEP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "PepsiCo, Inc."
+  },
+  {
+    "key_ticker": "LIN",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Linde plc"
+  },
+  {
+    "key_ticker": "ISRG",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Intuitive Surgical, Inc."
+  },
+  {
+    "key_ticker": "SHOP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Shopify Inc."
+  },
+  {
+    "key_ticker": "APP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "AppLovin Corporation"
+  },
+  {
+    "key_ticker": "QCOM",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "QUALCOMM Incorporated"
+  },
+  {
+    "key_ticker": "LRCX",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Lam Research Corporation"
+  },
+  {
+    "key_ticker": "PDD",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "PDD Holdings Inc."
+  },
+  {
+    "key_ticker": "INTU",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Intuit Inc."
+  },
+  {
+    "key_ticker": "AMGN",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Amgen Inc."
+  },
+  {
+    "key_ticker": "AMAT",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Applied Materials, Inc."
+  },
+  {
+    "key_ticker": "INTC",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Intel Corporation"
+  },
+  {
+    "key_ticker": "BKNG",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Booking Holdings Inc."
+  },
+  {
+    "key_ticker": "GILD",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Gilead Sciences, Inc."
+  },
+  {
+    "key_ticker": "KLAC",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "KLA Corporation"
+  },
+  {
+    "key_ticker": "ARM",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Arm Holdings plc"
+  },
+  {
+    "key_ticker": "TXN",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Texas Instruments Incorporated"
+  },
+  {
+    "key_ticker": "PANW",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Palo Alto Networks, Inc."
+  },
+  {
+    "key_ticker": "ADBE",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Adobe Inc."
+  },
+  {
+    "key_ticker": "CRWD",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "CrowdStrike Holdings, Inc."
+  },
+  {
+    "key_ticker": "HON",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Honeywell International Inc."
+  },
+  {
+    "key_ticker": "ADI",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Analog Devices, Inc."
+  },
+  {
+    "key_ticker": "VRTX",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Vertex Pharmaceuticals Incorporated"
+  },
+  {
+    "key_ticker": "CEG",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Constellation Energy Corporation"
+  },
+  {
+    "key_ticker": "MELI",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "MercadoLibre, Inc."
+  },
+  {
+    "key_ticker": "ADP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Automatic Data Processing, Inc."
+  },
+  {
+    "key_ticker": "CMCSA",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Comcast Corporation"
+  },
+  {
+    "key_ticker": "SBUX",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Starbucks Corporation"
+  },
+  {
+    "key_ticker": "DASH",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "DoorDash, Inc."
+  },
+  {
+    "key_ticker": "CDNS",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Cadence Design Systems, Inc."
+  },
+  {
+    "key_ticker": "ORLY",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "O'Reilly Automotive, Inc."
+  },
+  {
+    "key_ticker": "MAR",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Marriott International, Inc."
+  },
+  {
+    "key_ticker": "CTAS",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Cintas Corporation"
+  },
+  {
+    "key_ticker": "MRVL",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Marvell Technology, Inc."
+  },
+  {
+    "key_ticker": "ABNB",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Airbnb, Inc."
+  },
+  {
+    "key_ticker": "MDLZ",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Mondelez International, Inc."
+  },
+  {
+    "key_ticker": "SNPS",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Synopsys, Inc."
+  },
+  {
+    "key_ticker": "REGN",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Regeneron Pharmaceuticals, Inc."
+  },
+  {
+    "key_ticker": "MNST",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Monster Beverage Corporation"
+  },
+  {
+    "key_ticker": "CSX",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "CSX Corporation"
+  },
+  {
+    "key_ticker": "DDOG",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Datadog, Inc."
+  },
+  {
+    "key_ticker": "AEP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "American Electric Power Company, Inc."
+  },
+  {
+    "key_ticker": "ADSK",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Autodesk, Inc."
+  },
+  {
+    "key_ticker": "TRI",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Thomson Reuters Corporation"
+  },
+  {
+    "key_ticker": "WDAY",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Workday, Inc."
+  },
+  {
+    "key_ticker": "FTNT",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Fortinet, Inc."
+  },
+  {
+    "key_ticker": "PYPL",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "PayPal Holdings, Inc."
+  },
+  {
+    "key_ticker": "MSTR",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Strategy Inc"
+  },
+  {
+    "key_ticker": "WBD",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Warner Bros. Discovery, Inc."
+  },
+  {
+    "key_ticker": "IDXX",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "IDEXX Laboratories, Inc."
+  },
+  {
+    "key_ticker": "ROST",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Ross Stores, Inc."
+  },
+  {
+    "key_ticker": "PCAR",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "PACCAR Inc"
+  },
+  {
+    "key_ticker": "EA",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Electronic Arts Inc."
+  },
+  {
+    "key_ticker": "NXPI",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "NXP Semiconductors N.V."
+  },
+  {
+    "key_ticker": "ROP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Roper Technologies, Inc."
+  },
+  {
+    "key_ticker": "BKR",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Baker Hughes Company"
+  },
+  {
+    "key_ticker": "XEL",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Xcel Energy Inc."
+  },
+  {
+    "key_ticker": "ZS",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Zscaler, Inc."
+  },
+  {
+    "key_ticker": "FAST",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Fastenal Company"
+  },
+  {
+    "key_ticker": "EXC",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Exelon Corporation"
+  },
+  {
+    "key_ticker": "AXON",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Axon Enterprise, Inc."
+  },
+  {
+    "key_ticker": "TTWO",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Take-Two Interactive Software, Inc."
+  },
+  {
+    "key_ticker": "FANG",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Diamondback Energy, Inc."
+  },
+  {
+    "key_ticker": "CCEP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Coca-Cola Europacific Partners PLC"
+  },
+  {
+    "key_ticker": "PAYX",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Paychex, Inc."
+  },
+  {
+    "key_ticker": "TEAM",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Atlassian Corporation"
+  },
+  {
+    "key_ticker": "CPRT",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Copart, Inc."
+  },
+  {
+    "key_ticker": "KDP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Keurig Dr Pepper Inc."
+  },
+  {
+    "key_ticker": "CTSH",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Cognizant Technology Solutions Corporation"
+  },
+  {
+    "key_ticker": "GEHC",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "GE HealthCare Technologies Inc."
+  },
+  {
+    "key_ticker": "VRSK",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Verisk Analytics, Inc."
+  },
+  {
+    "key_ticker": "CHTR",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Charter Communications, Inc."
+  },
+  {
+    "key_ticker": "KHC",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "The Kraft Heinz Company"
+  },
+  {
+    "key_ticker": "MCHP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Microchip Technology Incorporated"
+  },
+  {
+    "key_ticker": "CSGP",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "CoStar Group, Inc."
+  },
+  {
+    "key_ticker": "ODFL",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Old Dominion Freight Line, Inc."
+  },
+  {
+    "key_ticker": "BIIB",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Biogen Inc."
+  },
+  {
+    "key_ticker": "DXCM",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "DexCom, Inc."
+  },
+  {
+    "key_ticker": "TTD",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "The Trade Desk, Inc."
+  },
+  {
+    "key_ticker": "LULU",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "Lululemon Athletica inc."
+  },
+  {
+    "key_ticker": "CDW",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "CDW Corporation"
+  },
+  {
+    "key_ticker": "ON",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "ON Semiconductor Corporation"
+  },
+  {
+    "key_ticker": "GFS",
+    "index": "quant-agents_stocks-eod_latest",
+    "name": "GlobalFoundries Inc."
+  }
+]

@@ -2,6 +2,7 @@ import os
 
 import hvac
 from dependency_injector import containers, providers
+from elasticsearch import Elasticsearch
 
 from app.domain.repositories.agents import AgentRepository, AgentSettingRepository
 from app.domain.repositories.attachments import AttachmentRepository
@@ -36,6 +37,7 @@ from app.services.auth import AuthService
 from app.services.integrations import IntegrationService
 from app.services.language_model_settings import LanguageModelSettingService
 from app.services.language_models import LanguageModelService
+from app.services.markets_stats import MarketsStatsService
 from app.services.messages import MessageService
 from app.services.tasks import TaskNotificationService
 
@@ -48,6 +50,7 @@ class Container(containers.DeclarativeContainer):
             "app.interface.api.auth.endpoints",
             "app.interface.api.integrations.endpoints",
             "app.interface.api.language_models.endpoints",
+            "app.interface.api.markets.endpoints",
             "app.interface.api.messages.endpoints",
         ]
     )
@@ -92,6 +95,12 @@ class Container(containers.DeclarativeContainer):
 
     db = providers.Singleton(Database, db_url=config.db.url)
 
+    es = providers.Singleton(
+        Elasticsearch,
+        hosts=[os.getenv("ELASTICSEARCH_URL")],
+        api_key=os.getenv("ELASTICSEARCH_API_KEY"),
+    )
+
     graph_persistence_factory = providers.Singleton(
         GraphPersistenceFactory, db_checkpoints=config.db.checkpoints
     )
@@ -111,6 +120,11 @@ class Container(containers.DeclarativeContainer):
         realm=config.auth.realm,
         client_id=config.auth.client_id,
         client_secret=config.auth.client_secret,
+    )
+
+    markets_stats_service = providers.Factory(
+        MarketsStatsService,
+        es=es,
     )
 
     integration_repository = providers.Factory(

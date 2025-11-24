@@ -1,0 +1,13 @@
+<section>
+    <app-stock-info-header
+            [indexName]="'quant-agents_stocks-eod_latest'"
+            [keyTicker]="keyTicker()"
+            [intervalInDays]="intervalInDays"
+    ></app-stock-info-header>
+</section>
+
+@if (kibanaUrl()) {
+    <section>
+        <iframe [src]="kibanaUrl()" class="w-full border-none"></iframe>
+    </section>
+}
