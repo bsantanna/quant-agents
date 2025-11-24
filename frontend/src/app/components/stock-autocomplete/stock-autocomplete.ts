@@ -1,12 +1,8 @@
 import { Component, signal, computed, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {IndexedKeyTicker} from '../../models/markets.model';
 
-interface Stock {
-  key_ticker: string;
-  index: string;
-  name: string;
-}
 
 @Component({
   selector: 'app-stock-autocomplete',
@@ -20,7 +16,7 @@ export class StockAutocompleteComponent {
   isOpen = signal(false);
 
   // Mocked stock data
-  private readonly mockedStocks: Stock[] = [
+  private readonly mockedStocks: IndexedKeyTicker[] = [
     { key_ticker: 'NVDA', index: 'X', name: 'NVIDIA Corporation' },
     { key_ticker: 'GOOG', index: 'X', name: 'Alphabet Inc. (Google)' },
     { key_ticker: 'AAPL', index: 'X', name: 'Apple Inc.' },
@@ -31,7 +27,7 @@ export class StockAutocompleteComponent {
   // Filtered stocks based on search query
   filteredStocks = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
-    
+
     if (!query || query.length === 0) {
       return [];
     }
@@ -44,7 +40,7 @@ export class StockAutocompleteComponent {
   });
 
   // Output event for when a stock is selected
-  stockSelected = output<Stock>();
+  stockSelected = output<IndexedKeyTicker>();
 
   onSearch(event: Event): void {
     const target = event.target as HTMLInputElement;
@@ -65,7 +61,7 @@ export class StockAutocompleteComponent {
     }, 200);
   }
 
-  onSelectStock(stock: Stock): void {
+  onSelectStock(stock: IndexedKeyTicker): void {
     this.searchQuery.set(stock.key_ticker);
     this.isOpen.set(false);
     this.stockSelected.emit(stock);
@@ -75,4 +71,5 @@ export class StockAutocompleteComponent {
     this.searchQuery.set('');
     this.isOpen.set(false);
   }
+
 }

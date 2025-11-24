@@ -1,3 +1,9 @@
+export interface IndexedKeyTicker {
+  key_ticker: string;
+  index: string;
+  name: string;
+}
+
 export interface StatsClose {
   key_ticker: string;
   most_recent_close: number;
