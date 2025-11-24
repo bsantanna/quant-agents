@@ -62,7 +62,7 @@ export class StockAutocompleteComponent {
   }
 
   onSelectStock(stock: IndexedKeyTicker): void {
-    this.searchQuery.set(stock.key_ticker);
+    this.searchQuery.set('');
     this.isOpen.set(false);
     this.stockSelected.emit(stock);
   }
