@@ -3,6 +3,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {filter, map} from 'rxjs';
 import {NavigationEnd, Router} from '@angular/router';
 import {StockAutocompleteComponent} from '../components/stock-autocomplete/stock-autocomplete';
+import {IndexedKeyTicker} from '../models/markets.model';
 
 @Component({
   selector: 'app-navigation-header',
@@ -28,7 +29,7 @@ export class NavigationHeader {
           return (route.snapshot.title as string) || '';
         })
       ),
-      { initialValue: '' }
+      {initialValue: ''}
     );
 
     this.path = toSignal(
@@ -40,14 +41,15 @@ export class NavigationHeader {
           return (route.snapshot.url.join('/') as string) || '';
         })
       ),
-      { initialValue: '' }
+      {initialValue: ''}
     );
-  
+
   }
 
-  onStockSelected(stock: any): void {
-    console.log('Stock selected:', stock);
-    // Handle stock selection here (e.g., navigate to stock page, fetch data, etc.)
+  onKeyTickerSelected(indexedKeyTicker: IndexedKeyTicker): void {
+    if(indexedKeyTicker.index.startsWith('quant-agents_stocks-eod')) {
+      this.router.navigate(['/markets/stocks-eod-dashboard', indexedKeyTicker.key_ticker]);
+    }
   }
 
 }

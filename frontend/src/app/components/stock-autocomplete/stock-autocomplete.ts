@@ -1,7 +1,9 @@
-import { Component, signal, computed, inject, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {Component, signal, computed, inject, output, Signal} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {HttpClient} from '@angular/common/http';
 import {IndexedKeyTicker} from '../../models/markets.model';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 
 @Component({
@@ -12,17 +14,11 @@ import {IndexedKeyTicker} from '../../models/markets.model';
   styleUrl: './stock-autocomplete.scss',
 })
 export class StockAutocompleteComponent {
-  searchQuery = signal('');
-  isOpen = signal(false);
+  private readonly httpClient = inject(HttpClient);
 
-  // Mocked stock data
-  private readonly mockedStocks: IndexedKeyTicker[] = [
-    { key_ticker: 'NVDA', index: 'X', name: 'NVIDIA Corporation' },
-    { key_ticker: 'GOOG', index: 'X', name: 'Alphabet Inc. (Google)' },
-    { key_ticker: 'AAPL', index: 'X', name: 'Apple Inc.' },
-    { key_ticker: 'META', index: 'X', name: 'Meta Platforms Inc. (Facebook)' },
-    { key_ticker: 'MSFT', index: 'X', name: 'Microsoft Corporation' },
-  ];
+  readonly searchQuery = signal('');
+  readonly isOpen = signal(false);
+  readonly indexedKeyTickers!: Signal<IndexedKeyTicker[]>;
 
   // Filtered stocks based on search query
   filteredStocks = computed(() => {
@@ -32,15 +28,19 @@ export class StockAutocompleteComponent {
       return [];
     }
 
-    return this.mockedStocks.filter(
+    return this.indexedKeyTickers().filter(
       (stock) =>
-        stock.key_ticker.toLowerCase().includes(query) ||
-        stock.name.toLowerCase().includes(query)
+        (stock.key_ticker.toLowerCase().includes(query) || stock.name.toLowerCase().includes(query)) && stock.index.startsWith('quant-agents_stocks-eod')
     );
   });
 
   // Output event for when a stock is selected
   stockSelected = output<IndexedKeyTicker>();
+
+  constructor() {
+    const indexedKeyTickers$ = this.httpClient.get<IndexedKeyTicker[]>('/json/indexed_key_ticker_list.json');
+    this.indexedKeyTickers = toSignal(indexedKeyTickers$, {initialValue: []});
+  }
 
   onSearch(event: Event): void {
     const target = event.target as HTMLInputElement;
