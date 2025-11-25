@@ -32,7 +32,7 @@ def create_app():
     container = Container()
 
     application = FastAPI(
-        title=os.getenv("SERVICE_NAME", "Agent-Lab"),
+        title=os.getenv("SERVICE_NAME", "Quant-Agents"),
         version=os.getenv("SERVICE_VERSION", "snapshot"),
         dependencies=[],
     )
@@ -69,6 +69,11 @@ def setup_auth(container, application):
                 "/status/*",
                 ".well-known/*",
                 "/markets/*",
+                "/*.ico",
+                "/*.svg",
+                "/*.json",
+                "/#/*",
+                "/",
             ],
             user_mapper=map_user,
         )
@@ -82,7 +87,7 @@ def setup_mcp(container: Container, application: FastAPI):
     if config["auth"]["enabled"] == "True":
         mcp = FastApiMCP(
             application,
-            name=os.getenv("SERVICE_NAME", "Agent-Lab"),
+            name=os.getenv("SERVICE_NAME", "Quant-Agents"),
             include_operations=["get_agent_list", "get_message_list", "post_message"],
             describe_all_responses=True,
             describe_full_response_schema=True,
@@ -93,7 +98,7 @@ def setup_mcp(container: Container, application: FastAPI):
     else:
         mcp = FastApiMCP(
             application,
-            name=os.getenv("SERVICE_NAME", "Agent-Lab"),
+            name=os.getenv("SERVICE_NAME", "Quant-Agents"),
             include_operations=["get_agent_list", "get_message_list", "post_message"],
             describe_all_responses=True,
             describe_full_response_schema=True,
