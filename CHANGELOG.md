@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.2.1 (2025-11-25)
+
+### Bug Fixes
+
+- Adjusts url pattern for bypassing Auth for static resources
+  ([#17](https://github.com/bsantanna/quant-agents/pull/17),
+  [`90ce850`](https://github.com/bsantanna/quant-agents/commit/90ce850092ba271f01bd993ebb915eaf23da744a))
+
+- Adjusts url pattern for bypassing Auth for static resources (2)
+  ([#17](https://github.com/bsantanna/quant-agents/pull/17),
+  [`90ce850`](https://github.com/bsantanna/quant-agents/commit/90ce850092ba271f01bd993ebb915eaf23da744a))
+
+
 ## v1.2.0 (2025-11-24)
 
 ### Features
