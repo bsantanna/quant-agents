@@ -1,4 +1,5 @@
 [tool.semantic_release]
 version_variables = [
   "docker/app/Dockerfile:SERVICE_VERSION",
+  "frontend/package.json:version"
 ]

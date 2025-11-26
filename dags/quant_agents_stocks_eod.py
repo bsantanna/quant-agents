@@ -12,7 +12,7 @@ default_args = {
 dag = DAG(
     "quant_agents_stocks_eod",
     default_args=default_args,
-    schedule="@daily",
+    schedule="0 16,22,4,10 * * *",
     catchup=False,
 )
 
@@ -86,17 +86,12 @@ def load_stocks_eod():
             data=format_bulk_stocks_eod(ticker, ticker_daily_time_series, index_suffix)
         )
 
-    symbols = [
-        "AAPL", "ASML",
-        "GOOG",
-        "META", "MSFT",
-        "NVDA",
-    ]
+    api_endpoint = "https://finance.bsantanna.me"
+    indexed_key_ticker_list = requests.get(f"{api_endpoint}/json/indexed_key_ticker_list.json").json()
 
-    for symbol in symbols:
-        stocks_eod_response = ingest_stocks_eod(symbol)
-        print(f"Ingestion complete stocks EOD for {symbol}: {stocks_eod_response.json()}")
-
+    for company in indexed_key_ticker_list:
+        stocks_eod_response = ingest_stocks_eod(company["key_ticker"],  company["index"])
+        print(f"Ingestion complete stocks EOD for {company["key_ticker"]}, index {company["index"]}: {stocks_eod_response.json()}")
 
 with dag:
     load_stocks_eod()
