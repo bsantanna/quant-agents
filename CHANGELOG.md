@@ -2,6 +2,15 @@
 
 <!-- version list -->
 
+## v1.2.2 (2025-11-26)
+
+### Bug Fixes
+
+- Adjusts ingestion dag and index name and prod endpoint for js bundle
+  ([#18](https://github.com/bsantanna/quant-agents/pull/18),
+  [`642c6a7`](https://github.com/bsantanna/quant-agents/commit/642c6a70ff23ee08437719f942599b1cbc1a0ff5))
+
+
 ## v1.2.1 (2025-11-25)
 
 ### Bug Fixes
