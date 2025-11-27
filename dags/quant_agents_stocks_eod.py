@@ -12,7 +12,7 @@ default_args = {
 dag = DAG(
     "quant_agents_stocks_eod",
     default_args=default_args,
-    schedule="0 16,22,4,10 * * *",
+    schedule="0 16,22,10 * * *",
     catchup=False,
 )
 
