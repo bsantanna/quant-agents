@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v1.3.0 (2025-11-27)
+
+### Bug Fixes
+
+- Adjusts ingestion dag schedule, aliases and pre-defined indices
+  ([#19](https://github.com/bsantanna/quant-agents/pull/19),
+  [`7eed770`](https://github.com/bsantanna/quant-agents/commit/7eed77078ec0d90ad67a7a21c8dc0f0eaf2c4228))
+
+- Hides info header for small screen ([#19](https://github.com/bsantanna/quant-agents/pull/19),
+  [`7eed770`](https://github.com/bsantanna/quant-agents/commit/7eed77078ec0d90ad67a7a21c8dc0f0eaf2c4228))
+
+### Features
+
+- Adjusts key tickers filtering with constants
+  ([#19](https://github.com/bsantanna/quant-agents/pull/19),
+  [`7eed770`](https://github.com/bsantanna/quant-agents/commit/7eed77078ec0d90ad67a7a21c8dc0f0eaf2c4228))
+
+
 ## v1.2.2 (2025-11-26)
 
 ### Bug Fixes
