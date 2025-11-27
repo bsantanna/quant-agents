@@ -24,7 +24,7 @@ resource "elasticstack_elasticsearch_index_lifecycle" "quant-agents_policy" {
   }
 
   delete {
-    min_age = "7d"
+    min_age = "365d"
     delete {}
   }
 }
@@ -57,6 +57,25 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-eod_te
       }
     })
   }
+}
+
+resource "elasticstack_elasticsearch_index" "nasdaq" {
+  name = "quant-agents_stocks-eod_nasdaq_100"
+
+  alias {
+    name = "quant-agents_stocks-eod_latest"
+  }
+  depends_on = [elasticstack_elasticsearch_index_template.quant-agents_stocks-eod_template]
+}
+
+resource "elasticstack_elasticsearch_index" "sp500" {
+  name = "quant-agents_stocks-eod_sp_500"
+
+  alias {
+    name = "quant-agents_stocks-eod_latest"
+  }
+
+  depends_on = [elasticstack_elasticsearch_index_template.quant-agents_stocks-eod_template]
 }
 
 resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-insider-trades_template" {

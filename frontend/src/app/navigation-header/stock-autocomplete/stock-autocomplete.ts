@@ -4,6 +4,7 @@ import {FormsModule} from '@angular/forms';
 import {HttpClient} from '@angular/common/http';
 import {IndexedKeyTicker} from '../../models/markets.model';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {STOCK_MARKETS} from '../../constants';
 
 
 @Component({
@@ -30,8 +31,10 @@ export class StockAutocompleteComponent {
 
     return this.indexedKeyTickers().filter(
       (stock) =>
-        (stock.key_ticker.toLowerCase().includes(query) || stock.name.toLowerCase().includes(query)) && stock.index.startsWith('quant-agents_stocks-eod')
+        (stock.key_ticker.toLowerCase().includes(query) || stock.name.toLowerCase().includes(query))
+        && STOCK_MARKETS.filter(market=> market === stock.index)
     );
+
   });
 
   // Output event for when a stock is selected

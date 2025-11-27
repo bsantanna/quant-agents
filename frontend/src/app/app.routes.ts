@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import {MarketsStocksEodDashboard} from './markets-stocks-eod-dashboard/markets-stocks-eod-dashboard';
+import {MarketsStocksEodDashboard} from './page-markets-stocks-eod-dashboard/markets-stocks-eod-dashboard';
 import { PageTerms } from './page-terms/page-terms';
 
 export const routes: Routes = [
