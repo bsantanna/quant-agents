@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 from app.core.container import Container
 from app.interface.api.cache_control import cache_control
-from app.interface.api.markets.schema import StatsClose
+from app.interface.api.markets.schema import StatsClose, StatsCloseRequest
 from app.services.markets_stats import MarketsStatsService
 
 router = APIRouter()
@@ -20,10 +20,11 @@ async def get_most_recent_close(
         index_name: str,
         key_ticker: str,
         markets_stats_service: MarketsStatsService = Depends(Provide[Container.markets_stats_service]),
+        request: StatsCloseRequest = Depends(),
         _ = cache_control(86400)
 
 ):
-    result = await markets_stats_service.get_stats_close(index_name, key_ticker)
+    result = await markets_stats_service.get_stats_close(index_name, key_ticker, request.close_date)
     response = StatsClose(
         key_ticker=key_ticker,
         most_recent_close=result.get('most_recent_close'),

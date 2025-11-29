@@ -1,21 +1,46 @@
+from typing_extensions import Optional
 from elasticsearch import Elasticsearch
-
 
 class MarketsStatsService:
 
     def __init__(self, es: Elasticsearch) -> None:
         self.es = es
 
-    async def get_stats_close(self, index_name: str, key_ticker: str) -> dict:
-        query = {
-            "size": 0,
-            "query": {
+    async def get_stats_close(self, index_name: str, key_ticker: str, close_date:Optional[str]) -> dict:
+
+        if close_date is not None:
+            filter_query = {
+                "bool": {
+                    "must": [
+                        {
+                            "term": {
+                                "key_ticker": {
+                                    "value": key_ticker
+                                }
+                            }
+                        },
+                        {
+                            "range": {
+                                "date_reference": {
+                                    "lte": close_date
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        else:
+            filter_query = {
                 "term": {
                     "key_ticker": {
                         "value": key_ticker
                     }
                 }
-            },
+            }
+
+        search_query = {
+            "size": 0,
+            "query": filter_query,
             "aggs": {
                 "recent_stats": {
                     "scripted_metric": {
@@ -74,5 +99,5 @@ class MarketsStatsService:
             }
         }
 
-        response = self.es.search(index=index_name, body=query)
+        response = self.es.search(index=index_name, body=search_query)
         return response['aggregations']['recent_stats']['value']
