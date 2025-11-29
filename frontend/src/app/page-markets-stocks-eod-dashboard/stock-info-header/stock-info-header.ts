@@ -17,7 +17,9 @@ export class StockInfoHeader {
 
   indexName = input.required<string>();
   keyTicker = input.required<string>();
-  
+  intervalInDates = input.required<string>();
+  useIntervalInDates = input.required<boolean>();
+
   @Input() intervalInDays!: WritableSignal<number>;
 
   statsClose!: Signal<StatsClose>;
@@ -26,9 +28,10 @@ export class StockInfoHeader {
 
     const stats$ = combineLatest([
       toObservable(this.indexName),
-      toObservable(this.keyTicker)
+      toObservable(this.keyTicker),
+      toObservable(this.intervalInDates)
     ]).pipe(
-      switchMap(([index, ticker]) => this.marketsStatsService.getStatsClose(index, ticker))
+      switchMap(([index, ticker, intervalInDates]) => this.marketsStatsService.getStatsClose(index, ticker, intervalInDates))
     );
 
     this.statsClose = toSignal(stats$, {
@@ -40,7 +43,7 @@ export class StockInfoHeader {
     this.intervalInDays.set(days);
   }
 
-  getPastDate(days: number): string {
+  getPastDateInDays(days: number): string {
     const date = new Date();
     date.setDate(date.getDate() - days);
     const year = date.getFullYear();

@@ -49,7 +49,7 @@ export class NavigationHeader {
 
   onKeyTickerSelected(indexedKeyTicker: IndexedKeyTicker): void {
     if (STOCK_MARKETS.filter(market=> market === indexedKeyTicker.index)) {
-      this.router.navigate(['/markets/stocks-eod-dashboard', indexedKeyTicker.key_ticker]);
+      this.router.navigate(['/markets/stocks', indexedKeyTicker.key_ticker]);
     }
   }
 
