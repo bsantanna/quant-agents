@@ -2,6 +2,27 @@
 
 <!-- version list -->
 
+## v1.3.1 (2025-12-02)
+
+### Bug Fixes
+
+- Adds support to interval as query parameter
+  ([#20](https://github.com/bsantanna/quant-agents/pull/20),
+  [`cc3fbea`](https://github.com/bsantanna/quant-agents/commit/cc3fbead50900ba8fcf9890496671de1331346a1))
+
+- Link with interval parameter ([#20](https://github.com/bsantanna/quant-agents/pull/20),
+  [`cc3fbea`](https://github.com/bsantanna/quant-agents/commit/cc3fbead50900ba8fcf9890496671de1331346a1))
+
+- Readme update ([#20](https://github.com/bsantanna/quant-agents/pull/20),
+  [`cc3fbea`](https://github.com/bsantanna/quant-agents/commit/cc3fbead50900ba8fcf9890496671de1331346a1))
+
+- Refactoring for share button ([#20](https://github.com/bsantanna/quant-agents/pull/20),
+  [`cc3fbea`](https://github.com/bsantanna/quant-agents/commit/cc3fbead50900ba8fcf9890496671de1331346a1))
+
+- Share url implementation ([#20](https://github.com/bsantanna/quant-agents/pull/20),
+  [`cc3fbea`](https://github.com/bsantanna/quant-agents/commit/cc3fbead50900ba8fcf9890496671de1331346a1))
+
+
 ## v1.3.0 (2025-11-27)
 
 ### Bug Fixes
