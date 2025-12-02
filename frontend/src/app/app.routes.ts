@@ -9,7 +9,7 @@ export const routes: Routes = [
     children: [
       {
         title: 'Stock Analysis',
-        path: 'stocks-eod-dashboard/:keyTicker',
+        path: 'stocks/:keyTicker',
         component: MarketsStocksEodDashboard
       }
     ]

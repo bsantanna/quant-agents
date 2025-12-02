@@ -28,12 +28,17 @@ export class MarketsStatsService {
   getStatsClose(
     indexName: string,
     ticker: string,
+    intervalInDates: string,
     requestTimeoutMs = 10000
   ): Observable<StatsClose> {
 
     const url = `${this.marketsStatsCloseUrl}/${encodeURIComponent(indexName)}/${encodeURIComponent(ticker)}`;
+    const params = {};
+    if (intervalInDates && intervalInDates.trim().length > 0) {
+      Object.assign(params, {close_date: intervalInDates.split('_')[1]});
+    }
 
-    return this.http.get<StatsClose>(url).pipe(
+    return this.http.get<StatsClose>(url, {params}).pipe(
       timeout(requestTimeoutMs),
       catchError((error) => {
         console.error(`Failed to fetch latest close for ${ticker} @ ${indexName}`, error);

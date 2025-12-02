@@ -10,5 +10,5 @@ import {NavigationFooter} from './navigation-footer/navigation-footer';
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('frontend');
+
 }
