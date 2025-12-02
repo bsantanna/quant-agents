@@ -33,20 +33,6 @@ export class StockInfoHeader {
       toObservable(this.keyTicker),
       toObservable(this.intervalInDates)
     ]).pipe(
-      tap(([_, keyTicker, intervalInDates]) => {
-        const title = `Stock Analysis ${keyTicker}`
-        if (intervalInDates) {
-          this.shareUrlService.update({
-            title,
-            url: window.location.href
-          })
-        } else {
-          this.shareUrlService.update({
-            title,
-            url: `${window.location.href.split('?')[0]}?interval=${this.getPastDateInDays(this.intervalInDays())}_${this.getPastDateInDays(1)}`
-          })
-        }
-      }),
       switchMap(
         ([index, ticker, intervalInDates]) => this.marketsStatsService.getStatsClose(index, ticker, intervalInDates)
       )
@@ -63,12 +49,7 @@ export class StockInfoHeader {
   }
 
   getPastDateInDays(days: number): string {
-    const date = new Date();
-    date.setDate(date.getDate() - days);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`
+    return this.shareUrlService.getPastDateInDays(days);
   }
 
 }

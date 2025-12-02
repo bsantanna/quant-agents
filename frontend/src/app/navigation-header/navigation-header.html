@@ -8,36 +8,36 @@
 
                         <div class="shrink-0">
                             <a href="#/">
-                                <img src="/logo.svg" alt="Bsantanna Finance Research" class="block size-14"/>
+                                <img src="/logo.svg" alt="Bsantanna Finance Research" class="block size-12"/>
                             </a>
                         </div>
 
-                        <!-- <div class="hidden lg:ml-10 lg:block">
+                        <div class="hidden lg:ml-10 lg:block">
                             <div class="flex space-x-4">
-                                <a href="#" aria-current="page"
-                                class="rounded-md bg-slate-950/40 px-3 py-2 text-sm font-medium text-white">Dashboard</a>
-                                <a href="#"
-                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Team</a>
-                                <a href="#"
-                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Projects</a>
-                                <a href="#"
-                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Calendar</a>
-                                <a href="#"
-                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Reports</a>
+<!--                                <a href="#" aria-current="page"-->
+<!--                                class="rounded-md bg-slate-950/40 px-3 py-2 text-sm font-medium text-white">Dashboard</a>-->
+<!--                                <a href="#"-->
+<!--                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Team</a>-->
+<!--                                <a href="#"-->
+<!--                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Projects</a>-->
+<!--                                <a href="#"-->
+<!--                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Calendar</a>-->
+<!--                                <a href="#"-->
+<!--                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Reports</a>-->
+                                <app-share-button></app-share-button>
                             </div>
-                        </div> -->
-
+                        </div>
                     </div>
 
                     <div class="flex flex-1 justify-center px-2 lg:ml-6 lg:justify-end">
-
                         <div class="w-full max-w-lg lg:max-w-xs">
-                            <app-stock-autocomplete
-                                    (stockSelected)="onKeyTickerSelected($event)"></app-stock-autocomplete>
+                            @if (path().indexOf('stocks') >-1) {
+                                <app-stock-autocomplete
+                                        (stockSelected)="onKeyTickerSelected($event)">
+                                </app-stock-autocomplete>
+                            }
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </nav>
@@ -49,106 +49,6 @@
                 <div class="min-w-0 flex-1">
                     <h2 class="text-2xl/7 font-bold text-white sm:truncate sm:text-3xl sm:tracking-tight">{{ title() }}</h2>
                 </div>
-
-                @if (showCopied()) {
-                    <div class="rounded-md bg-green-500/10 p-2 outline outline-green-500/20 ml-4">
-                        <div class="flex">
-                            <div class="shrink-0">
-                                <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true"
-                                     class="size-5 text-green-400">
-                                    <path d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z"
-                                          clip-rule="evenodd" fill-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-green-300">Link copied</p>
-                            </div>
-                        </div>
-                    </div>
-                }
-
-                @if (shareUrl().url.trim().length > 0) {
-                    <div class="mt-4 flex md:mt-0 md:ml-4 relative">
-                        <button type="button" (click)="toggleMenu()"
-                                class="inline-flex items-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring inset-ring-white/5 hover:bg-white/20 cursor-pointer">
-                            <svg
-                                    class="mr-2 size-5 text-white/50"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    aria-hidden="true"
-                            >
-                                <path
-                                        d="M13 4.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.501 2.501 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 13 4.5Z"
-                                />
-                            </svg>
-                            <span>Share</span>
-                        </button>
-
-                        @if (showMenu()) {
-                            <div class="absolute top-full right-0 mt-2 w-36 rounded-md bg-slate-800 shadow-lg ring-1 ring-white/5">
-                                <ul class="py-1">
-                                    <li>
-                                        <button (click)="share('x')"
-                                                class="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-white/20 cursor-pointer">
-                                            <span class="ml-2">X</span>
-                                        </button>
-                                    </li>
-                                    <div aria-hidden="true" class="w-full border-t border-white/15"></div>
-                                    <li>
-                                        <button (click)="share('facebook')"
-                                                class="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-white/20 cursor-pointer">
-                                            <span class="ml-2">Facebook</span>
-                                        </button>
-                                    </li>
-                                    <div aria-hidden="true" class="w-full border-t border-white/15"></div>
-                                    <li>
-                                        <button (click)="share('whatsapp')"
-                                                class="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-white/20 cursor-pointer">
-                                            <span class="ml-2">WhatsApp</span>
-                                        </button>
-                                    </li>
-                                    <div aria-hidden="true" class="w-full border-t border-white/15"></div>
-                                    <li>
-                                        <button (click)="share('threads')"
-                                                class="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-white/20 cursor-pointer">
-                                            <span class="ml-2">Threads</span>
-                                        </button>
-                                    </li>
-                                    <div aria-hidden="true" class="w-full border-t border-white/15"></div>
-                                    <li>
-                                        <button (click)="share('linkedin')"
-                                                class="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-white/20 cursor-pointer">
-                                            <span class="ml-2">LinkedIn</span>
-                                        </button>
-                                    </li>
-                                    <div aria-hidden="true" class="w-full border-t border-white/15"></div>
-                                    <li>
-                                        <button (click)="share('reddit')"
-                                                class="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-white/20 cursor-pointer">
-                                            <span class="ml-2">Reddit</span>
-                                        </button>
-                                    </li>
-                                    <div aria-hidden="true" class="w-full border-t border-white/15"></div>
-                                    <li>
-                                        <button (click)="share('copy')"
-                                                class="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-white/20 cursor-pointer">
-                                            <span class="ml-2">Copy link</span>
-                                        </button>
-                                    </li>
-                                    <div aria-hidden="true" class="w-full border-t border-white/15"></div>
-                                    <li>
-                                        <button (click)="share('email')"
-                                                class="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-white/20 cursor-pointer">
-                                            <span class="ml-2">E-mail link</span>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                        }
-                    </div>
-                }
-
-
             </div>
         </div>
     </div>
