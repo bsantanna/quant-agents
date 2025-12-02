@@ -2,8 +2,9 @@ import {Component, inject, Input, input, Signal, WritableSignal} from '@angular/
 import {MarketsStatsService} from '../../services/markets-stats.service';
 import {StatsClose} from '../../models/markets.model';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
-import {combineLatest, switchMap} from 'rxjs';
-import { DecimalPipe } from '@angular/common';
+import {combineLatest, switchMap, tap} from 'rxjs';
+import {DecimalPipe} from '@angular/common';
+import {ShareUrlService} from '../../services/share-url-service';
 
 @Component({
   selector: 'app-stock-info-header',
@@ -14,6 +15,7 @@ import { DecimalPipe } from '@angular/common';
 export class StockInfoHeader {
 
   private readonly marketsStatsService = inject(MarketsStatsService);
+  private readonly shareUrlService = inject(ShareUrlService);
 
   indexName = input.required<string>();
   keyTicker = input.required<string>();
@@ -31,12 +33,29 @@ export class StockInfoHeader {
       toObservable(this.keyTicker),
       toObservable(this.intervalInDates)
     ]).pipe(
-      switchMap(([index, ticker, intervalInDates]) => this.marketsStatsService.getStatsClose(index, ticker, intervalInDates))
+      tap(([_, keyTicker, intervalInDates]) => {
+        const title = `Stock Analysis ${keyTicker}`
+        if (intervalInDates) {
+          this.shareUrlService.update({
+            title,
+            url: window.location.href
+          })
+        } else {
+          this.shareUrlService.update({
+            title,
+            url: `${window.location.href.split('?')[0]}?interval=${this.getPastDateInDays(this.intervalInDays())}_${this.getPastDateInDays(1)}`
+          })
+        }
+      }),
+      switchMap(
+        ([index, ticker, intervalInDates]) => this.marketsStatsService.getStatsClose(index, ticker, intervalInDates)
+      )
     );
 
     this.statsClose = toSignal(stats$, {
       initialValue: MarketsStatsService.INITIAL_STATS_CLOSE
     });
+
   }
 
   setIntervalInDays(days: number): void {
