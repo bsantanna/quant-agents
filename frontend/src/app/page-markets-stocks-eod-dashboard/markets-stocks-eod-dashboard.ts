@@ -25,7 +25,7 @@ export class MarketsStocksEodDashboard implements OnDestroy {
   readonly useIntervalInDates = computed<boolean>(() => this.intervalInDates().trim().length > 0);
   readonly kibanaUrl = computed<SafeResourceUrl>(() => {
     const symbol = encodeURIComponent(this.keyTicker());
-    const baseUrl = 'https://kibana.bsantanna.me/app/dashboards';
+    const baseUrl = 'https://kibana.quaks.ai/app/dashboards';
 
     const dashboardId = (this.intervalInDays() > 30 || this.useIntervalInDates())
     ? '16c3228b-0831-442d-ae18-3a2cf4700792'
