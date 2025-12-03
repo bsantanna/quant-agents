@@ -2,6 +2,18 @@
 
 <!-- version list -->
 
+## v1.3.2 (2025-12-03)
+
+### Bug Fixes
+
+- Domain change frontend bundle ([#22](https://github.com/bsantanna/quant-agents/pull/22),
+  [`d471c86`](https://github.com/bsantanna/quant-agents/commit/d471c8641266e24e9a02899d0ebc38cc403a3025))
+
+- Domain change in terms and dashboard page
+  ([#21](https://github.com/bsantanna/quant-agents/pull/21),
+  [`f9034ac`](https://github.com/bsantanna/quant-agents/commit/f9034ace4cf04a1a178dd24c5880107c1407c055))
+
+
 ## v1.3.1 (2025-12-02)
 
 ### Bug Fixes
