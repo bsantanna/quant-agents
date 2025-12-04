@@ -15,7 +15,7 @@ export const routes: Routes = [
     ]
   },
   {
-    title: 'Terms of Service',
+    title: '',
     path: 'terms',
     component: PageTerms
   },
