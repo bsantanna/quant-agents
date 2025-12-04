@@ -2,6 +2,30 @@
 
 <!-- version list -->
 
+## v1.3.3 (2025-12-04)
+
+### Bug Fixes
+
+- Adjusts header to fixed position ([#23](https://github.com/bsantanna/quant-agents/pull/23),
+  [`0670201`](https://github.com/bsantanna/quant-agents/commit/067020139d0c45d8bdd21087a9fab0ef5b23408a))
+
+- Adjusts key tickers json web address ([#23](https://github.com/bsantanna/quant-agents/pull/23),
+  [`0670201`](https://github.com/bsantanna/quant-agents/commit/067020139d0c45d8bdd21087a9fab0ef5b23408a))
+
+- Adjusts page layout ([#23](https://github.com/bsantanna/quant-agents/pull/23),
+  [`0670201`](https://github.com/bsantanna/quant-agents/commit/067020139d0c45d8bdd21087a9fab0ef5b23408a))
+
+- Cookie consent ([#23](https://github.com/bsantanna/quant-agents/pull/23),
+  [`0670201`](https://github.com/bsantanna/quant-agents/commit/067020139d0c45d8bdd21087a9fab0ef5b23408a))
+
+- Fix menu dismiss behaviour ([#23](https://github.com/bsantanna/quant-agents/pull/23),
+  [`0670201`](https://github.com/bsantanna/quant-agents/commit/067020139d0c45d8bdd21087a9fab0ef5b23408a))
+
+- Intro feedback message component and service
+  ([#23](https://github.com/bsantanna/quant-agents/pull/23),
+  [`0670201`](https://github.com/bsantanna/quant-agents/commit/067020139d0c45d8bdd21087a9fab0ef5b23408a))
+
+
 ## v1.3.2 (2025-12-03)
 
 ### Bug Fixes
