@@ -1,4 +1,4 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, HostListener, inject, signal} from '@angular/core';
 import {ShareUrlService} from '../../services/share-url.service';
 import {FeedbackMessageService} from '../../services/feedback-message.service';
 
@@ -62,6 +62,15 @@ export class ShareButtonComponent {
     }
 
     window.open(targetUrl, '_blank');
+  }
+
+  @HostListener('document:click', ['$event'])
+  @HostListener('document:touchstart', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('app-share-button')) {
+      this.showMenu.set(false);
+    }
   }
 
 }
