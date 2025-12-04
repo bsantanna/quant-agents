@@ -13,7 +13,7 @@ export class CookieService implements SharedStateService<CookieConsent> {
 
   static readonly COOKIE_CONSENT_KEY = "CookieConsent"
 
-  state!: WritableSignal<CookieConsent>;// = signal(CookieService.INITIAL_COOKIE_CONSENT);
+  readonly state!: WritableSignal<CookieConsent>;
 
   constructor() {
     effect(() => {
@@ -35,14 +35,14 @@ export class CookieService implements SharedStateService<CookieConsent> {
     this.state.set(cookieConsent);
   }
 
-  private setCookie(name: string, value: string, days: number) {
+  setCookie(name: string, value: string, days: number) {
     const date = new Date();
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     const expires = '; expires=' + date.toUTCString();
     document.cookie = name + '=' + value + expires + '; path=/; SameSite=Lax; Secure';
   }
 
-  private getCookie(name: string): string | null {
+  getCookie(name: string): string | null {
     const nameEQ = name + '=';
     const ca = document.cookie.split(';');
     for (let i = 0; i < ca.length; i++) {
