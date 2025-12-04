@@ -4,7 +4,7 @@ import {FeedbackMessage, SharedStateService} from '../models/navigation.models';
 @Injectable({
   providedIn: 'root',
 })
-export class FeedbackMessageService implements SharedStateService {
+export class FeedbackMessageService implements SharedStateService<FeedbackMessage> {
 
   static readonly INITIAL_FEEDBACK_MESSAGE: FeedbackMessage = {
     message: '',

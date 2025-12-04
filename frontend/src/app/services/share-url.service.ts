@@ -4,7 +4,7 @@ import {NavigationModel, SharedStateService, ShareUrl} from '../models/navigatio
 @Injectable({
   providedIn: 'root',
 })
-export class ShareUrlService implements SharedStateService {
+export class ShareUrlService implements SharedStateService<ShareUrl> {
 
   readonly state: WritableSignal<ShareUrl> = signal({url: '', title: ''});
 
