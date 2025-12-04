@@ -86,7 +86,7 @@ def load_stocks_eod():
             data=format_bulk_stocks_eod(ticker, ticker_daily_time_series, index_suffix)
         )
 
-    api_endpoint = "https://finance.bsantanna.me"
+    api_endpoint = "https://quaks.ai"
     indexed_key_ticker_list = requests.get(f"{api_endpoint}/json/indexed_key_ticker_list.json").json()
 
     for company in indexed_key_ticker_list:
