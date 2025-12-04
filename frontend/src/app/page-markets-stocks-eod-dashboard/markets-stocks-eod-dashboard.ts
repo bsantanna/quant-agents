@@ -3,7 +3,7 @@ import {ActivatedRoute, ParamMap, Params} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import { StockInfoHeader } from './stock-info-header/stock-info-header';
-import {ShareUrlService} from '../services/share-url-service';
+import {ShareUrlService} from '../services/share-url.service';
 
 
 @Component({

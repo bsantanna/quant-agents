@@ -1,15 +1,15 @@
 import {Injectable, signal, WritableSignal} from '@angular/core';
-import {ShareUrl} from '../models/navigation.models';
+import {NavigationModel, SharedStateService, ShareUrl} from '../models/navigation.models';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ShareUrlService {
+export class ShareUrlService implements SharedStateService {
 
-  readonly shareUrl: WritableSignal<ShareUrl> = signal({url: '', title: ''});
+  readonly state: WritableSignal<ShareUrl> = signal({url: '', title: ''});
 
   update(newUrl: ShareUrl): void {
-    this.shareUrl.set(newUrl);
+    this.state.set(newUrl);
   }
 
   getPastDateInDays(days: number): string {

@@ -5,11 +5,12 @@ import {NavigationEnd, Router} from '@angular/router';
 import {StockAutocompleteComponent} from './stock-autocomplete/stock-autocomplete';
 import {IndexedKeyTicker} from '../models/markets.model';
 import {STOCK_MARKETS} from '../constants';
-import {ShareButton} from './share-button/share-button';
+import {ShareButtonComponent} from './share-button/share-button';
+import {FeedbackMessageComponent} from './feedback-message/feedback-message';
 
 @Component({
   selector: 'app-navigation-header',
-  imports: [StockAutocompleteComponent, ShareButton],
+  imports: [StockAutocompleteComponent, ShareButtonComponent, FeedbackMessageComponent],
   templateUrl: './navigation-header.html',
   styleUrl: './navigation-header.scss',
 })

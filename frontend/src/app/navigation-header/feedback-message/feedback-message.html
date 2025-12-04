@@ -1,0 +1,30 @@
+@if (feedbackMessage().message.trim().length > 0) {
+
+    @if (feedbackMessage().type === 'success') {
+        <div class="rounded-md bg-green-500/10 p-2 outline outline-green-500/20 ml-8 mr-8">
+            <p class="text-sm font-medium text-green-300">
+                {{ feedbackMessage().message }}
+            </p>
+        </div>
+    } @else if (feedbackMessage().type === 'info') {
+        <div class="rounded-md bg-blue-500/10 p-2 outline outline-blue-500/20 ml-8 mr-8">
+            <p class="text-sm font-medium text-blue-300">
+                {{ feedbackMessage().message }}
+            </p>
+        </div>
+    } @else if (feedbackMessage().type === 'warning') {
+        <div class="rounded-md bg-orange-500/10 p-2 outline outline-orange-500/20 ml-8 mr-8">
+            <p class="text-sm font-medium text-orange-300">
+                {{ feedbackMessage().message }}
+            </p>
+        </div>
+    } @else {
+        <div class="rounded-md bg-red-500/10 p-2 outline outline-red-500/20 ml-8 mr-8">
+            <p class="text-sm font-medium text-red-300">
+                {{ feedbackMessage().message }}
+            </p>
+        </div>
+    }
+    
+}
+
