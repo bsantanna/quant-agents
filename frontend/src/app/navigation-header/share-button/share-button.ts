@@ -1,5 +1,6 @@
-import {Component, inject, signal} from '@angular/core';
-import {ShareUrlService} from '../../services/share-url-service';
+import {Component, HostListener, inject, signal} from '@angular/core';
+import {ShareUrlService} from '../../services/share-url.service';
+import {FeedbackMessageService} from '../../services/feedback-message.service';
 
 @Component({
   selector: 'app-share-button',
@@ -7,12 +8,12 @@ import {ShareUrlService} from '../../services/share-url-service';
   templateUrl: './share-button.html',
   styleUrl: './share-button.scss',
 })
-export class ShareButton {
+export class ShareButtonComponent {
 
   private readonly shareUrlService = inject(ShareUrlService);
-  readonly shareUrl = this.shareUrlService.shareUrl;
+  private readonly feedbackMessageService = inject(FeedbackMessageService);
+  readonly shareUrl = this.shareUrlService.state;
   readonly showMenu = signal<boolean>(false);
-  readonly showCopied = signal<boolean>(false);
 
   toggleMenu() {
     this.showMenu.update((val) => !val);
@@ -21,43 +22,55 @@ export class ShareButton {
   share(platform: string) {
     this.showMenu.set(false);
     const currentShareUrl = this.shareUrl();
-    const url = encodeURIComponent(currentShareUrl.url);
+    const urlEncoded = encodeURIComponent(currentShareUrl.url);
     const text = encodeURIComponent(currentShareUrl.title);
     let targetUrl: string;
 
     switch (platform) {
       case 'facebook':
-        targetUrl = `https://www.facebook.com/sharer.php?u=${url}`;
+        targetUrl = `https://www.facebook.com/sharer.php?u=${urlEncoded}`;
         break;
       case 'x':
-        targetUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+        targetUrl = `https://twitter.com/intent/tweet?url=${urlEncoded}&text=${text}`;
         break;
       case 'whatsapp':
-        targetUrl = `https://api.whatsapp.com/send?text=${text}%20${url}`;
+        targetUrl = `https://api.whatsapp.com/send?text=${text}%20${urlEncoded}`;
         break;
       case 'threads':
-        targetUrl = `https://www.threads.net/intent/post?text=${text}&url=${url}`;
+        targetUrl = `https://www.threads.net/intent/post?text=${text}&url=${urlEncoded}`;
         break;
       case 'linkedin':
-        targetUrl = `https://www.linkedin.com/shareArticle?url=${url}&title=${text}`;
+        targetUrl = `https://www.linkedin.com/shareArticle?url=${urlEncoded}&title=${text}`;
         break;
       case 'reddit':
-        targetUrl = `https://reddit.com/submit?url=${url}&title=${text}`;
+        targetUrl = `https://reddit.com/submit?url=${urlEncoded}&title=${text}`;
         break;
       case 'email':
-        targetUrl = `mailto:?subject=Quaks&body=${text}%20${url}`;
+        targetUrl = `mailto:?subject=Quaks&body=${text}%20${urlEncoded}`;
         window.location.href = targetUrl;
         return; // No new tab for email
       case 'copy':
-        navigator.clipboard.writeText(url);
-        this.showCopied.set(true);
-        setTimeout(() => this.showCopied.set(false), 3000);
-        return;
+        navigator.clipboard.writeText(currentShareUrl.url);
+        this.feedbackMessageService.update({
+          message: 'Link copied',
+          type: 'info',
+          timeout: 3000,
+        });
+        return; // No new tab for clipboard copy
       default:
         return;
     }
 
     window.open(targetUrl, '_blank');
+  }
+
+  @HostListener('document:click', ['$event'])
+  @HostListener('document:touchstart', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('app-share-button')) {
+      this.showMenu.set(false);
+    }
   }
 
 }

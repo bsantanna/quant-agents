@@ -4,7 +4,7 @@ import {StatsClose} from '../../models/markets.model';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {combineLatest, switchMap, tap} from 'rxjs';
 import {DecimalPipe} from '@angular/common';
-import {ShareUrlService} from '../../services/share-url-service';
+import {ShareUrlService} from '../../services/share-url.service';
 
 @Component({
   selector: 'app-stock-info-header',

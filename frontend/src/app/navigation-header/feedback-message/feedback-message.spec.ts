@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShareButtonComponent } from './share-button';
+import { FeedbackMessageComponent } from './feedback-message';
 
-describe('ShareButton', () => {
-  let component: ShareButtonComponent;
-  let fixture: ComponentFixture<ShareButtonComponent>;
+describe('FeedbackMessage', () => {
+  let component: FeedbackMessageComponent;
+  let fixture: ComponentFixture<FeedbackMessageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ShareButtonComponent]
+      imports: [FeedbackMessageComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ShareButtonComponent);
+    fixture = TestBed.createComponent(FeedbackMessageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

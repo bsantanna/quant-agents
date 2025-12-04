@@ -1,0 +1,31 @@
+@if (!cookieConsent().consentGiven) {
+    <div class="pointer-events-none fixed inset-x-0 bottom-0 px-6 pb-6">
+        <div class="pointer-events-auto mx-auto max-w-xl rounded-xl bg-gray-800 p-6 outline-1 -outline-offset-1 outline-white/10">
+
+            <p class="text-sm/6 text-white">
+                We use cookies to ensure the basic functionality of our site and, with your consent, to analyze usage
+                and deliver personalized content and advertising.
+                <br/>You can accept all, reject non-essential ones, or customize your choices.
+                <br/>See our
+                <a href="#/cookies"
+                   class="font-semibold text-indigo-400 hover:text-indigo-300">
+                    cookie policy
+                </a> for details.
+            </p>
+
+            <div class="mt-4 flex items-center gap-x-5 w-full justify-end">
+                <button type="button"
+                        (click)="updateConsent('all')"
+                        class="rounded-md bg-gray-700 px-3 py-2 text-sm font-semibold text-white shadow-xs inset-ring inset-ring-white/10 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                    Accept all
+                </button>
+                <button type="button"
+                        (click)="updateConsent('essential_only')"
+                        class="text-sm/6 font-semibold text-white hover:text-gray-300">
+                    Reject non-essential
+                </button>
+            </div>
+
+        </div>
+    </div>
+}

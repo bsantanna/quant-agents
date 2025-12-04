@@ -1,9 +1,9 @@
 <div class="bg-slate-800 pb-32">
 
     @if (path() !== '') {
-        <nav class="border-b border-slate-400/25 bg-slate-800 lg:border-none">
-            <div class="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
-                <div class="relative flex h-16 items-center justify-between lg:border-b lg:border-slate-400/25">
+        <nav class="fixed top-0 w-full bg-slate-800">
+            <div class="mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="relative flex h-16 items-center justify-between">
                     <div class="flex items-center px-2 lg:px-0">
 
                         <div class="shrink-0">
@@ -14,19 +14,11 @@
 
                         <div class="hidden lg:ml-10 lg:block">
                             <div class="flex space-x-4">
-<!--                                <a href="#" aria-current="page"-->
-<!--                                class="rounded-md bg-slate-950/40 px-3 py-2 text-sm font-medium text-white">Dashboard</a>-->
-<!--                                <a href="#"-->
-<!--                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Team</a>-->
-<!--                                <a href="#"-->
-<!--                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Projects</a>-->
-<!--                                <a href="#"-->
-<!--                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Calendar</a>-->
-<!--                                <a href="#"-->
-<!--                                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-slate-700/75">Reports</a>-->
                                 <app-share-button></app-share-button>
                             </div>
                         </div>
+
+                        <app-feedback-message></app-feedback-message>
                     </div>
 
                     <div class="flex flex-1 justify-center px-2 lg:ml-6 lg:justify-end">
@@ -43,8 +35,8 @@
         </nav>
     }
 
-    <div class="py-10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mt-16 py-10">
+        <div class="mx-auto px-4 sm:px-6 lg:px-8">
             <div class="md:flex md:items-center md:justify-between">
                 <div class="min-w-0 flex-1">
                     <h2 class="text-2xl/7 font-bold text-white sm:truncate sm:text-3xl sm:tracking-tight">{{ title() }}</h2>
