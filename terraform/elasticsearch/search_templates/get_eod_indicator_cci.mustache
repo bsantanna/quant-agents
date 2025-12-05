@@ -1,0 +1,39 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "key_ticker": "{{key_ticker}}"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "date_reference": {
+              "gte": "{{date_gte}}",
+              "lte": "{{date_lte}}",
+              "format": "strict_date_optional_time||epoch_millis"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "cci_stats": {
+      "scripted_metric": {
+        "params": {
+          "period": {{period}},
+          "constant": {{constant}}
+        },
+        "init_script": "state.entries = new ArrayList();",
+        "map_script": "if (doc.containsKey('val_high') && doc['val_high'].size() > 0 && doc['val_high'].value != null && doc.containsKey('val_low') && doc['val_low'].size() > 0 && doc['val_low'].value != null && doc.containsKey('val_close') && doc['val_close'].size() > 0 && doc['val_close'].value != null && doc.containsKey('date_reference') && doc['date_reference'].size() > 0) { def entry = ['date': doc['date_reference'].value.millis, 'high': doc['val_high'].value, 'low': doc['val_low'].value, 'close': doc['val_close'].value]; state.entries.add(entry); }",
+        "combine_script": "return state.entries;",
+        "reduce_script": "def all = []; for (s in states) { if (s != null) all.addAll(s); } if (all.isEmpty()) return null; all.sort((a,b) -> Long.compare(a.date, b.date)); def period = params.period; def constant = params.constant; def results = new ArrayList(); int n = all.size(); for (int i = 0; i < n; i++) { if (i < period - 1) { results.add(['date': all[i].date, 'cci': null, 'position': null]); continue; } def tp_sum = 0.0; for (int j = i - period + 1; j <= i; j++) { tp_sum += (all[j].high + all[j].low + all[j].close) / 3.0; } def atp = tp_sum / period; def tp = (all[i].high + all[i].low + all[i].close) / 3.0; def dev_sum = 0.0; for (int j = i - period + 1; j <= i; j++) { def j_tp = (all[j].high + all[j].low + all[j].close) / 3.0; dev_sum += Math.abs(j_tp - atp); } def md = dev_sum / period; def cci = null; def position = null; if (md != 0) { cci = (tp - atp) / (constant * md); position = cci < -100 ? 1 : (cci > 100 ? -1 : 1); } results.add(['date': all[i].date, 'cci': cci != null ? Math.round(cci * 100.0) / 100.0 : null, 'position': position]); } def formatter = DateTimeFormatter.ofPattern('yyyy-MM-dd').withZone(ZoneId.of('UTC')); def formatted_results = new ArrayList(); for (res in results) { def date_str = formatter.format(Instant.ofEpochMilli(res.date)); formatted_results.add(['date': date_str, 'cci': res.cci, 'position': res.position]); } return formatted_results;"
+      }
+    }
+  }
+}
