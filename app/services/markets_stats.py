@@ -9,7 +9,7 @@ class MarketsStatsService:
     async def get_stats_close(self, index_name: str, key_ticker: str, close_date:Optional[str]) -> dict:
 
         search_params = {
-            "id": "get_stats_close",
+            "id": "get_stats_close_template",
             "params": {
                 "key_ticker": key_ticker,
                 "close_date": close_date,

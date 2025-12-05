@@ -1,0 +1,107 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "key_ticker": "{{key_ticker}}"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "date_reference": {
+              "gte": "{{date_gte}}",
+              "lte": "{{date_lte}}",
+              "format": "strict_date_optional_time||epoch_millis"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "time_buckets": {
+      "date_histogram": {
+        "field": "date_reference",
+        "calendar_interval": "1d",
+        "min_doc_count": 0
+      },
+      "aggs": {
+        "close": {
+          "avg": {
+            "field": "val_close"
+          }
+        },
+        "short_ema": {
+          "moving_fn": {
+            "buckets_path": "close",
+            "window": 5000,
+            "script": "double alpha = 2.0 / ({{short_period}} + 1); double ema = Double.NaN; for (double v : values) { if (!Double.isNaN(v)) { if (Double.isNaN(ema)) ema = v; else ema = alpha * v + (1 - alpha) * ema; } } return ema;"
+          }
+        },
+        "long_ema": {
+          "moving_fn": {
+            "buckets_path": "close",
+            "window": 5000,
+            "script": "double alpha = 2.0 / ({{long_period}} + 1); double ema = Double.NaN; for (double v : values) { if (!Double.isNaN(v)) { if (Double.isNaN(ema)) ema = v; else ema = alpha * v + (1 - alpha) * ema; } } return ema;"
+          }
+        },
+        "macd": {
+          "bucket_script": {
+            "buckets_path": {
+              "s": "short_ema",
+              "l": "long_ema"
+            },
+            "script": "if (params.s == null || params.l == null || Double.isNaN(params.s) || Double.isNaN(params.l)) return Double.NaN; return params.s - params.l;"
+          }
+        },
+        "signal": {
+          "moving_fn": {
+            "buckets_path": "macd",
+            "window": 5000,
+            "script": "double alpha = 2.0 / ({{signal_period}} + 1); double ema = Double.NaN; for (double v : values) { if (!Double.isNaN(v)) { if (Double.isNaN(ema)) ema = v; else ema = alpha * v + (1 - alpha) * ema; } } return ema;"
+          }
+        },
+        "histogram": {
+          "bucket_script": {
+            "buckets_path": {
+              "m": "macd",
+              "s": "signal"
+            },
+            "script": "if (params.m == null || params.s == null || Double.isNaN(params.m) || Double.isNaN(params.s)) return Double.NaN; return params.m - params.s;"
+          }
+        },
+        "prev_macd": {
+          "moving_fn": {
+            "buckets_path": "macd",
+            "window": 1,
+            "shift": 1,
+            "script": "return values.length > 0 ? values[0] : Double.NaN;"
+          }
+        },
+        "prev_signal": {
+          "moving_fn": {
+            "buckets_path": "signal",
+            "window": 1,
+            "shift": 1,
+            "script": "return values.length > 0 ? values[0] : Double.NaN;"
+          }
+        },
+        "position": {
+          "bucket_script": {
+            "buckets_path": {
+              "macd": "macd",
+              "signal": "signal",
+              "prev_macd": "prev_macd",
+              "prev_signal": "prev_signal"
+            },
+            "script": "def pm = params.prev_macd; def ps = params.prev_signal; def m = params.macd; def s = params.signal; if (pm == null || ps == null || m == null || s == null || Double.isNaN(pm) || Double.isNaN(ps) || Double.isNaN(m) || Double.isNaN(s)) { return Double.NaN; } if (pm < ps && m > s) { return 1; } else if (pm > ps && m < s) { return -1; } else { return 1; }"
+          }
+        }
+      }
+    }
+  }
+}

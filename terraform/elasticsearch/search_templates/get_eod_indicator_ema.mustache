@@ -1,0 +1,55 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "key_ticker": "{{key_ticker}}"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "date_reference": {
+              "gte": "{{date_gte}}",
+              "lte": "{{date_lte}}",
+              "format": "strict_date_optional_time||epoch_millis"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "time_buckets": {
+      "date_histogram": {
+        "field": "date_reference",
+        "calendar_interval": "1d",
+        "min_doc_count": 0
+      },
+      "aggs": {
+        "close": {
+          "avg": {
+            "field": "val_close"
+          }
+        },
+        "ema_short": {
+          "moving_fn": {
+            "buckets_path": "close",
+            "window": 1000,
+            "script": "double ewma = Double.NaN; double alpha = 2.0 / ({{ema_short}} + 1); for (int i=0; i<values.length; i++) { if (!Double.isNaN(values[i])) { if (Double.isNaN(ewma)) ewma = values[i]; else ewma = alpha * values[i] + (1 - alpha) * ewma; } } return ewma;"
+          }
+        },
+        "ema_long": {
+          "moving_fn": {
+            "buckets_path": "close",
+            "window": 1000,
+            "script": "double ewma = Double.NaN; double alpha = 2.0 / ({{ema_long}} + 1); for (int i=0; i<values.length; i++) { if (!Double.isNaN(values[i])) { if (Double.isNaN(ewma)) ewma = values[i]; else ewma = alpha * values[i] + (1 - alpha) * ewma; } } return ewma;"
+          }
+        }
+      }
+    }
+  }
+}

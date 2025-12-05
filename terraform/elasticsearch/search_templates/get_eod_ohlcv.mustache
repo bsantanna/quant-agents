@@ -1,0 +1,45 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "key_ticker": "{{key_ticker}}"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "date_reference": {
+              "gte": "{{date_gte}}",
+              "lte": "{{date_lte}}",
+              "format": "strict_date_optional_time||epoch_millis"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "time_buckets": {
+      "date_histogram": {
+        "field": "date_reference",
+        "calendar_interval": "1d",
+        "extended_bounds": {
+          "min": "{{date_gte}}",
+          "max": "{{date_lte}}"
+        },
+        "min_doc_count": 0
+      },
+      "aggs": {
+        "open":  { "avg": { "field": "val_open" } },
+        "high":  { "avg": { "field": "val_high" } },
+        "low":   { "avg": { "field": "val_low" } },
+        "close": { "avg": { "field": "val_close" } },
+        "volume":{ "avg": { "field": "val_volume" } }
+      }
+    }
+  }
+}
