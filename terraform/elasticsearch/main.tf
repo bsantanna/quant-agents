@@ -59,25 +59,6 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-eod_te
   }
 }
 
-resource "elasticstack_elasticsearch_index" "nasdaq" {
-  name = "quant-agents_stocks-eod_nasdaq_100"
-
-  alias {
-    name = "quant-agents_stocks-eod_latest"
-  }
-  depends_on = [elasticstack_elasticsearch_index_template.quant-agents_stocks-eod_template]
-}
-
-resource "elasticstack_elasticsearch_index" "sp500" {
-  name = "quant-agents_stocks-eod_sp_500"
-
-  alias {
-    name = "quant-agents_stocks-eod_latest"
-  }
-
-  depends_on = [elasticstack_elasticsearch_index_template.quant-agents_stocks-eod_template]
-}
-
 resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-insider-trades_template" {
   name = "quant-agents_stocks-insider-trades_template"
 
@@ -415,3 +396,32 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-fundam
     })
   }
 }
+
+locals {
+  search_templates = {
+    get_stats_close_template = "get_stats_close.mustache"
+  }
+}
+
+resource "elasticstack_elasticsearch_script" "search_templates" {
+  for_each = local.search_templates
+  script_id = each.key
+  lang      = "mustache"
+  source    = file("${path.module}/search_templates/${each.value}")
+}
+
+# resource "elasticstack_elasticsearch_index" "nasdaq" {
+#   name = "quant-agents_stocks-eod_nasdaq_100"
+#   alias {
+#     name = "quant-agents_stocks-eod_latest"
+#   }
+#   depends_on = [elasticstack_elasticsearch_index_template.quant-agents_stocks-eod_template]
+# }
+#
+# resource "elasticstack_elasticsearch_index" "sp500" {
+#   name = "quant-agents_stocks-eod_sp_500"
+#   alias {
+#     name = "quant-agents_stocks-eod_latest"
+#   }
+#   depends_on = [elasticstack_elasticsearch_index_template.quant-agents_stocks-eod_template]
+# }
