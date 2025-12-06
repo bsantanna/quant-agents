@@ -23,32 +23,16 @@
     }
   },
   "aggs": {
-    "time_buckets": {
-      "date_histogram": {
-        "field": "date_reference",
-        "calendar_interval": "1d",
-        "min_doc_count": 0
-      },
-      "aggs": {
-        "close": {
-          "avg": {
-            "field": "val_close"
-          }
+    "ema_stats": {
+      "scripted_metric": {
+        "params": {
+          "short_window": {{#short_window}}{{short_window}}{{/short_window}}{{^short_window}}10{{/short_window}},
+          "long_window": {{#long_window}}{{long_window}}{{/long_window}}{{^long_window}}20{{/long_window}}
         },
-        "ema_short": {
-          "moving_fn": {
-            "buckets_path": "close",
-            "window": 1000,
-            "script": "double ewma = Double.NaN; double alpha = 2.0 / ({{ema_short}} + 1); for (int i=0; i<values.length; i++) { if (!Double.isNaN(values[i])) { if (Double.isNaN(ewma)) ewma = values[i]; else ewma = alpha * values[i] + (1 - alpha) * ewma; } } return ewma;"
-          }
-        },
-        "ema_long": {
-          "moving_fn": {
-            "buckets_path": "close",
-            "window": 1000,
-            "script": "double ewma = Double.NaN; double alpha = 2.0 / ({{ema_long}} + 1); for (int i=0; i<values.length; i++) { if (!Double.isNaN(values[i])) { if (Double.isNaN(ewma)) ewma = values[i]; else ewma = alpha * values[i] + (1 - alpha) * ewma; } } return ewma;"
-          }
-        }
+        "init_script": "state.entries = new ArrayList();",
+        "map_script": "if (doc.containsKey('val_close') && doc['val_close'].size() > 0 && doc['val_close'].value != null && doc.containsKey('date_reference') && doc['date_reference'].size() > 0) { def entry = ['date': doc['date_reference'].value.millis, 'close': doc['val_close'].value]; state.entries.add(entry); }",
+        "combine_script": "return state.entries;",
+        "reduce_script": "def all = []; for (def s : states) { if (s != null) all.addAll(s); } if (all.isEmpty()) return null; all.sort((a,b) -> Long.compare(a.date, b.date)); def short_window = params.short_window; def long_window = params.long_window; def alpha_short = 2.0 / (short_window + 1.0); def alpha_long = 2.0 / (long_window + 1.0); def one_minus_alpha_short = 1.0 - alpha_short; def one_minus_alpha_long = 1.0 - alpha_long; def n = all.size(); def ema_short = new double[n]; def ema_long = new double[n]; def results = new ArrayList(); if (n == 0) return []; ema_short[0] = all[0].close; ema_long[0] = all[0].close; def position = ema_short[0] > ema_long[0] ? 1 : -1; results.add(['date': all[0].date, 'ema_short': Math.round(ema_short[0] * 100.0) / 100.0, 'ema_long': Math.round(ema_long[0] * 100.0) / 100.0, 'position': position]); for (int i = 1; i < n; i++) { ema_short[i] = all[i].close * alpha_short + ema_short[i-1] * one_minus_alpha_short; ema_long[i] = all[i].close * alpha_long + ema_long[i-1] * one_minus_alpha_long; position = ema_short[i] > ema_long[i] ? 1 : -1; results.add(['date': all[i].date, 'ema_short': Math.round(ema_short[i] * 100.0) / 100.0, 'ema_long': Math.round(ema_long[i] * 100.0) / 100.0, 'position': position]); } def formatter = DateTimeFormatter.ofPattern('yyyy-MM-dd').withZone(ZoneId.of('UTC')); def formatted_results = new ArrayList(); for (def res : results) { def date_str = formatter.format(Instant.ofEpochMilli(res.date)); formatted_results.add(['date': date_str, 'ema_short': res.ema_short, 'ema_long': res.ema_long, 'position': res.position]); } return formatted_results;"
       }
     }
   }

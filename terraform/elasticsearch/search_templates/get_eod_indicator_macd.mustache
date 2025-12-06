@@ -23,84 +23,17 @@
     }
   },
   "aggs": {
-    "time_buckets": {
-      "date_histogram": {
-        "field": "date_reference",
-        "calendar_interval": "1d",
-        "min_doc_count": 0
-      },
-      "aggs": {
-        "close": {
-          "avg": {
-            "field": "val_close"
-          }
+    "macd_stats": {
+      "scripted_metric": {
+        "params": {
+          "short_window": {{#short_window}}{{short_window}}{{/short_window}}{{^short_window}}7{{/short_window}},
+          "long_window": {{#long_window}}{{long_window}}{{/long_window}}{{^long_window}}20{{/long_window}},
+          "signal_window": {{#signal_window}}{{signal_window}}{{/signal_window}}{{^signal_window}}6{{/signal_window}}
         },
-        "short_ema": {
-          "moving_fn": {
-            "buckets_path": "close",
-            "window": 5000,
-            "script": "double alpha = 2.0 / ({{short_period}} + 1); double ema = Double.NaN; for (double v : values) { if (!Double.isNaN(v)) { if (Double.isNaN(ema)) ema = v; else ema = alpha * v + (1 - alpha) * ema; } } return ema;"
-          }
-        },
-        "long_ema": {
-          "moving_fn": {
-            "buckets_path": "close",
-            "window": 5000,
-            "script": "double alpha = 2.0 / ({{long_period}} + 1); double ema = Double.NaN; for (double v : values) { if (!Double.isNaN(v)) { if (Double.isNaN(ema)) ema = v; else ema = alpha * v + (1 - alpha) * ema; } } return ema;"
-          }
-        },
-        "macd": {
-          "bucket_script": {
-            "buckets_path": {
-              "s": "short_ema",
-              "l": "long_ema"
-            },
-            "script": "if (params.s == null || params.l == null || Double.isNaN(params.s) || Double.isNaN(params.l)) return Double.NaN; return params.s - params.l;"
-          }
-        },
-        "signal": {
-          "moving_fn": {
-            "buckets_path": "macd",
-            "window": 5000,
-            "script": "double alpha = 2.0 / ({{signal_period}} + 1); double ema = Double.NaN; for (double v : values) { if (!Double.isNaN(v)) { if (Double.isNaN(ema)) ema = v; else ema = alpha * v + (1 - alpha) * ema; } } return ema;"
-          }
-        },
-        "histogram": {
-          "bucket_script": {
-            "buckets_path": {
-              "m": "macd",
-              "s": "signal"
-            },
-            "script": "if (params.m == null || params.s == null || Double.isNaN(params.m) || Double.isNaN(params.s)) return Double.NaN; return params.m - params.s;"
-          }
-        },
-        "prev_macd": {
-          "moving_fn": {
-            "buckets_path": "macd",
-            "window": 1,
-            "shift": 1,
-            "script": "return values.length > 0 ? values[0] : Double.NaN;"
-          }
-        },
-        "prev_signal": {
-          "moving_fn": {
-            "buckets_path": "signal",
-            "window": 1,
-            "shift": 1,
-            "script": "return values.length > 0 ? values[0] : Double.NaN;"
-          }
-        },
-        "position": {
-          "bucket_script": {
-            "buckets_path": {
-              "macd": "macd",
-              "signal": "signal",
-              "prev_macd": "prev_macd",
-              "prev_signal": "prev_signal"
-            },
-            "script": "def pm = params.prev_macd; def ps = params.prev_signal; def m = params.macd; def s = params.signal; if (pm == null || ps == null || m == null || s == null || Double.isNaN(pm) || Double.isNaN(ps) || Double.isNaN(m) || Double.isNaN(s)) { return Double.NaN; } if (pm < ps && m > s) { return 1; } else if (pm > ps && m < s) { return -1; } else { return 1; }"
-          }
-        }
+        "init_script": "state.entries = new ArrayList();",
+        "map_script": "if (doc.containsKey('val_close') && doc['val_close'].size() > 0 && doc['val_close'].value != null && doc.containsKey('date_reference') && doc['date_reference'].size() > 0) { def entry = ['date': doc['date_reference'].value.millis, 'close': doc['val_close'].value]; state.entries.add(entry); }",
+        "combine_script": "return state.entries;",
+        "reduce_script": "def all = []; for (def s : states) { if (s != null) all.addAll(s); } if (all.isEmpty()) return null; all.sort((a,b) -> Long.compare(a.date, b.date)); def short_window = params.short_window; def long_window = params.long_window; def signal_window = params.signal_window; def alpha_short = 2.0 / (short_window + 1.0); def alpha_long = 2.0 / (long_window + 1.0); def alpha_signal = 2.0 / (signal_window + 1.0); def one_minus_alpha_short = 1.0 - alpha_short; def one_minus_alpha_long = 1.0 - alpha_long; def one_minus_alpha_signal = 1.0 - alpha_signal; def n = all.size(); if (n < 2) return []; def short_ema = new double[n]; def long_ema = new double[n]; def macd = new double[n]; def signal = new double[n]; def histogram = new double[n]; short_ema[0] = all[0].close; long_ema[0] = all[0].close; macd[0] = short_ema[0] - long_ema[0]; signal[0] = macd[0]; histogram[0] = macd[0] - signal[0]; def results = new ArrayList(); for (int i = 1; i < n; i++) { short_ema[i] = all[i].close * alpha_short + short_ema[i-1] * one_minus_alpha_short; long_ema[i] = all[i].close * alpha_long + long_ema[i-1] * one_minus_alpha_long; macd[i] = short_ema[i] - long_ema[i]; signal[i] = macd[i] * alpha_signal + signal[i-1] * one_minus_alpha_signal; histogram[i] = macd[i] - signal[i]; def prev_macd = macd[i-1]; def prev_signal = signal[i-1]; def position = (prev_macd < prev_signal && macd[i] > signal[i]) ? 1 : ((prev_macd > prev_signal && macd[i] < signal[i]) ? -1 : 1); results.add(['date': all[i].date, 'short_ema': Math.round(short_ema[i] * 100.0) / 100.0, 'long_ema': Math.round(long_ema[i] * 100.0) / 100.0, 'macd': Math.round(macd[i] * 100.0) / 100.0, 'signal': Math.round(signal[i] * 100.0) / 100.0, 'histogram': Math.round(histogram[i] * 100.0) / 100.0, 'position': position]); } def formatter = DateTimeFormatter.ofPattern('yyyy-MM-dd').withZone(ZoneId.of('UTC')); def formatted_results = new ArrayList(); for (def res : results) { def date_str = formatter.format(Instant.ofEpochMilli(res.date)); formatted_results.add(['date': date_str, 'short_ema': res.short_ema, 'long_ema': res.long_ema, 'macd': res.macd, 'signal': res.signal, 'histogram': res.histogram, 'position': res.position]); } return formatted_results;"
       }
     }
   }
