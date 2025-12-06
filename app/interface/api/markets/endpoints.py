@@ -21,7 +21,7 @@ async def get_most_recent_close(
         key_ticker: str,
         markets_stats_service: MarketsStatsService = Depends(Provide[Container.markets_stats_service]),
         request: StatsCloseRequest = Depends(),
-        _ = cache_control(86400)
+        _ = cache_control(3600)
 
 ):
     result = await markets_stats_service.get_stats_close(index_name, key_ticker, request.close_date)
@@ -37,3 +37,4 @@ async def get_most_recent_close(
     )
 
     return response
+
