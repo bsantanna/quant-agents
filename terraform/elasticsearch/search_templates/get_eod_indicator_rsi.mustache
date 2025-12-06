@@ -1,0 +1,38 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "key_ticker": "{{key_ticker}}"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "date_reference": {
+              "gte": "{{date_gte}}",
+              "lte": "{{date_lte}}",
+              "format": "strict_date_optional_time||epoch_millis"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "rsi_stats": {
+      "scripted_metric": {
+        "params": {
+          "period": {{period}}
+        },
+        "init_script": "state.entries = new ArrayList();",
+        "map_script": "if (doc.containsKey('val_close') && doc['val_close'].size() > 0 && doc['val_close'].value != null && doc.containsKey('date_reference') && doc['date_reference'].size() > 0) { def entry = ['date': doc['date_reference'].value.millis, 'close': doc['val_close'].value]; state.entries.add(entry); }",
+        "combine_script": "return state.entries;",
+        "reduce_script": "def all = []; for (def s : states) { if (s != null) all.addAll(s); } if (all.isEmpty()) return null; all.sort((a,b) -> Long.compare(a.date, b.date)); def period = params.period; def alpha = 1.0 / period; def one_minus_alpha = 1.0 - alpha; def results = new ArrayList(); if (all.size() < 2) { for (def entry : all) { results.add(['date': entry.date, 'rsi': null, 'position': null]); } } else { results.add(['date': all[0].date, 'rsi': null, 'position': null]); def upavg = 0.0; def dnavg = 0.0; boolean initialized = false; for (int i = 1; i < all.size(); i++) { def delta = all[i].close - all[i-1].close; def up = Math.max(delta, 0.0); def dn = Math.max(-delta, 0.0); if (!initialized) { upavg = up; dnavg = dn; initialized = true; } else { upavg = upavg * one_minus_alpha + up * alpha; dnavg = dnavg * one_minus_alpha + dn * alpha; } def rsi = null; def position = null; if (upavg == 0.0 && dnavg == 0.0) { rsi = null; } else if (dnavg == 0.0) { rsi = 100.0; } else { def rs = upavg / dnavg; rsi = 100.0 - 100.0 / (1.0 + rs); } if (rsi != null) { position = rsi < 30 ? 1 : (rsi > 70 ? -1 : 1); } results.add(['date': all[i].date, 'rsi': rsi != null ? Math.round(rsi * 100.0) / 100.0 : null, 'position': position]); } } def formatter = DateTimeFormatter.ofPattern('yyyy-MM-dd').withZone(ZoneId.of('UTC')); def formatted_results = new ArrayList(); for (def res : results) { def date_str = formatter.format(Instant.ofEpochMilli(res.date)); formatted_results.add(['date': date_str, 'rsi': res.rsi, 'position': res.position]); } return formatted_results;"
+      }
+    }
+  }
+}

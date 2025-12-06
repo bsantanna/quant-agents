@@ -1,0 +1,38 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "key_ticker": "{{key_ticker}}"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "date_reference": {
+              "gte": "{{date_gte}}",
+              "lte": "{{date_lte}}",
+              "format": "strict_date_optional_time||epoch_millis"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "adx_stats": {
+      "scripted_metric": {
+        "params": {
+          "period": {{period}}
+        },
+        "init_script": "state.entries = new ArrayList();",
+        "map_script": "if (doc.containsKey('val_high') && doc['val_high'].size() > 0 && doc['val_high'].value != null && doc.containsKey('val_low') && doc['val_low'].size() > 0 && doc['val_low'].value != null && doc.containsKey('val_close') && doc['val_close'].size() > 0 && doc['val_close'].value != null && doc.containsKey('date_reference') && doc['date_reference'].size() > 0) { def entry = ['date': doc['date_reference'].value.millis, 'high': doc['val_high'].value, 'low': doc['val_low'].value, 'close': doc['val_close'].value]; state.entries.add(entry); }",
+        "combine_script": "return state.entries;",
+        "reduce_script": "def all = []; for (def s : states) { if (s != null) all.addAll(s); } if (all.isEmpty()) return null; all.sort((a,b) -> Long.compare(a.date, b.date)); def period = params.period; def alpha = 1.0 / period; def one_minus_alpha = 1.0 - alpha; def n = all.size(); def results = new ArrayList(); if (n < 2) { for (def entry : all) { results.add(['date': entry.date, 'adx': null, 'plus_di': null, 'minus_di': null, 'position': null]); } } else { results.add(['date': all[0].date, 'adx': null, 'plus_di': null, 'minus_di': null, 'position': null]); def m = n - 1; def plus_dms = new double[m]; def minus_dms = new double[m]; def trs = new double[m]; for (int i = 1; i < n; i++) { def prev_high = all[i-1].high; def prev_low = all[i-1].low; def prev_close = all[i-1].close; def high = all[i].high; def low = all[i].low; def close = all[i].close; def up_move = high - prev_high; def down_move = prev_low - low; def plus_dm = (up_move > down_move && up_move > 0) ? up_move : 0.0; def minus_dm = (down_move > up_move && down_move > 0) ? down_move : 0.0; plus_dms[i-1] = plus_dm; minus_dms[i-1] = minus_dm; trs[i-1] = Math.max(high - low, Math.max(Math.abs(high - prev_close), Math.abs(low - prev_close))); } def plus_dm_smooth = new double[m]; def minus_dm_smooth = new double[m]; def tr_smooth = new double[m]; plus_dm_smooth[0] = plus_dms[0]; minus_dm_smooth[0] = minus_dms[0]; tr_smooth[0] = trs[0]; for (int k = 1; k < m; k++) { plus_dm_smooth[k] = plus_dm_smooth[k-1] * one_minus_alpha + plus_dms[k] * alpha; minus_dm_smooth[k] = minus_dm_smooth[k-1] * one_minus_alpha + minus_dms[k] * alpha; tr_smooth[k] = tr_smooth[k-1] * one_minus_alpha + trs[k] * alpha; } def plus_dis = new double[m]; def minus_dis = new double[m]; def dxs = new double[m]; for (int k = 0; k < m; k++) { def tr_s = tr_smooth[k]; def plus_di = tr_s != 0 ? 100.0 * plus_dm_smooth[k] / tr_s : null; def minus_di = tr_s != 0 ? 100.0 * minus_dm_smooth[k] / tr_s : null; plus_dis[k] = plus_di != null ? plus_di : 0.0; minus_dis[k] = minus_di != null ? minus_di : 0.0; def di_sum = plus_dis[k] + minus_dis[k]; dxs[k] = di_sum != 0 ? 100.0 * Math.abs(plus_dis[k] - minus_dis[k]) / di_sum : 0.0; } def adxs = new double[m]; adxs[0] = dxs[0]; for (int k = 1; k < m; k++) { adxs[k] = adxs[k-1] * one_minus_alpha + dxs[k] * alpha; } for (int k = 0; k < m; k++) { def adx = adxs[k]; def plus_di = plus_dis[k]; def minus_di = minus_dis[k]; def position = (adx > 25 && plus_di > minus_di) ? 1 : ((adx > 25 && minus_di > plus_di) ? -1 : 1); results.add(['date': all[k+1].date, 'adx': Math.round(adx * 100.0) / 100.0, 'plus_di': Math.round(plus_di * 100.0) / 100.0, 'minus_di': Math.round(minus_di * 100.0) / 100.0, 'position': position]); } } def formatter = DateTimeFormatter.ofPattern('yyyy-MM-dd').withZone(ZoneId.of('UTC')); def formatted_results = new ArrayList(); for (def res : results) { def date_str = formatter.format(Instant.ofEpochMilli(res.date)); formatted_results.add(['date': date_str, 'adx': res.adx, 'plus_di': res.plus_di, 'minus_di': res.minus_di, 'position': res.position]); } return formatted_results;"
+      }
+    }
+  }
+}

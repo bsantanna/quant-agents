@@ -400,9 +400,14 @@ resource "elasticstack_elasticsearch_index_template" "quant-agents_stocks-fundam
 locals {
   search_templates = {
     get_eod_ohlcv_template = "get_eod_ohlcv.mustache"
+    get_eod_indicator_ad_template = "get_eod_indicator_ad.mustache"
+    get_eod_indicator_adx_template = "get_eod_indicator_adx.mustache"
     get_eod_indicator_cci_template = "get_eod_indicator_cci.mustache"
     get_eod_indicator_ema_template = "get_eod_indicator_ema.mustache"
     get_eod_indicator_macd_template = "get_eod_indicator_macd.mustache"
+    get_eod_indicator_obv_template = "get_eod_indicator_obv.mustache"
+    get_eod_indicator_rsi_template = "get_eod_indicator_rsi.mustache"
+    get_eod_indicator_stoch_template = "get_eod_indicator_stoch.mustache"
     get_stats_close_template = "get_stats_close.mustache"
   }
 }

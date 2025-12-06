@@ -1,0 +1,98 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "key_ticker": "{{key_ticker}}"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "date_reference": {
+              "gte": "{{date_gte}}",
+              "lte": "{{date_lte}}",
+              "format": "strict_date_optional_time||epoch_millis"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "time_buckets": {
+      "date_histogram": {
+        "field": "date_reference",
+        "calendar_interval": "1d",
+        "min_doc_count": 0
+      },
+      "aggs": {
+        "the_high": {
+          "max": {
+            "field": "val_high"
+          }
+        },
+        "the_low": {
+          "min": {
+            "field": "val_low"
+          }
+        },
+        "the_close": {
+          "avg": {
+            "field": "val_close"
+          }
+        },
+        "lowest_low": {
+          "moving_fn": {
+            "buckets_path": "the_low",
+            "window": {{lookback}},
+            "script": "if (values.length < {{lookback}}) return Double.NaN; else return MovingFunctions.min(values);"
+          }
+        },
+        "highest_high": {
+          "moving_fn": {
+            "buckets_path": "the_high",
+            "window": {{lookback}},
+            "script": "if (values.length < {{lookback}}) return Double.NaN; else return MovingFunctions.max(values);"
+          }
+        },
+        "raw_k": {
+          "bucket_script": {
+            "buckets_path": {
+              "close": "the_close",
+              "low": "lowest_low",
+              "high": "highest_high"
+            },
+            "script": "def denom = params.high - params.low; if (denom > 0 && params.low != null && params.high != null && params.close != null) { return 100.0 * (params.close - params.low) / denom; } else { return Double.NaN; }"
+          }
+        },
+        "slow_k": {
+          "moving_fn": {
+            "buckets_path": "raw_k",
+            "window": {{smooth_k}},
+            "script": "if (values.length < {{smooth_k}}) return Double.NaN; else return MovingFunctions.unweightedAvg(values);"
+          }
+        },
+        "slow_d": {
+          "moving_fn": {
+            "buckets_path": "slow_k",
+            "window": {{smooth_d}},
+            "script": "if (values.length < {{smooth_d}}) return Double.NaN; else return MovingFunctions.unweightedAvg(values);"
+          }
+        },
+        "position": {
+          "bucket_script": {
+            "buckets_path": {
+              "k": "slow_k",
+              "d": "slow_d"
+            },
+            "script": "if (params.k == null || params.d == null || Double.isNaN(params.k) || Double.isNaN(params.d)) return null; else return params.k > params.d ? 1 : -1;"
+          }
+        }
+      }
+    }
+  }
+}
