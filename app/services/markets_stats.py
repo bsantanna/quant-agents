@@ -151,3 +151,26 @@ class MarketsStatsService:
         response = self.es.search_template(index=index_name, body=search_params)
         return response['aggregations']['rsi_stats']['value']
 
+    async def get_indicator_stoch(
+            self,
+            index_name: str,
+            key_ticker: str,
+            start_date: str,
+            end_date: str,
+            lookback: int,
+            smooth_k: int,
+            smooth_d: int
+    ) -> dict:
+        search_params = {
+            "id": "get_eod_indicator_stoch_template",
+            "params": {
+                "key_ticker": key_ticker,
+                "date_gte": start_date,
+                "date_lte": end_date,
+                "lookback": lookback,
+                "smooth_k": smooth_k,
+                "smooth_d": smooth_d,
+            }
+        }
+        response = self.es.search_template(index=index_name, body=search_params)
+        return response['aggregations']['stoch_stats']['value']

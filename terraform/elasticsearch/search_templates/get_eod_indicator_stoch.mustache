@@ -23,76 +23,14 @@
     }
   },
   "aggs": {
-    "time_buckets": {
-      "date_histogram": {
-        "field": "date_reference",
-        "calendar_interval": "1d",
-        "min_doc_count": 0
-      },
-      "aggs": {
-        "the_high": {
-          "max": {
-            "field": "val_high"
-          }
-        },
-        "the_low": {
-          "min": {
-            "field": "val_low"
-          }
-        },
-        "the_close": {
-          "avg": {
-            "field": "val_close"
-          }
-        },
-        "lowest_low": {
-          "moving_fn": {
-            "buckets_path": "the_low",
-            "window": {{lookback}},
-            "script": "if (values.length < {{lookback}}) return Double.NaN; else return MovingFunctions.min(values);"
-          }
-        },
-        "highest_high": {
-          "moving_fn": {
-            "buckets_path": "the_high",
-            "window": {{lookback}},
-            "script": "if (values.length < {{lookback}}) return Double.NaN; else return MovingFunctions.max(values);"
-          }
-        },
-        "raw_k": {
-          "bucket_script": {
-            "buckets_path": {
-              "close": "the_close",
-              "low": "lowest_low",
-              "high": "highest_high"
-            },
-            "script": "def denom = params.high - params.low; if (denom > 0 && params.low != null && params.high != null && params.close != null) { return 100.0 * (params.close - params.low) / denom; } else { return Double.NaN; }"
-          }
-        },
-        "slow_k": {
-          "moving_fn": {
-            "buckets_path": "raw_k",
-            "window": {{smooth_k}},
-            "script": "if (values.length < {{smooth_k}}) return Double.NaN; else return MovingFunctions.unweightedAvg(values);"
-          }
-        },
-        "slow_d": {
-          "moving_fn": {
-            "buckets_path": "slow_k",
-            "window": {{smooth_d}},
-            "script": "if (values.length < {{smooth_d}}) return Double.NaN; else return MovingFunctions.unweightedAvg(values);"
-          }
-        },
-        "position": {
-          "bucket_script": {
-            "buckets_path": {
-              "k": "slow_k",
-              "d": "slow_d"
-            },
-            "script": "if (params.k == null || params.d == null || Double.isNaN(params.k) || Double.isNaN(params.d)) return null; else return params.k > params.d ? 1 : -1;"
-          }
-        }
+    "stoch_stats": {
+      "scripted_metric": {
+        "init_script": "state.data = new ArrayList();",
+        "map_script": "def date_str = doc['date_reference'].value.format(DateTimeFormatter.ofPattern('yyyy-MM-dd')); long millis = doc['date_reference'].value.toInstant().toEpochMilli(); double low = (double) doc['val_low'].value; double high = (double) doc['val_high'].value; double close = (double) doc['val_close'].value; state.data.add(['date_str': date_str, 'millis': millis, 'low': low, 'high': high, 'close': close]);",
+        "combine_script": "return state.data;",
+        "reduce_script": "def all_data = new ArrayList(); for (def shard : states) { all_data.addAll(shard); } all_data.sort((a,b) -> Long.compare(a.millis, b.millis)); int lookback = 10; int smooth_k = 10; int smooth_d = 10; int n = all_data.size(); def raw_ks = new ArrayList(); for (int i = 0; i < n; i++) { double min_low = Double.POSITIVE_INFINITY; double max_high = Double.NEGATIVE_INFINITY; int start = i - lookback + 1; if (start < 0) start = 0; for (int j = start; j <= i; j++) { double curr_low = (double) all_data.get(j).low; double curr_high = (double) all_data.get(j).high; min_low = Math.min(min_low, curr_low); max_high = Math.max(max_high, curr_high); } double denom = max_high - min_low; double curr_close = (double) all_data.get(i).close; double rk = (denom != 0 && !Double.isNaN(denom)) ? 100 * (curr_close - min_low) / denom : Double.NaN; raw_ks.add(rk); } def slow_ks = new ArrayList(); for (int i = 0; i < n; i++) { double sum = 0.0; int count = 0; boolean has_nan = false; int start = i - smooth_k + 1; if (start < 0) start = 0; for (int j = start; j <= i; j++) { double val = (double) raw_ks.get(j); if (Double.isNaN(val)) { has_nan = true; break; } sum += val; count++; } double mean = has_nan ? Double.NaN : (count > 0 ? sum / count : Double.NaN); slow_ks.add(mean); } def slow_ds = new ArrayList(); for (int i = 0; i < n; i++) { double sum = 0.0; int count = 0; boolean has_nan = false; int start = i - smooth_d + 1; if (start < 0) start = 0; for (int j = start; j <= i; j++) { double val = (double) slow_ks.get(j); if (Double.isNaN(val)) { has_nan = true; break; } sum += val; count++; } double mean = has_nan ? Double.NaN : (count > 0 ? sum / count : Double.NaN); slow_ds.add(mean); } def result = new ArrayList(); for (int i = 0; i < n; i++) { double sk = (double) slow_ks.get(i); double sd = (double) slow_ds.get(i); if (!Double.isNaN(sk) && !Double.isNaN(sd)) { def row = new HashMap(); row.put('date', all_data.get(i).date_str); row.put('slow_k', sk); row.put('slow_d', sd); row.put('position', sk > sd ? 1 : -1); result.add(row); } } return result;"
       }
     }
   }
 }
+
