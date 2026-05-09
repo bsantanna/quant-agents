@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.27 (2026-05-09)
+
+### Bug Fixes
+
+- News feed 1 ([#141](https://github.com/bsantanna/quaks/pull/141),
+  [`411827b`](https://github.com/bsantanna/quaks/commit/411827b0377726e7a927daa06bd3a44cb8484217))
+
+
 ## v1.5.26 (2026-04-29)
 
 ### Bug Fixes
