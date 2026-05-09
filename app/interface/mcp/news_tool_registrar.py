@@ -220,7 +220,7 @@ class NewsToolRegistrar(McpRegistrar):
             svc = container.markets_insights_service()
 
             results, sort = svc.get_insights_news(
-                index_name="quaks_insights-news_latest",
+                index_name="quaks_insights-news",
                 id=id,
                 date_from=date_from,
                 date_to=date_to,

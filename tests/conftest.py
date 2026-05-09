@@ -250,10 +250,7 @@ def setup_elasticsearch():
             },
         }
     }
-    es.indices.create(index="quaks_insights-news_test", body=insights_mapping)
-    es.indices.put_alias(
-        index="quaks_insights-news_test", name="quaks_insights-news_latest"
-    )
+    es.indices.create(index="quaks_insights-news", body=insights_mapping)
 
     # Register search templates from Mustache files
     templates_dir = Path.cwd() / "terraform" / "01_elasticsearch" / "search_templates"
@@ -275,7 +272,7 @@ def setup_elasticsearch():
         )
     for doc in fixture["insights_news"]:
         es.index(
-            index="quaks_insights-news_test",
+            index="quaks_insights-news",
             id=doc["_id"],
             body=doc["_source"],
         )
@@ -305,7 +302,7 @@ def setup_elasticsearch():
     )
 
     es.indices.refresh(index="quaks_markets-news_test")
-    es.indices.refresh(index="quaks_insights-news_test")
+    es.indices.refresh(index="quaks_insights-news")
 
 
 @pytest.fixture(scope="function", autouse=True)

@@ -4,15 +4,13 @@
 # Initializes all modules and imports existing resources from the live environment.
 #
 # Usage:
-#   ./init.sh                           # uses default: ../quaks.tfvars (relative to terraform/)
-#   TFVARS_FILE=/path/to/vars ./init.sh # override tfvars path
+#   TFVARS_FILE=/path/to/vars ./init.sh 
 #
 # Prerequisites: terraform, kubectl, curl, jq
 #
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TFVARS_FILE="${TFVARS_FILE:-${SCRIPT_DIR}/../quaks.tfvars}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -133,6 +131,7 @@ init_01_elasticsearch() {
     "quaks_stocks-fundamental-cash-flow_template"
     "quaks_stocks-fundamental-estimated-earnings_template"
     "quaks_insights-news_template"
+    "quaks_insights-finance_template"
     "quaks_waiting-list_template"
     "quaks_published-content_template"
   )
@@ -151,7 +150,8 @@ init_01_elasticsearch() {
     "stocks_metadata_nyse:quaks_stocks-metadata_nyse"
     "stocks_metadata_nasdaq:quaks_stocks-metadata_nasdaq"
     "stocks_metadata_amex:quaks_stocks-metadata_amex"
-    "insights_news_usa:quaks_insights-news_usa"
+    "insights_news:quaks_insights-news"
+    "insights_finance:quaks_insights-finance"
     "waiting_list_initial:quaks_waiting-list_initial"
     "published_content_initial:quaks_published-content_initial"
   )

@@ -70,7 +70,7 @@ def build_get_insights_news_tool(markets_insights_service: MarketsInsightsServic
         """
         actual_size = min(size, 10)
         results, _ = markets_insights_service.get_insights_news(
-            index_name="quaks_insights-news_latest",
+            index_name="quaks_insights-news",
             date_from=date_from if date_from else None,
             size=actual_size,
             include_report_html=True,

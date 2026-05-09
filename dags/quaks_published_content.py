@@ -82,7 +82,11 @@ def process_published_content():
 
     skill_routing = {
         "/news_analyst": {
-            "index": "quaks_insights-news_usa",
+            "index": "quaks_insights-news",
+            "build_doc": build_news_analyst_doc,
+        },
+        "/financial_analyst_v1": {
+            "index": "quaks_insights-finance",
             "build_doc": build_news_analyst_doc,
         },
     }

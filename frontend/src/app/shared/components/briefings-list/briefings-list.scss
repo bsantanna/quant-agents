@@ -1,0 +1,445 @@
+// ── Briefings list ──────────────────────────────────────
+
+.briefings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// ── Avatar ──────────────────────────────────────────────
+
+.briefing-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 2px solid var(--border-primary);
+  background: var(--surface-elevated);
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .briefing-card-top {
+    flex-direction: column-reverse;
+    align-items: center !important;
+  }
+
+  .briefing-avatar-col {
+    margin-left: 0 !important;
+    margin-bottom: 0.75rem;
+  }
+
+  .briefing-avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  .briefing-summary-text {
+    text-align: left;
+  }
+}
+
+// ── Briefing card ───────────────────────────────────────
+
+.briefing-card {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.briefing-card-expanded {
+  border-color: var(--border-accent);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  position: sticky;
+  top: 4rem;
+  z-index: 10;
+  background: var(--surface-elevated-translucent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.briefing-summary-text {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.briefing-toggle-btn {
+  color: var(--text-primary);
+  font-family: var(--font-data);
+  letter-spacing: 0.02em;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  &:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-primary);
+  }
+}
+
+.briefing-date-label {
+  font-family: var(--font-data);
+  color: var(--accent-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.briefing-agent-name {
+  font-family: var(--font-heading);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.briefing-agent-meta {
+  font-family: var(--font-body);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.briefing-agent-author,
+.briefing-agent-skill {
+  font-family: var(--font-heading);
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.briefing-agent-model {
+  font-family: var(--font-data);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.65rem;
+}
+
+// ── Expanded report (container) ─────────────────────────
+
+.briefing-report {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-accent);
+  border-top: none;
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+  padding: 2.5rem 2.5rem 3rem;
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+  overflow-x: auto;
+
+  @media (max-width: 640px) {
+    padding: 1.5rem 1.25rem 2rem;
+    font-size: 0.95rem;
+  }
+}
+
+// ── Expanded report (innerHTML content) ─────────────────
+// Must be at :host level so styles penetrate innerHTML
+
+:host ::ng-deep .briefing-report {
+
+  // ── Headings ──
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+
+  h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-top: 2.5em;
+    margin-bottom: 0.75em;
+    padding-bottom: 0.4em;
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  h2 {
+    font-size: 1.65rem;
+    font-weight: 600;
+    margin-top: 2em;
+    margin-bottom: 0.6em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-top: 1.75em;
+    margin-bottom: 0.5em;
+    color: var(--accent-primary);
+  }
+
+  h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.4em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  > h1:first-child,
+  > h2:first-child,
+  > h3:first-child {
+    margin-top: 0;
+  }
+
+  // ── Body text ──
+
+  p {
+    margin-bottom: 1.1em;
+    hanging-punctuation: first;
+  }
+
+  .report-lede {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    border-left: 3px solid var(--accent-primary);
+    padding-left: 1em;
+    margin-bottom: 1.75em;
+  }
+
+  // ── Links ──
+
+  a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      color: var(--accent-hover);
+      border-bottom-color: var(--accent-hover);
+    }
+  }
+
+  .ticker-link {
+    font-family: var(--font-data);
+    font-weight: 600;
+    color: var(--accent-primary);
+    background: var(--surface-elevated);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    border-bottom: none;
+
+    &:hover {
+      background: var(--accent-primary);
+      color: var(--surface-base);
+      border-bottom: none;
+    }
+  }
+
+  // ── Bold / emphasis ──
+
+  strong, b {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  em, i {
+    color: var(--text-primary);
+    font-style: italic;
+  }
+
+  // ── Lists ──
+
+  ul, ol {
+    padding-left: 1.25em;
+    margin-bottom: 1.25em;
+  }
+
+  ul { list-style-type: disc; }
+  ul ul { list-style-type: circle; }
+  ol { list-style-type: decimal; }
+
+  li {
+    margin-bottom: 0.4em;
+    padding-left: 0.25em;
+
+    &::marker {
+      color: var(--accent-primary);
+    }
+  }
+
+  // ── Tables ──
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1.75em 0;
+    font-family: var(--font-data);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  th {
+    background: var(--surface-elevated);
+    color: var(--text-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    padding: 0.75em 1em;
+    text-align: left;
+    border-bottom: 2px solid var(--border-accent);
+  }
+
+  td {
+    padding: 0.6em 1em;
+    border-bottom: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface-hover); }
+
+  // ── Blockquotes ──
+
+  blockquote {
+    border-left: 3px solid var(--accent-primary);
+    padding: 0.75em 1.25em;
+    margin: 1.5em 0;
+    background: var(--surface-elevated);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: var(--text-secondary);
+    font-style: italic;
+
+    p:last-child { margin-bottom: 0; }
+  }
+
+  // ── Code ──
+
+  code {
+    font-family: var(--font-data);
+    background: var(--surface-elevated);
+    padding: 0.2em 0.45em;
+    border-radius: 4px;
+    font-size: 0.85em;
+    color: var(--accent-primary);
+  }
+
+  pre {
+    background: var(--surface-base);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius);
+    padding: 1.25em 1.5em;
+    overflow-x: auto;
+    margin: 1.5em 0;
+    line-height: 1.6;
+
+    code {
+      background: none;
+      padding: 0;
+      color: var(--text-primary);
+    }
+  }
+
+  // ── Horizontal rules ──
+
+  hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--border-primary) 20%,
+      var(--border-primary) 80%,
+      transparent 100%
+    );
+    margin: 2.5em 0;
+  }
+
+  // ── Images ──
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    margin: 1.5em 0;
+  }
+}
+
+// ── Share dropdown ──────────────────────────────────────
+
+.share-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  width: 9rem;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius);
+  z-index: 50;
+}
+
+.share-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+}
+
+.share-divider {
+  width: 100%;
+  border-top: 1px solid var(--border-primary);
+}
+
+// ── Load more / empty states ────────────────────────────
+
+.load-more-btn {
+  font-family: var(--font-data);
+  background: var(--surface-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius);
+  padding: 0.5rem 1.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-accent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.empty-text,
+.loading-text {
+  font-family: var(--font-body);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}

@@ -130,7 +130,7 @@ def generate_insights_news():
 
     today = datetime.now().strftime("%Y-%m-%d")
     doc_id = hashlib.md5(f"insights_news_{today}_{agent_id}".encode("utf-8")).hexdigest()
-    index_name = "quaks_insights-news_usa"
+    index_name = "quaks_insights-news"
 
     doc = {
         "date_reference": today,

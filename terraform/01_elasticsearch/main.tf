@@ -599,11 +599,8 @@ resource "elasticstack_elasticsearch_index_template" "quaks_insights-news_templa
   }
 }
 
-resource "elasticstack_elasticsearch_index" "insights_news_usa" {
-  name = "quaks_insights-news_usa"
-  alias = [{
-    name = "quaks_insights-news_latest"
-  }]
+resource "elasticstack_elasticsearch_index" "insights_news" {
+  name = "quaks_insights-news"
   mappings = jsonencode({
     dynamic = "strict"
     properties = {
@@ -617,6 +614,52 @@ resource "elasticstack_elasticsearch_index" "insights_news_usa" {
   })
   deletion_protection = false
   depends_on = [elasticstack_elasticsearch_index_template.quaks_insights-news_template]
+}
+
+resource "elasticstack_elasticsearch_index_template" "quaks_insights-finance_template" {
+  name = "quaks_insights-finance_template"
+
+  index_patterns = ["quaks_insights-finance*"]
+
+  template {
+    mappings = jsonencode({
+      dynamic = "strict"
+      properties = {
+        key_author_username     = { type = "keyword" }
+        key_skill_name          = { type = "keyword" }
+        key_language_model_name = { type = "keyword" }
+        date_reference          = { type = "date", format = "yyyy-MM-dd" }
+        text_executive_summary  = { type = "text" }
+        text_report_html        = { type = "text" }
+      }
+    })
+
+    settings = jsonencode({
+      number_of_shards   = 1
+      number_of_replicas = 1
+
+      lifecycle = {
+        name = elasticstack_elasticsearch_index_lifecycle.quaks_policy.name
+      }
+    })
+  }
+}
+
+resource "elasticstack_elasticsearch_index" "insights_finance" {
+  name = "quaks_insights-finance"
+  mappings = jsonencode({
+    dynamic = "strict"
+    properties = {
+      key_author_username     = { type = "keyword" }
+      key_skill_name          = { type = "keyword" }
+      key_language_model_name = { type = "keyword" }
+      date_reference          = { type = "date", format = "yyyy-MM-dd" }
+      text_executive_summary  = { type = "text" }
+      text_report_html        = { type = "text" }
+    }
+  })
+  deletion_protection = false
+  depends_on = [elasticstack_elasticsearch_index_template.quaks_insights-finance_template]
 }
 
 resource "elasticstack_elasticsearch_index_template" "quaks_waiting-list_template" {

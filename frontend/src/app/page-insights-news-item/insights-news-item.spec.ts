@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {ActivatedRoute, convertToParamMap} from '@angular/router';
+import {ActivatedRoute, convertToParamMap, Router} from '@angular/router';
 import { of } from 'rxjs';
 
 import { InsightsNewsItem } from './insights-news-item';
@@ -45,6 +45,7 @@ describe('InsightsNewsItem', () => {
       imports: [InsightsNewsItem],
       providers: [
         {provide: ActivatedRoute, useValue: {paramMap: of(convertToParamMap({indexName: 'insights', newsItemId: 'news-1'}))}},
+        {provide: Router, useValue: {url: '/insights/news/item/insights/news-1'}},
         {provide: MarketsInsightsService, useValue: insightsService},
         {provide: IndexedKeyTickerService, useValue: tickerService},
         {provide: ShareUrlService, useValue: shareUrlService},
