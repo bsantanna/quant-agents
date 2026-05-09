@@ -95,6 +95,11 @@ export const routes: Routes = [
         title: 'Financial Insights',
         path: 'financial',
         component: InsightsFinance
+      },
+      {
+        title: 'Financial Insight',
+        path: 'financial/item/:indexName/:newsItemId',
+        component: InsightsNewsItem
       }
     ]
   },

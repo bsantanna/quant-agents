@@ -1,5 +1,5 @@
 import {Component, computed, effect, inject, OnDestroy, PLATFORM_ID, signal} from '@angular/core';
-import {ActivatedRoute, ParamMap} from '@angular/router';
+import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {isPlatformBrowser} from '@angular/common';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {take} from 'rxjs';
@@ -24,6 +24,7 @@ export class InsightsNewsItem implements OnDestroy {
 
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly insightsService = inject(MarketsInsightsService);
   private readonly tickerService = inject(IndexedKeyTickerService);
   private readonly shareUrlService = inject(ShareUrlService);
@@ -51,8 +52,8 @@ export class InsightsNewsItem implements OnDestroy {
             fetched.report_html = sanitizeInsightsReportHtml(fetched.report_html, this.getTickerSet());
             this.item.set(fetched);
 
-            const title = fetched.executive_summary || 'Quaks News Insight';
-            const path = `/insights/news/item/${indexName}/${id}`;
+            const title = fetched.executive_summary || 'Quaks Briefing';
+            const path = this.router.url;
             this.shareUrlService.update({
               title,
               url: `${globalThis.location.origin}${path}`,
