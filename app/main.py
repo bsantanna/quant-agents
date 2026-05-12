@@ -106,23 +106,26 @@ def setup_resource_metadata(container: Container, application: FastAPI):
         return
 
     base_url = config["api_base_url"]
-    resource_url = f"{base_url}/mcp"
     authorization_server = f"{base_url}/mcp"
 
-    resource_metadata = {
-        "resource": resource_url,
-        "authorization_servers": [authorization_server],
-        "scopes_supported": ["openid", "profile", "email"],
-        "bearer_methods_supported": ["header"],
-    }
+    def build_resource_metadata(request: Request) -> dict:
+        user_agent = (request.headers.get("user-agent") or "").lower()
+        path_stripped_client = "python-httpx" in user_agent
+        resource = base_url if path_stripped_client else f"{base_url}/mcp"
+        return {
+            "resource": resource,
+            "authorization_servers": [authorization_server],
+            "scopes_supported": ["openid", "profile", "email"],
+            "bearer_methods_supported": ["header"],
+        }
 
     @application.get("/.well-known/oauth-protected-resource/mcp")
-    async def oauth_protected_resource_metadata():
-        return JSONResponse(resource_metadata)
+    async def oauth_protected_resource_metadata(request: Request):
+        return JSONResponse(build_resource_metadata(request))
 
     @application.get("/.well-known/oauth-protected-resource/mcp/")
-    async def oauth_protected_resource_metadata_slash():
-        return JSONResponse(resource_metadata)
+    async def oauth_protected_resource_metadata_slash(request: Request):
+        return JSONResponse(build_resource_metadata(request))
 
     auth_server_metadata = {
         "issuer": authorization_server,
