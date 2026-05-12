@@ -106,7 +106,7 @@ def setup_resource_metadata(container: Container, application: FastAPI):
         return
 
     base_url = config["api_base_url"]
-    resource_url = base_url
+    resource_url = f"{base_url}/mcp"
     authorization_server = f"{base_url}/mcp"
 
     resource_metadata = {
