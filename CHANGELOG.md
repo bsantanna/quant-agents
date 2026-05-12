@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.28 (2026-05-12)
+
+### Bug Fixes
+
+- Hermes agent plugin prototype (1) ([#142](https://github.com/bsantanna/quaks/pull/142),
+  [`a168c62`](https://github.com/bsantanna/quaks/commit/a168c626fb48cca9a8a7819c0166e43f3ae7fa5f))
+
+
 ## v1.5.27 (2026-05-09)
 
 ### Bug Fixes
