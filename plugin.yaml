@@ -1,0 +1,10 @@
+# Plugin name is `quaks` (matches the GitHub repo) so `hermes plugins install
+# bsantanna/quaks` resolves to `~/.hermes/plugins/quaks/`. The Claude Code
+# sub-plugin under `plugins/quaks-agents/.claude-plugin/plugin.json` keeps its
+# own name (`quaks-agents`) because Claude's marketplace model nests multiple
+# plugins per repo. Both ship the same SKILL.md files from
+# `plugins/quaks-agents/skills/`.
+name: quaks
+version: 1.5.27
+description: Collection of Financial Insights Agents for market analysis, investor briefings, and financial news updates.
+author: bsantanna

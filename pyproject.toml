@@ -90,6 +90,7 @@ version_variables = [
   "frontend/package.json:version",
   ".claude-plugin/marketplace.json:version",
   "plugins/quaks-agents/.claude-plugin/plugin.json:version",
+  "plugin.yaml:version",
   "pyproject.toml:version",
   "terraform/02_airflow-instance/variables.tf:default",
   "terraform/05_quaks-instance/variables.tf:default",
