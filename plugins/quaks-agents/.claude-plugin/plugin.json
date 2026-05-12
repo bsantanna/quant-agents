@@ -1,7 +1,7 @@
 {
   "name": "quaks-agents",
   "description": "Collection of Financial Insights Agents for market analysis, investor briefings, and financial news updates.",
-  "version": "1.5.28",
+  "version": "1.5.29",
   "author": {
     "name": "bsantanna"
   },
