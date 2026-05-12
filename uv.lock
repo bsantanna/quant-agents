@@ -7840,7 +7840,7 @@ wheels = [
 
 [[package]]
 name = "quaks"
-version = "1.5.29"
+version = "1.5.30"
 source = { virtual = "." }
 dependencies = [
     { name = "browser-use" },
