@@ -1,6 +1,6 @@
 [project]
 name = "quaks"
-version = "1.5.30"
+version = "1.5.31"
 description = "Multi-agent financial agents platform"
 requires-python = ">=3.12"
 dependencies = [
