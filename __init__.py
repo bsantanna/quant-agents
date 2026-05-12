@@ -24,7 +24,7 @@ PLUGIN_ROOT = Path(__file__).parent
 SKILLS_DIR = PLUGIN_ROOT / "plugins" / "quaks-agents" / "skills"
 
 MCP_SERVER_NAME = "quaks.ai"
-MCP_SERVER_CONFIG = {"url": "https://quaks.ai/mcp/"}
+MCP_SERVER_CONFIG = {"url": "https://quaks.ai/mcp/", "auth": "oauth"}
 
 HERMES_CONFIG_PATH = Path.home() / ".hermes" / "config.yaml"
 
@@ -43,10 +43,36 @@ def _register_skills(ctx) -> None:
         skill_md = child / "SKILL.md"
         if not (child.is_dir() and skill_md.exists()):
             continue
+        description = _read_skill_description(skill_md)
         try:
-            ctx.register_skill(child.name, skill_md)
+            ctx.register_skill(child.name, skill_md, description)
         except Exception:
             logger.exception("Failed to register Quaks skill %s", child.name)
+
+
+def _read_skill_description(skill_md: Path) -> str:
+    """Extract the `description:` field from a SKILL.md YAML frontmatter block."""
+    try:
+        with skill_md.open("r", encoding="utf-8") as fh:
+            lines = fh.readlines()
+    except OSError:
+        return ""
+    if not lines or lines[0].rstrip() != "---":
+        return ""
+    end = next(
+        (i for i in range(1, len(lines)) if lines[i].rstrip() == "---"),
+        None,
+    )
+    if end is None:
+        return ""
+    try:
+        frontmatter = yaml.safe_load("".join(lines[1:end]))
+    except yaml.YAMLError:
+        return ""
+    if not isinstance(frontmatter, dict):
+        return ""
+    description = frontmatter.get("description", "")
+    return description if isinstance(description, str) else ""
 
 
 def _ensure_mcp_server(config_path: Path) -> None:

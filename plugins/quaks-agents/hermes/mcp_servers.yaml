@@ -1,3 +1,4 @@
 mcp_servers:
   quaks.ai:
     url: https://quaks.ai/mcp/
+    auth: oauth
