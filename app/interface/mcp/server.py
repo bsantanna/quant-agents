@@ -19,6 +19,7 @@ Available tools:
 - get_markets_news_mcp: Search and retrieve market news articles filtered by ticker, topic, or date range.
 - get_insights_news_mcp: Retrieve AI-generated investor briefings with executive summaries.
 - publish_content_mcp: Publish AI-generated content (reports, briefings) to the platform. Requires authentication. Content must be in HTML format.
+- read_prompt_mcp: Load a Quaks workflow system prompt by name (universal, tool-based way to load prompts that are also exposed as MCP prompts and as resources at uri prompt://<name>). Use this inside multi-step skills to fetch the system prompt for the current step when your client does not surface MCP prompts/resources as model-callable.
 - fetch_company_profile_mcp: Fetch company metadata, valuation multiples, profitability, growth, analyst ratings, and ownership data for a single ticker.
 - fetch_stats_close_mcp: Fetch latest OHLCV price stats and percent variance for a single ticker over a date range.
 - fetch_technical_indicators_mcp: Fetch RSI, MACD, EMA crossover, and ADX indicators for a single ticker over a date range.

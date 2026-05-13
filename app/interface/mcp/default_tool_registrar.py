@@ -7,6 +7,7 @@ from fastmcp.server.dependencies import get_access_token
 from pydantic import Field
 
 from app.domain.exceptions.base import DuplicateEntryError, UnauthorizedSkillError
+from app.interface.mcp.prompt_registry import PromptRegistry
 from app.interface.mcp.registrar import McpRegistrar
 from app.interface.mcp.schema import (
     AgentItem,
@@ -20,6 +21,9 @@ if TYPE_CHECKING:
 
 class DefaultToolRegistrar(McpRegistrar):
     """Registers the default Quaks MCP tools."""
+
+    def __init__(self, prompt_registry: PromptRegistry) -> None:
+        self._prompt_registry = prompt_registry
 
     def register_tools(self, mcp: FastMCP, container: Container) -> None:
         @mcp.tool(
@@ -124,3 +128,38 @@ class DefaultToolRegistrar(McpRegistrar):
                 message=f"Content published successfully by {author_username}. "
                 "It will be validated and routed to the appropriate index.",
             )
+
+        registry = self._prompt_registry
+
+        @mcp.tool(
+            name="read_prompt_mcp",
+            description="Load a Quaks workflow system prompt by name. Tool-based "
+            "equivalent of reading the MCP resource at prompt://<name> or "
+            "calling prompts/get for the same name — use whichever path your "
+            "runtime exposes. Returns the raw template text (per-tenant "
+            "override applied when available); any {{ CURRENT_TIME }} or "
+            "{{ TICKERS }} placeholder in the returned text is for the model "
+            "to substitute locally before applying the prompt. "
+            "Available prompt names: news_analyst_coordinator, "
+            "news_analyst_aggregator, news_analyst_reporter, "
+            "financial_analyst_v1_coordinator, "
+            "financial_analyst_v1_data_collector, "
+            "financial_analyst_v1_fundamental_analyst, "
+            "financial_analyst_v1_technical_analyst, "
+            "financial_analyst_v1_consensus_reporter.",
+            annotations={"readOnlyHint": True, "openWorldHint": False},
+        )
+        async def read_prompt_mcp(
+            name: Annotated[
+                str,
+                Field(
+                    description="Prompt identifier (e.g. 'news_analyst_aggregator', "
+                    "'financial_analyst_v1_data_collector'). Matches the "
+                    "name segment of the corresponding prompt:// resource URI."
+                ),
+            ],
+        ) -> str:
+            try:
+                return registry.resolve(name)
+            except KeyError as exc:
+                raise ValueError(str(exc)) from exc

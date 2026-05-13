@@ -4,6 +4,7 @@ import pytest
 
 from app.domain.exceptions.base import DuplicateEntryError, UnauthorizedSkillError
 from app.interface.mcp.default_tool_registrar import DefaultToolRegistrar
+from app.interface.mcp.prompt_registry import PromptRegistry
 
 
 def _capturing_mcp():
@@ -24,13 +25,50 @@ def _capturing_mcp():
 
 class TestDefaultToolRegistrar:
     def test_registers_tools(self):
-        registrar = DefaultToolRegistrar()
+        registrar = DefaultToolRegistrar(PromptRegistry())
         mcp = MagicMock()
         container = MagicMock()
         registrar.register_tools(mcp, container)
         tool_names = sorted(call[1]["name"] for call in mcp.tool.call_args_list)
         assert "get_agent_list" in tool_names
         assert "publish_content_mcp" in tool_names
+        assert "read_prompt_mcp" in tool_names
+
+
+class TestReadPromptMcp:
+    @pytest.mark.asyncio
+    async def test_resolves_known_prompt(self):
+        registry = PromptRegistry()
+        registry.register("demo_prompt", lambda **_: "raw template body")
+        mcp, captured = _capturing_mcp()
+        DefaultToolRegistrar(registry).register_tools(mcp, MagicMock())
+
+        result = await captured["read_prompt_mcp"](name="demo_prompt")
+        assert result == "raw template body"
+
+    @pytest.mark.asyncio
+    async def test_unknown_name_raises_with_available_list(self):
+        registry = PromptRegistry()
+        registry.register("real_prompt", lambda **_: "x")
+        mcp, captured = _capturing_mcp()
+        DefaultToolRegistrar(registry).register_tools(mcp, MagicMock())
+
+        with pytest.raises(ValueError, match="real_prompt"):
+            await captured["read_prompt_mcp"](name="missing_prompt")
+
+    @pytest.mark.asyncio
+    async def test_preserves_placeholders_in_raw_text(self):
+        registry = PromptRegistry()
+        registry.register(
+            "demo_prompt",
+            lambda **_: "Current time: {{ CURRENT_TIME }}\nTickers: {{ TICKERS }}",
+        )
+        mcp, captured = _capturing_mcp()
+        DefaultToolRegistrar(registry).register_tools(mcp, MagicMock())
+
+        result = await captured["read_prompt_mcp"](name="demo_prompt")
+        assert "{{ CURRENT_TIME }}" in result
+        assert "{{ TICKERS }}" in result
 
 
 class TestGetAgentList:
@@ -50,11 +88,13 @@ class TestGetAgentList:
         container.agent_service.return_value.get_agents.return_value = [agent]
 
         mcp, captured = _capturing_mcp()
-        DefaultToolRegistrar().register_tools(mcp, container)
+        DefaultToolRegistrar(PromptRegistry()).register_tools(mcp, container)
 
         result = await captured["get_agent_list"]()
 
-        container.agent_service.return_value.get_agents.assert_called_once_with("id_abc")
+        container.agent_service.return_value.get_agents.assert_called_once_with(
+            "id_abc"
+        )
         assert len(result) == 1
         assert result[0].id == "a1"
         assert result[0].language_model_id == "lm1"
@@ -75,7 +115,7 @@ class TestGetAgentList:
         container.agent_service.return_value.get_agents.return_value = [agent]
 
         mcp, captured = _capturing_mcp()
-        DefaultToolRegistrar().register_tools(mcp, container)
+        DefaultToolRegistrar(PromptRegistry()).register_tools(mcp, container)
 
         result = await captured["get_agent_list"]()
         assert result[0].language_model_id is None
@@ -90,7 +130,7 @@ class TestPublishContentMcp:
         container.published_content_service.return_value.publish.return_value = "doc-1"
 
         mcp, captured = _capturing_mcp()
-        DefaultToolRegistrar().register_tools(mcp, container)
+        DefaultToolRegistrar(PromptRegistry()).register_tools(mcp, container)
 
         result = await captured["publish_content_mcp"](
             text_executive_summary="summary",
@@ -120,7 +160,7 @@ class TestPublishContentMcp:
         )
 
         mcp, captured = _capturing_mcp()
-        DefaultToolRegistrar().register_tools(mcp, container)
+        DefaultToolRegistrar(PromptRegistry()).register_tools(mcp, container)
 
         result = await captured["publish_content_mcp"](
             text_executive_summary="s",
@@ -142,7 +182,7 @@ class TestPublishContentMcp:
         )
 
         mcp, captured = _capturing_mcp()
-        DefaultToolRegistrar().register_tools(mcp, container)
+        DefaultToolRegistrar(PromptRegistry()).register_tools(mcp, container)
 
         result = await captured["publish_content_mcp"](
             text_executive_summary="s",
@@ -155,11 +195,13 @@ class TestPublishContentMcp:
         assert "/quant_analyst" in result.message
 
     @pytest.mark.asyncio
-    @patch("app.interface.mcp.default_tool_registrar.get_access_token", return_value=None)
+    @patch(
+        "app.interface.mcp.default_tool_registrar.get_access_token", return_value=None
+    )
     async def test_publish_requires_auth(self, mock_token):
         container = MagicMock()
         mcp, captured = _capturing_mcp()
-        DefaultToolRegistrar().register_tools(mcp, container)
+        DefaultToolRegistrar(PromptRegistry()).register_tools(mcp, container)
 
         with pytest.raises(ValueError, match="Authentication required"):
             await captured["publish_content_mcp"](
@@ -175,7 +217,7 @@ class TestPublishContentMcp:
         mock_token.return_value = MagicMock(claims={})
         container = MagicMock()
         mcp, captured = _capturing_mcp()
-        DefaultToolRegistrar().register_tools(mcp, container)
+        DefaultToolRegistrar(PromptRegistry()).register_tools(mcp, container)
 
         with pytest.raises(ValueError, match="Authentication required"):
             await captured["publish_content_mcp"](
