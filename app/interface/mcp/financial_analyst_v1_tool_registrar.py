@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import re
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Annotated, Optional
 
 from fastmcp import FastMCP
-from jinja2.sandbox import SandboxedEnvironment
 from pydantic import Field
 
+from app.interface.mcp.prompt_registry import PromptRegistry
 from app.interface.mcp.registrar import McpRegistrar
 from app.interface.mcp.user_prompt_resolver import UserPromptResolver
 from app.services.agent_types.quaks.insights.financial_analyst.v1.portfolio_xray import (
@@ -17,7 +18,6 @@ from app.services.agent_types.quaks.insights.financial_analyst.v1.prompts import
     CONSENSUS_REPORTER_SYSTEM_PROMPT,
     COORDINATOR_SYSTEM_PROMPT,
     DATA_COLLECTOR_SYSTEM_PROMPT,
-    EXECUTION_PLAN,
     FUNDAMENTAL_ANALYST_SYSTEM_PROMPT,
     TECHNICAL_ANALYST_SYSTEM_PROMPT,
 )
@@ -26,8 +26,6 @@ if TYPE_CHECKING:
     from app.core.container import Container
 
 _AGENT_TYPE = "quaks_financial_analyst_v1"
-
-_DEFAULT_TICKERS = "To be determined from user query"
 
 _ROLE_SETTING_KEYS = {
     "coordinator": "coordinator_system_prompt",
@@ -45,49 +43,43 @@ _DEFAULT_TEMPLATES = {
     "consensus_reporter": CONSENSUS_REPORTER_SYSTEM_PROMPT,
 }
 
+_ROLE_PROMPT_NAMES = {
+    "coordinator": "financial_analyst_v1_coordinator",
+    "data_collector": "financial_analyst_v1_data_collector",
+    "fundamental_analyst": "financial_analyst_v1_fundamental_analyst",
+    "technical_analyst": "financial_analyst_v1_technical_analyst",
+    "consensus_reporter": "financial_analyst_v1_consensus_reporter",
+}
 
-_JINJA_ENV = SandboxedEnvironment()
+_EXECUTION_PLAN_BLOCK = re.compile(r"## Execution Plan\n\{\{ EXECUTION_PLAN \}\}\n\n?")
 
 
-def _render_prompt(
-    template_str: str,
-    current_time: str | None = None,
-    tickers: str | None = None,
-) -> str:
-    if current_time is not None and not current_time.strip():
-        raise ValueError("current_time must be a non-empty string when provided")
-    if tickers is not None and not tickers.strip():
-        raise ValueError("tickers must be a non-empty string when provided")
-    template = _JINJA_ENV.from_string(template_str)
-    resolved_time = current_time or datetime.now().strftime("%a %b %d %Y %H:%M:%S %z")
-    resolved_tickers = tickers or _DEFAULT_TICKERS
-    return template.render(
-        CURRENT_TIME=resolved_time,
-        EXECUTION_PLAN=EXECUTION_PLAN,
-        TICKERS=resolved_tickers,
-    )
+def _strip_execution_plan(text: str) -> str:
+    return _EXECUTION_PLAN_BLOCK.sub("", text)
 
 
 class FinancialAnalystV1ToolRegistrar(McpRegistrar):
     """Registers MCP tools, prompts, and resources for the quaks_financial_analyst_v1 agent."""
 
-    def __init__(self, user_prompt_resolver: UserPromptResolver) -> None:
-        self._user_prompt_resolver = user_prompt_resolver
-
-    def _resolve_prompt(
+    def __init__(
         self,
-        role: str,
-        current_time: str | None = None,
-        tickers: str | None = None,
-    ) -> str:
-        return self._user_prompt_resolver.resolve(
+        user_prompt_resolver: UserPromptResolver,
+        prompt_registry: PromptRegistry,
+    ) -> None:
+        self._user_prompt_resolver = user_prompt_resolver
+        for role, prompt_name in _ROLE_PROMPT_NAMES.items():
+            prompt_registry.register(
+                prompt_name,
+                lambda role=role, **_: self._resolve_prompt(role),
+            )
+
+    def _resolve_prompt(self, role: str) -> str:
+        template = self._user_prompt_resolver.resolve(
             agent_type=_AGENT_TYPE,
             setting_key=_ROLE_SETTING_KEYS[role],
             default_template=_DEFAULT_TEMPLATES[role],
-            render=lambda t: _render_prompt(
-                t, current_time=current_time, tickers=tickers
-            ),
         )
+        return _strip_execution_plan(template)
 
     def register_tools(self, mcp: FastMCP, container: Container) -> None:
         @mcp.tool(
@@ -237,130 +229,47 @@ class FinancialAnalystV1ToolRegistrar(McpRegistrar):
         @mcp.prompt(
             name="financial_analyst_v1_coordinator",
             description="System prompt for the Financial Analyst coordinator step. "
-            "Answers investment and financial analysis questions directly, or routes "
-            "batch requests (prefixed 'BATCH_ETL') to the data collector for full "
-            "multi-ticker analysis. Returns a ready-to-use system prompt.",
+            "Returns the raw template; the model substitutes any "
+            "{{ CURRENT_TIME }} / {{ TICKERS }} placeholders locally before use.",
         )
-        def financial_analyst_v1_coordinator(
-            current_time: Annotated[
-                Optional[str],
-                Field(
-                    description="Current timestamp to embed in the prompt (e.g. 'Mon Apr 06 2026 18:46:44'). Defaults to server time."
-                ),
-            ] = None,
-            tickers: Annotated[
-                Optional[str],
-                Field(
-                    description="Comma-separated tickers under analysis (e.g. 'AAPL,MSFT'). Defaults to a placeholder."
-                ),
-            ] = None,
-        ) -> str:
-            return self._resolve_prompt(
-                "coordinator", current_time=current_time, tickers=tickers
-            )
+        def financial_analyst_v1_coordinator() -> str:
+            return self._resolve_prompt("coordinator")
 
         @mcp.prompt(
             name="financial_analyst_v1_data_collector",
             description="System prompt for the Financial Analyst data collector step. "
-            "Instructs the LLM to fetch company profile, price stats, technical "
-            "indicators, and news for each ticker using the "
-            "fetch_company_profile_mcp, fetch_stats_close_mcp, "
-            "fetch_technical_indicators_mcp, and get_markets_news_mcp tools. "
-            "Returns a ready-to-use system prompt with current timestamp, execution plan, and tickers.",
+            "Returns the raw template; the model substitutes any "
+            "{{ CURRENT_TIME }} / {{ TICKERS }} placeholders locally before use.",
         )
-        def financial_analyst_v1_data_collector(
-            current_time: Annotated[
-                Optional[str],
-                Field(
-                    description="Current timestamp to embed in the prompt. Defaults to server time."
-                ),
-            ] = None,
-            tickers: Annotated[
-                Optional[str],
-                Field(
-                    description="Comma-separated tickers under analysis (e.g. 'AAPL,MSFT')."
-                ),
-            ] = None,
-        ) -> str:
-            return self._resolve_prompt(
-                "data_collector", current_time=current_time, tickers=tickers
-            )
+        def financial_analyst_v1_data_collector() -> str:
+            return self._resolve_prompt("data_collector")
 
         @mcp.prompt(
             name="financial_analyst_v1_fundamental_analyst",
             description="System prompt for the Financial Analyst fundamental analyst step. "
-            "Performs chain-of-thought valuation analysis: multiples (P/E, forward P/E, "
-            "P/B), profitability (margins, ROE), growth, risk profile. Produces a "
-            "BUY/HOLD/SELL recommendation with a conviction score (1-10) per ticker.",
+            "Returns the raw template; the model substitutes any "
+            "{{ CURRENT_TIME }} / {{ TICKERS }} placeholders locally before use.",
         )
-        def financial_analyst_v1_fundamental_analyst(
-            current_time: Annotated[
-                Optional[str],
-                Field(
-                    description="Current timestamp to embed in the prompt. Defaults to server time."
-                ),
-            ] = None,
-            tickers: Annotated[
-                Optional[str],
-                Field(
-                    description="Comma-separated tickers under analysis (e.g. 'AAPL,MSFT')."
-                ),
-            ] = None,
-        ) -> str:
-            return self._resolve_prompt(
-                "fundamental_analyst", current_time=current_time, tickers=tickers
-            )
+        def financial_analyst_v1_fundamental_analyst() -> str:
+            return self._resolve_prompt("fundamental_analyst")
 
         @mcp.prompt(
             name="financial_analyst_v1_technical_analyst",
             description="System prompt for the Financial Analyst technical analyst step. "
-            "Performs multi-indicator confluence analysis: trend (ADX/EMA), momentum "
-            "(RSI/MACD), price positioning (52-week range). Produces a BUY/HOLD/SELL "
-            "recommendation with a conviction score (1-10) per ticker.",
+            "Returns the raw template; the model substitutes any "
+            "{{ CURRENT_TIME }} / {{ TICKERS }} placeholders locally before use.",
         )
-        def financial_analyst_v1_technical_analyst(
-            current_time: Annotated[
-                Optional[str],
-                Field(
-                    description="Current timestamp to embed in the prompt. Defaults to server time."
-                ),
-            ] = None,
-            tickers: Annotated[
-                Optional[str],
-                Field(
-                    description="Comma-separated tickers under analysis (e.g. 'AAPL,MSFT')."
-                ),
-            ] = None,
-        ) -> str:
-            return self._resolve_prompt(
-                "technical_analyst", current_time=current_time, tickers=tickers
-            )
+        def financial_analyst_v1_technical_analyst() -> str:
+            return self._resolve_prompt("technical_analyst")
 
         @mcp.prompt(
             name="financial_analyst_v1_consensus_reporter",
             description="System prompt for the Financial Analyst consensus reporter step. "
-            "Merges fundamental and technical recommendations into one voice, "
-            "allocates USD 10,000 across tickers weighted by conviction, and "
-            "produces a polished HTML report with per-ticker verdicts, allocation "
-            "table, and a machine-parseable ALLOCATION: line.",
+            "Returns the raw template; the model substitutes any "
+            "{{ CURRENT_TIME }} / {{ TICKERS }} placeholders locally before use.",
         )
-        def financial_analyst_v1_consensus_reporter(
-            current_time: Annotated[
-                Optional[str],
-                Field(
-                    description="Current timestamp to embed in the prompt. Defaults to server time."
-                ),
-            ] = None,
-            tickers: Annotated[
-                Optional[str],
-                Field(
-                    description="Comma-separated tickers under analysis (e.g. 'AAPL,MSFT')."
-                ),
-            ] = None,
-        ) -> str:
-            return self._resolve_prompt(
-                "consensus_reporter", current_time=current_time, tickers=tickers
-            )
+        def financial_analyst_v1_consensus_reporter() -> str:
+            return self._resolve_prompt("consensus_reporter")
 
     def register_resources(self, mcp: FastMCP) -> None:
         @mcp.resource(

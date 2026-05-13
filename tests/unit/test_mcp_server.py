@@ -8,6 +8,7 @@ from app.interface.mcp.schema import (
 from app.interface.mcp.server import _build_auth
 from app.interface.mcp.registrar import McpRegistrar
 from app.interface.mcp.default_tool_registrar import DefaultToolRegistrar
+from app.interface.mcp.prompt_registry import PromptRegistry
 
 
 class TestMcpModels:
@@ -29,11 +30,12 @@ class TestMcpModels:
         result = PublishContentResult(
             status="published",
             message="Content published successfully",
-            doc_id="doc-123"
+            doc_id="doc-123",
         )
         assert result.status == "published"
         assert result.message == "Content published successfully"
         assert result.doc_id == "doc-123"
+
 
 class TestBuildAuth:
     def test_build_auth_disabled(self):
@@ -101,12 +103,16 @@ class TestMcpRegistrar:
         assert issubclass(DefaultToolRegistrar, McpRegistrar)
 
     def test_default_tool_registrar_registers_tools(self):
-        registrar = DefaultToolRegistrar()
+        registrar = DefaultToolRegistrar(PromptRegistry())
         mcp = MagicMock()
         container = MagicMock()
         registrar.register_tools(mcp, container)
         tool_names = sorted(call[1]["name"] for call in mcp.tool.call_args_list)
-        assert tool_names == ["get_agent_list", "publish_content_mcp"]
+        assert tool_names == [
+            "get_agent_list",
+            "publish_content_mcp",
+            "read_prompt_mcp",
+        ]
 
     def test_custom_registrar_overrides(self):
         class CustomRegistrar(McpRegistrar):

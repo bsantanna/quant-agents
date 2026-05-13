@@ -4,17 +4,16 @@ import pytest
 
 from app.interface.mcp.financial_analyst_v1_tool_registrar import (
     FinancialAnalystV1ToolRegistrar,
-    _render_prompt,
+    _strip_execution_plan,
 )
+from app.interface.mcp.prompt_registry import PromptRegistry
 
 
 def _passthrough_resolver():
-    """Resolver mock that always renders the default template (no override)."""
+    """Resolver mock that always returns the default template (no override)."""
     resolver = MagicMock()
-    resolver.resolve.side_effect = (
-        lambda agent_type, setting_key, default_template, render: render(
-            default_template
-        )
+    resolver.resolve.side_effect = lambda agent_type, setting_key, default_template: (
+        default_template
     )
     return resolver
 
@@ -53,61 +52,32 @@ def _capturing_mcp():
     return mcp, tools, prompts, resources
 
 
-class TestRenderPrompt:
-    def test_renders_with_current_time(self):
-        result = _render_prompt(
-            "Hello {{ CURRENT_TIME }}", current_time="Mon Jan 01 2025 12:00:00"
+class TestStripExecutionPlan:
+    def test_strips_block(self):
+        text = "Header\n\n## Execution Plan\n{{ EXECUTION_PLAN }}\n\nBody"
+        assert _strip_execution_plan(text) == "Header\n\nBody"
+
+    def test_no_block_leaves_text_untouched(self):
+        text = "No placeholder here.\nJust text."
+        assert _strip_execution_plan(text) == text
+
+    def test_preserves_tickers_and_current_time(self):
+        text = (
+            "Current time: {{ CURRENT_TIME }}\n\n"
+            "## Execution Plan\n{{ EXECUTION_PLAN }}\n\n"
+            "Tickers: {{ TICKERS }}"
         )
-        assert "Mon Jan 01 2025 12:00:00" in result
-
-    def test_renders_with_execution_plan(self):
-        result = _render_prompt(
-            "Plan: {{ EXECUTION_PLAN }}", current_time="Mon Jan 01 2025 12:00:00"
-        )
-        assert "data_collector" in result
-        assert "fundamental_analyst" in result
-
-    def test_renders_with_tickers(self):
-        result = _render_prompt(
-            "Tickers: {{ TICKERS }}",
-            current_time="Mon Jan 01 2025 12:00:00",
-            tickers="AAPL,MSFT",
-        )
-        assert "AAPL,MSFT" in result
-
-    def test_renders_default_tickers_placeholder(self):
-        result = _render_prompt(
-            "Tickers: {{ TICKERS }}", current_time="Mon Jan 01 2025 12:00:00"
-        )
-        assert "To be determined" in result
-
-    def test_renders_with_default_time(self):
-        result = _render_prompt("Time: {{ CURRENT_TIME }}")
-        assert result  # should not be empty
-
-    def test_empty_current_time_raises(self):
-        with pytest.raises(ValueError, match="non-empty"):
-            _render_prompt("Test", current_time="")
-
-    def test_whitespace_current_time_raises(self):
-        with pytest.raises(ValueError, match="non-empty"):
-            _render_prompt("Test", current_time="   ")
-
-    def test_empty_tickers_raises(self):
-        with pytest.raises(ValueError, match="non-empty"):
-            _render_prompt("Test", tickers="")
-
-    def test_sandbox_blocks_attribute_access_ssti(self):
-        from jinja2.exceptions import SecurityError
-
-        payload = "{{ ''.__class__.__mro__[1].__subclasses__() }}"
-        with pytest.raises(SecurityError):
-            _render_prompt(payload, current_time="Mon Jan 01 2025 12:00:00")
+        out = _strip_execution_plan(text)
+        assert "{{ CURRENT_TIME }}" in out
+        assert "{{ TICKERS }}" in out
+        assert "EXECUTION_PLAN" not in out
 
 
 class TestFinancialAnalystV1ToolRegistrar:
     def test_registers_tools(self):
-        registrar = FinancialAnalystV1ToolRegistrar(_passthrough_resolver())
+        registrar = FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        )
         mcp = MagicMock()
         container = MagicMock()
         registrar.register_tools(mcp, container)
@@ -118,7 +88,9 @@ class TestFinancialAnalystV1ToolRegistrar:
         assert "fetch_portfolio_xray_mcp" in tool_names
 
     def test_registers_prompts(self):
-        registrar = FinancialAnalystV1ToolRegistrar(_passthrough_resolver())
+        registrar = FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        )
         mcp = MagicMock()
         registrar.register_prompts(mcp)
         prompt_names = [call[1]["name"] for call in mcp.prompt.call_args_list]
@@ -132,7 +104,9 @@ class TestFinancialAnalystV1ToolRegistrar:
             assert f"financial_analyst_v1_{role}" in prompt_names
 
     def test_registers_resources(self):
-        registrar = FinancialAnalystV1ToolRegistrar(_passthrough_resolver())
+        registrar = FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        )
         mcp = MagicMock()
         registrar.register_resources(mcp)
         resource_names = [call[1]["name"] for call in mcp.resource.call_args_list]
@@ -145,6 +119,28 @@ class TestFinancialAnalystV1ToolRegistrar:
         ):
             assert f"financial_analyst_v1_{role}" in resource_names
 
+    def test_contributes_prompts_to_registry(self):
+        registry = PromptRegistry()
+        FinancialAnalystV1ToolRegistrar(_passthrough_resolver(), registry)
+        for role in (
+            "coordinator",
+            "data_collector",
+            "fundamental_analyst",
+            "technical_analyst",
+            "consensus_reporter",
+        ):
+            assert f"financial_analyst_v1_{role}" in registry
+
+    def test_registry_resolve_returns_raw_template_minus_execution_plan(self):
+        registry = PromptRegistry()
+        FinancialAnalystV1ToolRegistrar(_passthrough_resolver(), registry)
+        text = registry.resolve("financial_analyst_v1_data_collector")
+        assert isinstance(text, str)
+        assert text
+        assert "{{ EXECUTION_PLAN }}" not in text
+        assert "{{ CURRENT_TIME }}" in text
+        assert "{{ TICKERS }}" in text
+
 
 class TestFetchCompanyProfileMcp:
     @pytest.mark.asyncio
@@ -155,9 +151,9 @@ class TestFetchCompanyProfileMcp:
             "sector": "Technology",
         }
         mcp, tools, _, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(_passthrough_resolver()).register_tools(
-            mcp, container
-        )
+        FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        ).register_tools(mcp, container)
 
         result = await tools["fetch_company_profile_mcp"](ticker="aapl")
 
@@ -179,9 +175,9 @@ class TestFetchStatsCloseMcp:
             "latest_close": 100
         }
         mcp, tools, _, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(_passthrough_resolver()).register_tools(
-            mcp, container
-        )
+        FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        ).register_tools(mcp, container)
 
         result = await tools["fetch_stats_close_mcp"](ticker="AAPL")
 
@@ -198,9 +194,9 @@ class TestFetchStatsCloseMcp:
         container = MagicMock()
         container.markets_stats_service.return_value.get_stats_close.return_value = {}
         mcp, tools, _, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(_passthrough_resolver()).register_tools(
-            mcp, container
-        )
+        FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        ).register_tools(mcp, container)
 
         await tools["fetch_stats_close_mcp"](
             ticker="MSFT", start_date="2026-01-01", end_date="2026-04-01"
@@ -223,9 +219,9 @@ class TestFetchTechnicalIndicatorsMcp:
         svc.get_indicator_ema.return_value = {"ema": 2}
         svc.get_indicator_adx.return_value = {"adx": 3}
         mcp, tools, _, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(_passthrough_resolver()).register_tools(
-            mcp, container
-        )
+        FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        ).register_tools(mcp, container)
 
         result = await tools["fetch_technical_indicators_mcp"](ticker="nvda")
 
@@ -252,9 +248,9 @@ class TestFetchPortfolioXrayMcp:
             "pe_ratio": 30,
         }
         mcp, tools, _, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(_passthrough_resolver()).register_tools(
-            mcp, container
-        )
+        FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        ).register_tools(mcp, container)
 
         result = await tools["fetch_portfolio_xray_mcp"](tickers="aapl,msft")
 
@@ -266,9 +262,9 @@ class TestFetchPortfolioXrayMcp:
         container = MagicMock()
         container.markets_stats_service.return_value.get_company_profile.return_value = {}
         mcp, tools, _, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(_passthrough_resolver()).register_tools(
-            mcp, container
-        )
+        FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        ).register_tools(mcp, container)
 
         result = await tools["fetch_portfolio_xray_mcp"](tickers="XXXX")
 
@@ -284,34 +280,29 @@ class TestPromptsAndResources:
         "consensus_reporter",
     )
 
-    def test_prompt_functions_return_rendered_strings(self):
+    def test_prompt_functions_return_raw_strings(self):
         mcp, _, prompts, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(_passthrough_resolver()).register_prompts(mcp)
+        FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        ).register_prompts(mcp)
 
         for role in self._ROLES:
             result = prompts[f"financial_analyst_v1_{role}"]()
             assert isinstance(result, str)
             assert result
+            assert "{{ EXECUTION_PLAN }}" not in result
 
-    def test_prompt_functions_accept_current_time_and_tickers(self):
-        mcp, _, prompts, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(_passthrough_resolver()).register_prompts(mcp)
-
-        result = prompts["financial_analyst_v1_data_collector"](
-            current_time="Mon Jan 01 2025 12:00:00",
-            tickers="AAPL,MSFT",
-        )
-        assert "Mon Jan 01 2025 12:00:00" in result
-        assert "AAPL,MSFT" in result
-
-    def test_resource_functions_return_rendered_strings(self):
+    def test_resource_functions_return_raw_strings(self):
         mcp, _, _, resources = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(_passthrough_resolver()).register_resources(mcp)
+        FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        ).register_resources(mcp)
 
         for role in self._ROLES:
             result = resources[f"financial_analyst_v1_{role}"]()
             assert isinstance(result, str)
             assert result
+            assert "{{ EXECUTION_PLAN }}" not in result
 
 
 class TestUserOverrideWiring:
@@ -329,7 +320,9 @@ class TestUserOverrideWiring:
         resolver = MagicMock()
         resolver.resolve.return_value = "RESOLVED"
         mcp, _, prompts, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(resolver).register_prompts(mcp)
+        FinancialAnalystV1ToolRegistrar(resolver, PromptRegistry()).register_prompts(
+            mcp
+        )
 
         for role, setting_key in self._EXPECTED:
             resolver.resolve.reset_mock()
@@ -338,13 +331,16 @@ class TestUserOverrideWiring:
             kwargs = resolver.resolve.call_args.kwargs
             assert kwargs["agent_type"] == "quaks_financial_analyst_v1"
             assert kwargs["setting_key"] == setting_key
-            assert kwargs["default_template"]  # non-empty
+            assert kwargs["default_template"]
+            assert "render" not in kwargs
 
     def test_resources_call_resolver_with_role_specific_keys(self):
         resolver = MagicMock()
         resolver.resolve.return_value = "RESOLVED"
         mcp, _, _, resources = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(resolver).register_resources(mcp)
+        FinancialAnalystV1ToolRegistrar(resolver, PromptRegistry()).register_resources(
+            mcp
+        )
 
         for role, setting_key in self._EXPECTED:
             resolver.resolve.reset_mock()
@@ -354,23 +350,17 @@ class TestUserOverrideWiring:
             assert kwargs["agent_type"] == "quaks_financial_analyst_v1"
             assert kwargs["setting_key"] == setting_key
 
-    def test_prompt_render_closure_includes_current_time_and_tickers(self):
+    def test_user_override_strips_execution_plan(self):
         resolver = MagicMock()
-        captured = {}
-
-        def capture(agent_type, setting_key, default_template, render):
-            captured["rendered"] = render(
-                "Time: {{ CURRENT_TIME }} | Tickers: {{ TICKERS }}"
-            )
-            return captured["rendered"]
-
-        resolver.resolve.side_effect = capture
-        mcp, _, prompts, _ = _capturing_mcp()
-        FinancialAnalystV1ToolRegistrar(resolver).register_prompts(mcp)
-
-        prompts["financial_analyst_v1_fundamental_analyst"](
-            current_time="Mon Jan 01 2025 12:00:00",
-            tickers="AAPL,MSFT,NVDA",
+        resolver.resolve.return_value = (
+            "User template\n## Execution Plan\n{{ EXECUTION_PLAN }}\n\nBody"
         )
-        assert "Mon Jan 01 2025 12:00:00" in captured["rendered"]
-        assert "AAPL,MSFT,NVDA" in captured["rendered"]
+        mcp, _, prompts, _ = _capturing_mcp()
+        FinancialAnalystV1ToolRegistrar(resolver, PromptRegistry()).register_prompts(
+            mcp
+        )
+
+        result = prompts["financial_analyst_v1_consensus_reporter"]()
+        assert "{{ EXECUTION_PLAN }}" not in result
+        assert "User template" in result
+        assert "Body" in result

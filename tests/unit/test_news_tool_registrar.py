@@ -2,16 +2,18 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from app.interface.mcp.news_tool_registrar import NewsToolRegistrar, _render_prompt
+from app.interface.mcp.news_tool_registrar import (
+    NewsToolRegistrar,
+    _strip_execution_plan,
+)
+from app.interface.mcp.prompt_registry import PromptRegistry
 
 
 def _passthrough_resolver():
-    """Resolver mock that always renders the default template (no override)."""
+    """Resolver mock that always returns the default template (no override)."""
     resolver = MagicMock()
-    resolver.resolve.side_effect = (
-        lambda agent_type, setting_key, default_template, render: render(
-            default_template
-        )
+    resolver.resolve.side_effect = lambda agent_type, setting_key, default_template: (
+        default_template
     )
     return resolver
 
@@ -75,44 +77,34 @@ def _insights_hit(doc_id="i1", report_html=True, language_model_name=None):
     return {"_id": doc_id, "_source": source}
 
 
-class TestRenderPrompt:
-    def test_renders_with_current_time(self):
-        result = _render_prompt(
-            "Hello {{ CURRENT_TIME }}", current_time="Mon Jan 01 2025 12:00:00"
+class TestStripExecutionPlan:
+    def test_strips_block(self):
+        text = "Header\n\n## Execution Plan\n{{ EXECUTION_PLAN }}\n\nBody"
+        assert _strip_execution_plan(text) == "Header\n\nBody"
+
+    def test_strips_block_without_trailing_blank(self):
+        text = "## Execution Plan\n{{ EXECUTION_PLAN }}\nBody"
+        assert _strip_execution_plan(text) == "Body"
+
+    def test_no_block_leaves_text_untouched(self):
+        text = "No placeholder here.\nJust text."
+        assert _strip_execution_plan(text) == text
+
+    def test_preserves_other_placeholders(self):
+        text = (
+            "Current time: {{ CURRENT_TIME }}\n\n"
+            "## Execution Plan\n{{ EXECUTION_PLAN }}\n\n"
+            "Tickers: {{ TICKERS }}"
         )
-        assert "Mon Jan 01 2025 12:00:00" in result
-
-    def test_renders_with_execution_plan(self):
-        result = _render_prompt(
-            "Plan: {{ EXECUTION_PLAN }}", current_time="Mon Jan 01 2025 12:00:00"
-        )
-        assert "coordinator" in result
-
-    def test_renders_with_default_time(self):
-        result = _render_prompt("Time: {{ CURRENT_TIME }}")
-        assert result  # Should not be empty
-
-    def test_empty_current_time_raises(self):
-        with pytest.raises(ValueError, match="non-empty"):
-            _render_prompt("Test", current_time="")
-
-    def test_whitespace_current_time_raises(self):
-        with pytest.raises(ValueError, match="non-empty"):
-            _render_prompt("Test", current_time="   ")
-
-    def test_sandbox_blocks_attribute_access_ssti(self):
-        from jinja2.exceptions import SecurityError
-
-        # Classic Jinja2 sandbox-escape payload: reach Python's object model
-        # through an attribute chain. The sandbox must reject this.
-        payload = "{{ ''.__class__.__mro__[1].__subclasses__() }}"
-        with pytest.raises(SecurityError):
-            _render_prompt(payload, current_time="Mon Jan 01 2025 12:00:00")
+        out = _strip_execution_plan(text)
+        assert "{{ CURRENT_TIME }}" in out
+        assert "{{ TICKERS }}" in out
+        assert "EXECUTION_PLAN" not in out
 
 
 class TestNewsToolRegistrar:
     def test_registers_tools(self):
-        registrar = NewsToolRegistrar(_passthrough_resolver())
+        registrar = NewsToolRegistrar(_passthrough_resolver(), PromptRegistry())
         mcp = MagicMock()
         container = MagicMock()
         registrar.register_tools(mcp, container)
@@ -121,7 +113,7 @@ class TestNewsToolRegistrar:
         assert "get_insights_news_mcp" in tool_names
 
     def test_registers_prompts(self):
-        registrar = NewsToolRegistrar(_passthrough_resolver())
+        registrar = NewsToolRegistrar(_passthrough_resolver(), PromptRegistry())
         mcp = MagicMock()
         registrar.register_prompts(mcp)
         prompt_names = [call[1]["name"] for call in mcp.prompt.call_args_list]
@@ -130,13 +122,29 @@ class TestNewsToolRegistrar:
         assert "news_analyst_reporter" in prompt_names
 
     def test_registers_resources(self):
-        registrar = NewsToolRegistrar(_passthrough_resolver())
+        registrar = NewsToolRegistrar(_passthrough_resolver(), PromptRegistry())
         mcp = MagicMock()
         registrar.register_resources(mcp)
         resource_names = [call[1]["name"] for call in mcp.resource.call_args_list]
         assert "news_analyst_coordinator" in resource_names
         assert "news_analyst_aggregator" in resource_names
         assert "news_analyst_reporter" in resource_names
+
+    def test_contributes_prompts_to_registry(self):
+        registry = PromptRegistry()
+        NewsToolRegistrar(_passthrough_resolver(), registry)
+        assert "news_analyst_coordinator" in registry
+        assert "news_analyst_aggregator" in registry
+        assert "news_analyst_reporter" in registry
+
+    def test_registry_resolve_returns_raw_template_minus_execution_plan(self):
+        registry = PromptRegistry()
+        NewsToolRegistrar(_passthrough_resolver(), registry)
+        text = registry.resolve("news_analyst_aggregator")
+        assert isinstance(text, str)
+        assert text
+        assert "{{ EXECUTION_PLAN }}" not in text
+        assert "{{ CURRENT_TIME }}" in text
 
 
 class TestGetMarketsNewsMcp:
@@ -148,7 +156,9 @@ class TestGetMarketsNewsMcp:
             "cursor-1",
         )
         mcp, tools, _, _ = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_tools(mcp, container)
+        NewsToolRegistrar(_passthrough_resolver(), PromptRegistry()).register_tools(
+            mcp, container
+        )
 
         result = await tools["get_markets_news_mcp"]()
 
@@ -158,7 +168,7 @@ class TestGetMarketsNewsMcp:
         assert result.cursor == "cursor-1"
         call_kwargs = container.markets_news_service.return_value.get_news.call_args[1]
         assert call_kwargs["include_text_content"] is False
-        assert call_kwargs["date_from"] is not None  # defaulted to yesterday
+        assert call_kwargs["date_from"] is not None
 
     @pytest.mark.asyncio
     async def test_batch_with_include_content_returns_full_body(self):
@@ -168,7 +178,9 @@ class TestGetMarketsNewsMcp:
             None,
         )
         mcp, tools, _, _ = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_tools(mcp, container)
+        NewsToolRegistrar(_passthrough_resolver(), PromptRegistry()).register_tools(
+            mcp, container
+        )
 
         result = await tools["get_markets_news_mcp"](include_content=True)
         assert result.items[0].content == "Full content body"
@@ -181,7 +193,9 @@ class TestGetMarketsNewsMcp:
             None,
         )
         mcp, tools, _, _ = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_tools(mcp, container)
+        NewsToolRegistrar(_passthrough_resolver(), PromptRegistry()).register_tools(
+            mcp, container
+        )
 
         result = await tools["get_markets_news_mcp"](id="single")
 
@@ -196,7 +210,9 @@ class TestGetMarketsNewsMcp:
         container = MagicMock()
         container.markets_news_service.return_value.get_news.return_value = ([], None)
         mcp, tools, _, _ = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_tools(mcp, container)
+        NewsToolRegistrar(_passthrough_resolver(), PromptRegistry()).register_tools(
+            mcp, container
+        )
 
         await tools["get_markets_news_mcp"](size=15)
         assert (
@@ -214,7 +230,9 @@ class TestGetInsightsNewsMcp:
             "cur",
         )
         mcp, tools, _, _ = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_tools(mcp, container)
+        NewsToolRegistrar(_passthrough_resolver(), PromptRegistry()).register_tools(
+            mcp, container
+        )
 
         result = await tools["get_insights_news_mcp"]()
 
@@ -231,7 +249,9 @@ class TestGetInsightsNewsMcp:
             None,
         )
         mcp, tools, _, _ = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_tools(mcp, container)
+        NewsToolRegistrar(_passthrough_resolver(), PromptRegistry()).register_tools(
+            mcp, container
+        )
 
         result = await tools["get_insights_news_mcp"](include_report_html=True)
         assert result.items[0].report_html == "<p>Report</p>"
@@ -244,7 +264,9 @@ class TestGetInsightsNewsMcp:
             None,
         )
         mcp, tools, _, _ = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_tools(mcp, container)
+        NewsToolRegistrar(_passthrough_resolver(), PromptRegistry()).register_tools(
+            mcp, container
+        )
 
         await tools["get_insights_news_mcp"](id="brief-1")
         call_kwargs = (
@@ -256,9 +278,11 @@ class TestGetInsightsNewsMcp:
 
 
 class TestPromptsAndResources:
-    def test_prompt_functions_return_rendered_strings(self):
+    def test_prompt_functions_return_raw_strings(self):
         mcp, _, prompts, _ = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_prompts(mcp)
+        NewsToolRegistrar(_passthrough_resolver(), PromptRegistry()).register_prompts(
+            mcp
+        )
 
         for name in (
             "news_analyst_coordinator",
@@ -268,19 +292,13 @@ class TestPromptsAndResources:
             result = prompts[name]()
             assert isinstance(result, str)
             assert result
+            assert "{{ EXECUTION_PLAN }}" not in result
 
-    def test_prompt_functions_accept_current_time(self):
-        mcp, _, prompts, _ = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_prompts(mcp)
-
-        result = prompts["news_analyst_coordinator"](
-            current_time="Mon Jan 01 2025 12:00:00"
-        )
-        assert "Mon Jan 01 2025 12:00:00" in result
-
-    def test_resource_functions_return_rendered_strings(self):
+    def test_resource_functions_return_raw_strings(self):
         mcp, _, _, resources = _capturing_mcp()
-        NewsToolRegistrar(_passthrough_resolver()).register_resources(mcp)
+        NewsToolRegistrar(_passthrough_resolver(), PromptRegistry()).register_resources(
+            mcp
+        )
 
         for name in (
             "news_analyst_coordinator",
@@ -290,6 +308,7 @@ class TestPromptsAndResources:
             result = resources[name]()
             assert isinstance(result, str)
             assert result
+            assert "{{ EXECUTION_PLAN }}" not in result
 
 
 class TestUserOverrideWiring:
@@ -305,7 +324,7 @@ class TestUserOverrideWiring:
         resolver = MagicMock()
         resolver.resolve.return_value = "RESOLVED"
         mcp, _, prompts, _ = _capturing_mcp()
-        NewsToolRegistrar(resolver).register_prompts(mcp)
+        NewsToolRegistrar(resolver, PromptRegistry()).register_prompts(mcp)
 
         for role, setting_key in self._EXPECTED:
             resolver.resolve.reset_mock()
@@ -314,13 +333,14 @@ class TestUserOverrideWiring:
             kwargs = resolver.resolve.call_args.kwargs
             assert kwargs["agent_type"] == "quaks_news_analyst"
             assert kwargs["setting_key"] == setting_key
-            assert kwargs["default_template"]  # non-empty
+            assert kwargs["default_template"]
+            assert "render" not in kwargs
 
     def test_resources_call_resolver_with_role_specific_keys(self):
         resolver = MagicMock()
         resolver.resolve.return_value = "RESOLVED"
         mcp, _, _, resources = _capturing_mcp()
-        NewsToolRegistrar(resolver).register_resources(mcp)
+        NewsToolRegistrar(resolver, PromptRegistry()).register_resources(mcp)
 
         for role, setting_key in self._EXPECTED:
             resolver.resolve.reset_mock()
@@ -330,17 +350,15 @@ class TestUserOverrideWiring:
             assert kwargs["agent_type"] == "quaks_news_analyst"
             assert kwargs["setting_key"] == setting_key
 
-    def test_prompt_render_closure_includes_current_time(self):
+    def test_user_override_strips_execution_plan(self):
         resolver = MagicMock()
-        captured = {}
-
-        def capture(agent_type, setting_key, default_template, render):
-            captured["rendered"] = render("Time: {{ CURRENT_TIME }}")
-            return captured["rendered"]
-
-        resolver.resolve.side_effect = capture
+        resolver.resolve.return_value = (
+            "User template\n## Execution Plan\n{{ EXECUTION_PLAN }}\n\nBody"
+        )
         mcp, _, prompts, _ = _capturing_mcp()
-        NewsToolRegistrar(resolver).register_prompts(mcp)
+        NewsToolRegistrar(resolver, PromptRegistry()).register_prompts(mcp)
 
-        prompts["news_analyst_coordinator"](current_time="Mon Jan 01 2025 12:00:00")
-        assert "Mon Jan 01 2025 12:00:00" in captured["rendered"]
+        result = prompts["news_analyst_coordinator"]()
+        assert "{{ EXECUTION_PLAN }}" not in result
+        assert "User template" in result
+        assert "Body" in result

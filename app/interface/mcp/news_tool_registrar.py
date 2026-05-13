@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import re
 from datetime import datetime, timedelta
 from html import unescape
 from typing import TYPE_CHECKING, Annotated, Optional
 
 from fastmcp import FastMCP
-from jinja2.sandbox import SandboxedEnvironment
 from pydantic import Field
 
+from app.interface.mcp.prompt_registry import PromptRegistry
 from app.interface.mcp.registrar import McpRegistrar
 from app.interface.mcp.schema import (
     InsightsNewsItem,
@@ -19,7 +20,6 @@ from app.interface.mcp.user_prompt_resolver import UserPromptResolver
 from app.services.agent_types.quaks.insights.news.prompts import (
     AGGREGATOR_SYSTEM_PROMPT,
     COORDINATOR_SYSTEM_PROMPT,
-    EXECUTION_PLAN,
     REPORTER_SYSTEM_PROMPT,
 )
 
@@ -40,34 +40,41 @@ _DEFAULT_TEMPLATES = {
     "reporter": REPORTER_SYSTEM_PROMPT,
 }
 
+_ROLE_PROMPT_NAMES = {
+    "coordinator": "news_analyst_coordinator",
+    "aggregator": "news_analyst_aggregator",
+    "reporter": "news_analyst_reporter",
+}
 
-_JINJA_ENV = SandboxedEnvironment()
+_EXECUTION_PLAN_BLOCK = re.compile(r"## Execution Plan\n\{\{ EXECUTION_PLAN \}\}\n\n?")
 
 
-def _render_prompt(template_str: str, current_time: str | None = None) -> str:
-    if current_time is not None and not current_time.strip():
-        raise ValueError("current_time must be a non-empty string when provided")
-    template = _JINJA_ENV.from_string(template_str)
-    resolved_time = current_time or datetime.now().strftime("%a %b %d %Y %H:%M:%S %z")
-    return template.render(
-        CURRENT_TIME=resolved_time,
-        EXECUTION_PLAN=EXECUTION_PLAN,
-    )
+def _strip_execution_plan(text: str) -> str:
+    return _EXECUTION_PLAN_BLOCK.sub("", text)
 
 
 class NewsToolRegistrar(McpRegistrar):
     """Registers news-related MCP tools, prompts, and resources."""
 
-    def __init__(self, user_prompt_resolver: UserPromptResolver) -> None:
+    def __init__(
+        self,
+        user_prompt_resolver: UserPromptResolver,
+        prompt_registry: PromptRegistry,
+    ) -> None:
         self._user_prompt_resolver = user_prompt_resolver
+        for role, prompt_name in _ROLE_PROMPT_NAMES.items():
+            prompt_registry.register(
+                prompt_name,
+                lambda role=role, **_: self._resolve_prompt(role),
+            )
 
-    def _resolve_prompt(self, role: str, current_time: str | None = None) -> str:
-        return self._user_prompt_resolver.resolve(
+    def _resolve_prompt(self, role: str) -> str:
+        template = self._user_prompt_resolver.resolve(
             agent_type=_AGENT_TYPE,
             setting_key=_ROLE_SETTING_KEYS[role],
             default_template=_DEFAULT_TEMPLATES[role],
-            render=lambda t: _render_prompt(t, current_time=current_time),
         )
+        return _strip_execution_plan(template)
 
     def register_tools(self, mcp: FastMCP, container: Container) -> None:
         @mcp.tool(
@@ -249,55 +256,29 @@ class NewsToolRegistrar(McpRegistrar):
         @mcp.prompt(
             name="news_analyst_coordinator",
             description="System prompt for the News Analyst coordinator step. "
-            "In QA mode, this prompt instructs the LLM to answer financial "
-            "questions using investor briefings from get_insights_news_mcp. "
-            "In briefing mode (input 'BATCH_ETL'), it routes to the aggregator. "
-            "Returns a ready-to-use system prompt with current timestamp.",
+            "Returns the raw template; the model substitutes any "
+            "{{ CURRENT_TIME }} placeholder locally before use.",
         )
-        def news_analyst_coordinator(
-            current_time: Annotated[
-                Optional[str],
-                Field(
-                    description="Current timestamp to embed in the prompt (e.g. 'Mon Apr 06 2026 18:46:44'). Defaults to server time."
-                ),
-            ] = None,
-        ) -> str:
-            return self._resolve_prompt("coordinator", current_time=current_time)
+        def news_analyst_coordinator() -> str:
+            return self._resolve_prompt("coordinator")
 
         @mcp.prompt(
             name="news_analyst_aggregator",
             description="System prompt for the News Analyst aggregator step. "
-            "Instructs the LLM to collect market news via get_markets_news_mcp, "
-            "sort articles by economic impact, and write a market mood summary. "
-            "Returns a ready-to-use system prompt with current timestamp and execution plan.",
+            "Returns the raw template; the model substitutes any "
+            "{{ CURRENT_TIME }} placeholder locally before use.",
         )
-        def news_analyst_aggregator(
-            current_time: Annotated[
-                Optional[str],
-                Field(
-                    description="Current timestamp to embed in the prompt (e.g. 'Mon Apr 06 2026 18:46:44'). Defaults to server time."
-                ),
-            ] = None,
-        ) -> str:
-            return self._resolve_prompt("aggregator", current_time=current_time)
+        def news_analyst_aggregator() -> str:
+            return self._resolve_prompt("aggregator")
 
         @mcp.prompt(
             name="news_analyst_reporter",
             description="System prompt for the News Analyst reporter step. "
-            "Instructs the LLM to group aggregated articles by topic, write "
-            "4-paragraph summaries (what happened, why it matters, bigger picture, "
-            "what to watch), and produce the final investor briefing in HTML format. "
-            "Returns a ready-to-use system prompt with current timestamp and execution plan.",
+            "Returns the raw template; the model substitutes any "
+            "{{ CURRENT_TIME }} placeholder locally before use.",
         )
-        def news_analyst_reporter(
-            current_time: Annotated[
-                Optional[str],
-                Field(
-                    description="Current timestamp to embed in the prompt (e.g. 'Mon Apr 06 2026 18:46:44'). Defaults to server time."
-                ),
-            ] = None,
-        ) -> str:
-            return self._resolve_prompt("reporter", current_time=current_time)
+        def news_analyst_reporter() -> str:
+            return self._resolve_prompt("reporter")
 
     def register_resources(self, mcp: FastMCP) -> None:
         @mcp.resource(

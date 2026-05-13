@@ -23,10 +23,6 @@ def _make_resolver(agents=None, settings=None):
     return resolver, agent_service, agent_setting_service
 
 
-def _render(template):
-    return f"RENDERED:{template}"
-
-
 class TestUserPromptResolver:
     @patch(
         "app.interface.mcp.user_prompt_resolver._get_mcp_schema",
@@ -38,9 +34,8 @@ class TestUserPromptResolver:
             agent_type="quaks_news_analyst",
             setting_key="coordinator_system_prompt",
             default_template="DEFAULT",
-            render=_render,
         )
-        assert result == "RENDERED:DEFAULT"
+        assert result == "DEFAULT"
         agent_service.get_agents.assert_not_called()
 
     @patch(
@@ -55,9 +50,8 @@ class TestUserPromptResolver:
             agent_type="quaks_news_analyst",
             setting_key="coordinator_system_prompt",
             default_template="DEFAULT",
-            render=_render,
         )
-        assert result == "RENDERED:DEFAULT"
+        assert result == "DEFAULT"
         setting_service.get_agent_settings.assert_not_called()
 
     @patch(
@@ -73,9 +67,8 @@ class TestUserPromptResolver:
             agent_type="quaks_news_analyst",
             setting_key="coordinator_system_prompt",
             default_template="DEFAULT",
-            render=_render,
         )
-        assert result == "RENDERED:USER_PROMPT"
+        assert result == "USER_PROMPT"
 
     @patch(
         "app.interface.mcp.user_prompt_resolver._get_mcp_schema",
@@ -90,9 +83,8 @@ class TestUserPromptResolver:
             agent_type="quaks_news_analyst",
             setting_key="coordinator_system_prompt",
             default_template="DEFAULT",
-            render=_render,
         )
-        assert result == "RENDERED:DEFAULT"
+        assert result == "DEFAULT"
 
     @patch(
         "app.interface.mcp.user_prompt_resolver._get_mcp_schema",
@@ -107,38 +99,8 @@ class TestUserPromptResolver:
             agent_type="quaks_news_analyst",
             setting_key="coordinator_system_prompt",
             default_template="DEFAULT",
-            render=_render,
         )
-        assert result == "RENDERED:DEFAULT"
-
-    @patch(
-        "app.interface.mcp.user_prompt_resolver._get_mcp_schema",
-        return_value="id_tenant",
-    )
-    def test_broken_user_template_falls_back_to_default(self, _mock_schema, caplog):
-        from jinja2 import TemplateSyntaxError
-
-        # render() fails for the user template but succeeds for the default.
-        def render(template):
-            if template == "BROKEN":
-                raise TemplateSyntaxError("bad", 1)
-            return f"RENDERED:{template}"
-
-        resolver, _, _ = _make_resolver(
-            agents=[_agent()],
-            settings=[_setting("coordinator_system_prompt", "BROKEN")],
-        )
-        with caplog.at_level(
-            "WARNING", logger="app.interface.mcp.user_prompt_resolver"
-        ):
-            result = resolver.resolve(
-                agent_type="quaks_news_analyst",
-                setting_key="coordinator_system_prompt",
-                default_template="DEFAULT",
-                render=render,
-            )
-        assert result == "RENDERED:DEFAULT"
-        assert any("Falling back to default" in r.message for r in caplog.records)
+        assert result == "DEFAULT"
 
     @patch(
         "app.interface.mcp.user_prompt_resolver._get_mcp_schema",
@@ -155,8 +117,6 @@ class TestUserPromptResolver:
             agent_type="quaks_news_analyst",
             setting_key="coordinator_system_prompt",
             default_template="DEFAULT",
-            render=_render,
         )
         args, kwargs = setting_service.get_agent_settings.call_args
-        # Accept either positional or kwarg invocation.
         assert (args and args[0] == "first") or kwargs.get("agent_id") == "first"
