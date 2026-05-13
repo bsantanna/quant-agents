@@ -36,6 +36,30 @@ def test_publish_rejects_unauthorized_skill(service, mock_es):
         )
     mock_es.index.assert_not_called()
 
+@pytest.mark.parametrize("skill_name", [
+    "news_analyst",
+    "financial_analyst_v1",
+    "quaks-agents:news_analyst",
+    "quaks-agents:financial_analyst_v1",
+    "/news_analyst",
+])
+def test_publish_accepts_allowed_skill_suffixes(skill_name, service, mock_es):
+    mock_es.indices.exists_alias.return_value = True
+    doc_id = service.publish("summary", "html", skill_name, "author", "model")
+    assert doc_id is not None
+    mock_es.index.assert_called_once()
+
+@pytest.mark.parametrize("skill_name", [
+    "",
+    "news_analyst_v2",
+    "financial_analyst_v1_extended",
+    "unknown",
+])
+def test_publish_rejects_non_matching_skill_suffixes(skill_name, service, mock_es):
+    with pytest.raises(UnauthorizedSkillError):
+        service.publish("summary", "html", skill_name, "author", "model")
+    mock_es.index.assert_not_called()
+
 def test_get_by_id_success(service, mock_es):
     mock_es.get.return_value = {"_source": {"content": "data"}}
     

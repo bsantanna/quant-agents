@@ -13,7 +13,7 @@ from app.domain.exceptions.base import (
 
 class PublishedContentService:
     INDEX_ALIAS = "quaks_published-content_latest"
-    ALLOWED_SKILLS = frozenset({"/news_analyst", "/financial_analyst_v1"})
+    ALLOWED_SKILLS = frozenset({"news_analyst", "financial_analyst_v1"})
 
     def __init__(self, es: Elasticsearch) -> None:
         self.es = es
@@ -29,7 +29,7 @@ class PublishedContentService:
         author_username: str,
         language_model_name: str,
     ) -> str:
-        if skill_name not in self.ALLOWED_SKILLS:
+        if not any(skill_name.endswith(allowed) for allowed in self.ALLOWED_SKILLS):
             raise UnauthorizedSkillError(skill_name)
         doc_id = hashlib.sha256(
             (executive_summary + author_username + skill_name).encode()
