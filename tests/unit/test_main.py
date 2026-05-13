@@ -75,10 +75,10 @@ class TestResourceMetadata:
         data = response.json()
         assert data["resource"] == "http://localhost/mcp"
 
-    def test_oauth_protected_resource_metadata_httpx_client(self, client):
+    def test_oauth_protected_resource_metadata_no_user_agent(self, client):
         response = client.get(
             "/.well-known/oauth-protected-resource/mcp",
-            headers={"User-Agent": "python-httpx/0.28.1"},
+            headers={"User-Agent": ""},
         )
         assert response.status_code == 200
         data = response.json()
