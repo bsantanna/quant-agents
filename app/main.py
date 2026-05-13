@@ -221,16 +221,19 @@ def setup_mcp_authorize_resource_rewrite(container: Container, application: Fast
     if not config["auth"]["enabled"]:
         return
 
-    bare = config["api_base_url"]
+    bare = config["api_base_url"].rstrip("/")
     target = f"{bare}/mcp"
+
+    def is_bare(value: str) -> bool:
+        return value.rstrip("/") == bare
 
     @application.middleware("http")
     async def mcp_authorize_resource_rewrite(request: Request, call_next):
         if request.url.path == "/mcp/authorize":
             items = list(request.query_params.multi_items())
-            if any(k == "resource" and v == bare for k, v in items):
+            if any(k == "resource" and is_bare(v) for k, v in items):
                 rewritten = [
-                    (k, target if (k == "resource" and v == bare) else v)
+                    (k, target if (k == "resource" and is_bare(v)) else v)
                     for k, v in items
                 ]
                 request.scope["query_string"] = urlencode(rewritten).encode("ascii")
