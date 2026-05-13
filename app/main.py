@@ -109,9 +109,8 @@ def setup_resource_metadata(container: Container, application: FastAPI):
     authorization_server = f"{base_url}/mcp"
 
     def build_resource_metadata(request: Request) -> dict:
-        user_agent = (request.headers.get("user-agent") or "").lower()
-        path_stripped_client = "python-httpx" in user_agent
-        resource = base_url if path_stripped_client else f"{base_url}/mcp"
+        user_agent = request.headers.get("user-agent") or ""
+        resource = base_url if not user_agent else f"{base_url}/mcp"
         return {
             "resource": resource,
             "authorization_servers": [authorization_server],
