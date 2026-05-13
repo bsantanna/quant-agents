@@ -1,9 +1,9 @@
 import os
 import pytest
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.testclient import TestClient
 
-from app.main import app, setup_exception_handlers
+from app.main import app, setup_exception_handlers, setup_mcp_authorize_resource_rewrite
 
 
 @pytest.fixture
@@ -94,3 +94,49 @@ class TestResourceMetadata:
     def test_oauth_authorization_server_metadata_trailing_slash(self, client):
         response = client.get("/.well-known/oauth-authorization-server/mcp/")
         assert response.status_code == 200
+
+
+class TestMcpAuthorizeResourceRewrite:
+    def _build_app(self, auth_enabled: bool):
+        class FakeContainer:
+            def config(self_inner):
+                return {
+                    "auth": {"enabled": auth_enabled},
+                    "api_base_url": "http://localhost",
+                }
+
+        test_app = FastAPI()
+        setup_mcp_authorize_resource_rewrite(FakeContainer(), test_app)
+
+        @test_app.get("/mcp/authorize")
+        async def echo(request: Request):
+            return {"resource": request.query_params.get("resource")}
+
+        return TestClient(test_app)
+
+    def test_rewrites_bare_origin_to_path_qualified(self):
+        client = self._build_app(auth_enabled=True)
+        response = client.get(
+            "/mcp/authorize",
+            params={"resource": "http://localhost", "client_id": "x"},
+        )
+        assert response.status_code == 200
+        assert response.json()["resource"] == "http://localhost/mcp"
+
+    def test_passes_through_path_qualified_resource(self):
+        client = self._build_app(auth_enabled=True)
+        response = client.get(
+            "/mcp/authorize",
+            params={"resource": "http://localhost/mcp", "client_id": "x"},
+        )
+        assert response.status_code == 200
+        assert response.json()["resource"] == "http://localhost/mcp"
+
+    def test_skips_when_auth_disabled(self):
+        client = self._build_app(auth_enabled=False)
+        response = client.get(
+            "/mcp/authorize",
+            params={"resource": "http://localhost", "client_id": "x"},
+        )
+        assert response.status_code == 200
+        assert response.json()["resource"] == "http://localhost"
