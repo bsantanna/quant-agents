@@ -123,6 +123,15 @@ class TestMcpAuthorizeResourceRewrite:
         assert response.status_code == 200
         assert response.json()["resource"] == "http://localhost/mcp"
 
+    def test_rewrites_bare_origin_with_trailing_slash(self):
+        client = self._build_app(auth_enabled=True)
+        response = client.get(
+            "/mcp/authorize",
+            params={"resource": "http://localhost/", "client_id": "x"},
+        )
+        assert response.status_code == 200
+        assert response.json()["resource"] == "http://localhost/mcp"
+
     def test_passes_through_path_qualified_resource(self):
         client = self._build_app(auth_enabled=True)
         response = client.get(
