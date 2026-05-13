@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+from urllib.parse import urlencode
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi_keycloak_middleware import KeycloakConfiguration, setup_keycloak_middleware
@@ -49,6 +50,7 @@ def create_app():
     setup_exception_handlers(application)
     setup_middleware(application)
     setup_mcp_slash_rewrite(application)
+    setup_mcp_authorize_resource_rewrite(container, application)
     setup_spa_fallback(application)
 
     return application
@@ -211,6 +213,27 @@ def setup_mcp_slash_rewrite(application: FastAPI):
             scope = request.scope
             scope["path"] = "/mcp/"
             scope["raw_path"] = b"/mcp/"
+        return await call_next(request)
+
+
+def setup_mcp_authorize_resource_rewrite(container: Container, application: FastAPI):
+    config = container.config()
+    if not config["auth"]["enabled"]:
+        return
+
+    bare = config["api_base_url"]
+    target = f"{bare}/mcp"
+
+    @application.middleware("http")
+    async def mcp_authorize_resource_rewrite(request: Request, call_next):
+        if request.url.path == "/mcp/authorize":
+            items = list(request.query_params.multi_items())
+            if any(k == "resource" and v == bare for k, v in items):
+                rewritten = [
+                    (k, target if (k == "resource" and v == bare) else v)
+                    for k, v in items
+                ]
+                request.scope["query_string"] = urlencode(rewritten).encode("ascii")
         return await call_next(request)
 
 
