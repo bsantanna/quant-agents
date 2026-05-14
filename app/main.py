@@ -94,6 +94,7 @@ def setup_auth(container, application):
                 "/account/",
                 "^/$",
                 "/mcp(/.*)?$",
+                "/mcp-clients(/|$)",
             ],
             user_mapper=map_user,
         )

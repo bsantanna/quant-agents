@@ -15,10 +15,11 @@ import {AuthDropdownComponent} from './auth-dropdown/auth-dropdown';
 import {NavigationEnd, Router} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {filter, map, startWith} from 'rxjs';
+import {PageHeader} from '../shared/components/page-header/page-header';
 
 @Component({
   selector: 'app-navigation-header',
-  imports: [StockAutocompleteComponent, NewsAutocompleteComponent, ShareButtonComponent, FeedbackMessageComponent, SettingsDropdownComponent, HamburgerMenuComponent, InsightsDropdownComponent, MarketsDropdownComponent, McpDropdownComponent, AuthDropdownComponent],
+  imports: [StockAutocompleteComponent, NewsAutocompleteComponent, ShareButtonComponent, FeedbackMessageComponent, SettingsDropdownComponent, HamburgerMenuComponent, InsightsDropdownComponent, MarketsDropdownComponent, McpDropdownComponent, AuthDropdownComponent, PageHeader],
   templateUrl: './navigation-header.html',
   styleUrl: './navigation-header.scss',
 })
@@ -29,24 +30,32 @@ export class NavigationHeader implements AfterViewInit, OnDestroy {
   readonly stickyVisible = signal(false);
   private observer: IntersectionObserver | null = null;
 
-  private readonly routeInfo: Signal<{ path: string; title: string }> = toSignal(
+  private readonly routeInfo: Signal<{ path: string; title: string; eyebrow: string }> = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       startWith(null),
       map(() => {
-        let route = this.router.routerState.root;
-        while (route.firstChild) route = route.firstChild!;
+        const root = this.router.routerState.root;
+        let route = root;
+        let parent = root;
+        while (route.firstChild) {
+          parent = route;
+          route = route.firstChild!;
+        }
+        const eyebrow = parent !== root ? (parent.snapshot.title as string) || '' : '';
         return {
           path: this.router.url,
           title: (route.snapshot.title as string) || '',
+          eyebrow,
         };
       })
     ),
-    {initialValue: {path: this.router.url, title: ''}}
+    {initialValue: {path: this.router.url, title: '', eyebrow: ''}}
   );
 
   readonly path = () => this.routeInfo().path;
   readonly title = () => this.routeInfo().title;
+  readonly eyebrow = () => this.routeInfo().eyebrow;
 
   onKeyTickerSelected(indexedKeyTicker: IndexedKeyTicker): void {
     if (STOCK_MARKETS.filter(market => market === indexedKeyTicker.index)) {

@@ -29,7 +29,7 @@ export const routes: Routes = [
     path: 'account',
     children: [
       {
-        title: 'Account Profile',
+        title: 'Profile',
         path: 'profile',
         component: AccountProfile,
         canActivate: [authGuard]
@@ -41,7 +41,7 @@ export const routes: Routes = [
     path: 'mcp-clients',
     children: [
       {
-        title: 'MCP Clients: How to use',
+        title: 'How to use',
         path: 'how-to',
         component: McpClientsHowTo
       },
@@ -62,7 +62,7 @@ export const routes: Routes = [
     path: 'insights',
     children: [
       {
-        title: 'Insights Agents',
+        title: 'Quaks Agents',
         path: 'agents',
         component: InsightsAgents
       },
@@ -72,17 +72,17 @@ export const routes: Routes = [
         component: InsightsAgentsPersonal
       },
       {
-        title: 'Insights Agent Profile',
+        title: 'Agent Profile',
         path: 'profile/:agentName',
         component: InsightsProfile
       },
       {
-        title: 'News Insights',
+        title: 'News',
         path: 'news',
         component: InsightsNews
       },
       {
-        title: 'News Insight',
+        title: 'News',
         path: 'news/item/:indexName/:newsItemId',
         component: InsightsNewsItem
       },
@@ -92,12 +92,12 @@ export const routes: Routes = [
         component: InsightsPreview
       },
       {
-        title: 'Financial Insights',
+        title: 'Financial',
         path: 'financial',
         component: InsightsFinance
       },
       {
-        title: 'Financial Insight',
+        title: 'Financial',
         path: 'financial/item/:indexName/:newsItemId',
         component: InsightsNewsItem
       }
@@ -123,12 +123,12 @@ export const routes: Routes = [
         component: MarketsNewsItem
       },
       {
-        title: 'News feed',
+        title: 'Feed',
         path: 'news/related/:keyTicker',
         component: MarketsNewsRelated
       },
       {
-        title: 'Stocks Market',
+        title: 'Stocks',
         path: 'stocks',
         component: MarketsStocks
       },

@@ -18,5 +18,6 @@ export {NewsMediaCards} from './components/news-feed/news-media-cards/news-media
 export {StockEodActions} from './components/stock-eod-actions/stock-eod-actions';
 export {StockEodInsights} from './components/stock-eod-actions/stock-eod-insights/stock-eod-insights';
 export {StockEodTools} from './components/stock-eod-actions/stock-eod-tools/stock-eod-tools';
+export {PageHeader} from './components/page-header/page-header';
 export {SmallScreenMessage} from './components/small-screen-message/small-screen-message';
 export {StockInfoHeader} from './components/stock-info-header/stock-info-header';

@@ -1,0 +1,29 @@
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header__eyebrow {
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.page-header__title {
+  margin-top: 4px;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.page-header__subtitle {
+  margin-top: 8px;
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
