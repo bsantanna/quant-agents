@@ -2,6 +2,23 @@
 
 <!-- version list -->
 
+## v1.5.38 (2026-05-14)
+
+### Bug Fixes
+
+- Mcp client pages (1) ([#152](https://github.com/bsantanna/quaks/pull/152),
+  [`f8ecb35`](https://github.com/bsantanna/quaks/commit/f8ecb35d1bd7ad35cd8414efe2c7a9333aa91a82))
+
+- Mcp client pages (2) ([#152](https://github.com/bsantanna/quaks/pull/152),
+  [`f8ecb35`](https://github.com/bsantanna/quaks/commit/f8ecb35d1bd7ad35cd8414efe2c7a9333aa91a82))
+
+- Mcp client pages (3) ([#152](https://github.com/bsantanna/quaks/pull/152),
+  [`f8ecb35`](https://github.com/bsantanna/quaks/commit/f8ecb35d1bd7ad35cd8414efe2c7a9333aa91a82))
+
+- Mcp pages (1) ([#152](https://github.com/bsantanna/quaks/pull/152),
+  [`f8ecb35`](https://github.com/bsantanna/quaks/commit/f8ecb35d1bd7ad35cd8414efe2c7a9333aa91a82))
+
+
 ## v1.5.37 (2026-05-13)
 
 ### Bug Fixes
