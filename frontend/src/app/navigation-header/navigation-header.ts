@@ -7,6 +7,7 @@ import {STOCK_MARKETS} from '../constants';
 import {ShareButtonComponent} from './share-button/share-button';
 import {InsightsDropdownComponent} from './insights-dropdown/insights-dropdown';
 import {MarketsDropdownComponent} from './markets-dropdown/markets-dropdown';
+import {McpDropdownComponent} from './mcp-dropdown/mcp-dropdown';
 import {FeedbackMessageComponent} from './feedback-message/feedback-message';
 import {SettingsDropdownComponent} from './settings-dropdown/settings-dropdown';
 import {HamburgerMenuComponent} from './hamburger-menu/hamburger-menu';
@@ -17,7 +18,7 @@ import {filter, map, startWith} from 'rxjs';
 
 @Component({
   selector: 'app-navigation-header',
-  imports: [StockAutocompleteComponent, NewsAutocompleteComponent, ShareButtonComponent, FeedbackMessageComponent, SettingsDropdownComponent, HamburgerMenuComponent, InsightsDropdownComponent, MarketsDropdownComponent, AuthDropdownComponent],
+  imports: [StockAutocompleteComponent, NewsAutocompleteComponent, ShareButtonComponent, FeedbackMessageComponent, SettingsDropdownComponent, HamburgerMenuComponent, InsightsDropdownComponent, MarketsDropdownComponent, McpDropdownComponent, AuthDropdownComponent],
   templateUrl: './navigation-header.html',
   styleUrl: './navigation-header.scss',
 })

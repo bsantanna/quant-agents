@@ -49,6 +49,22 @@
                     </button>
                 </div>
 
+                <div class="hamburger-section">
+                    <span class="hamburger-label">MCP</span>
+                    <button class="hamburger-item" (click)="navigate('/mcp-clients/how-to')">
+                        <img src="/svg/icon-puzzle-piece.svg" class="size-5" aria-hidden="true" alt="" />
+                        <span>How to use</span>
+                    </button>
+                    <button class="hamburger-item" (click)="navigate('/mcp-clients/claude')">
+                        <img src="/webp/claude.webp" class="hamburger-item-logo size-5" aria-hidden="true" alt="" />
+                        <span>Claude</span>
+                    </button>
+                    <button class="hamburger-item" (click)="navigate('/mcp-clients/hermes')">
+                        <img src="/webp/hermesagent.webp" class="hamburger-item-logo size-5" aria-hidden="true" alt="" />
+                        <span>Hermes Agent</span>
+                    </button>
+                </div>
+
                 @if (path().indexOf('markets/stocks') > -1) {
                     <div class="hamburger-section">
                         <span class="hamburger-label">Search Stocks</span>

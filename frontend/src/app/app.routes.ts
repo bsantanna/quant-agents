@@ -19,9 +19,9 @@ import {PageWaitlist} from './page-waitlist';
 import {AccountProfile} from './page-account-profile/account-profile';
 import {authGuard} from './shared/guards/auth.guard';
 import {Privacy} from './page-privacy/privacy';
-import {McpClientsSupported} from './page-mcp-clients-supported/mcp-clients-supported';
 import {McpClientsClaude} from './page-mcp-clients-claude/mcp-clients-claude';
 import {McpClientsHowTo} from './page-mcp-clients-how-to/mcp-clients-how-to';
+import {McpClientsHermes} from './page-mcp-clients-hermes/mcp-clients-hermes';
 
 export const routes: Routes = [
   {
@@ -46,14 +46,14 @@ export const routes: Routes = [
         component: McpClientsHowTo
       },
       {
-        title: 'MCP Clients Supported',
-        path: 'supported',
-        component: McpClientsSupported
-      },
-      {
         title: 'Claude',
         path: 'claude',
         component: McpClientsClaude
+      },
+      {
+        title: 'Hermes Agent',
+        path: 'hermes',
+        component: McpClientsHermes
       }
     ]
   },
