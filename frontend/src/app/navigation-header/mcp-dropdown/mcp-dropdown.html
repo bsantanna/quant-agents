@@ -1,0 +1,27 @@
+<div class="relative">
+    <button type="button" (click)="toggleMenu()"
+            class="mcp-trigger">
+        <span>MCP</span>
+        <img src="/svg/icon-chevron-down.svg"
+             class="mcp-chevron size-4"
+             [class.open]="showMenu()"
+             aria-hidden="true" alt="" />
+    </button>
+
+    @if (showMenu()) {
+        <div class="mcp-panel">
+            <button class="mcp-item" (click)="navigate('/mcp-clients/how-to')">
+                <img src="/svg/icon-puzzle-piece.svg" class="size-5" aria-hidden="true" alt="" />
+                <span>How to use</span>
+            </button>
+            <button class="mcp-item" (click)="navigate('/mcp-clients/claude')">
+                <img src="/webp/claude.webp" class="mcp-item-logo size-5" aria-hidden="true" alt="" />
+                <span>Claude</span>
+            </button>
+            <button class="mcp-item" (click)="navigate('/mcp-clients/hermes')">
+                <img src="/webp/hermesagent.webp" class="mcp-item-logo size-5" aria-hidden="true" alt="" />
+                <span>Hermes Agent</span>
+            </button>
+        </div>
+    }
+</div>

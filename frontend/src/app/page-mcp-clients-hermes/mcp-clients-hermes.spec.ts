@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { McpServerSupported } from './mcp-server-supported';
+import { McpClientsHermes } from './mcp-clients-hermes';
 
-describe('McpServerSupported', () => {
-  let component: McpServerSupported;
-  let fixture: ComponentFixture<McpServerSupported>;
+describe('McpClientsHermes', () => {
+  let component: McpClientsHermes;
+  let fixture: ComponentFixture<McpClientsHermes>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [McpServerSupported]
+      imports: [McpClientsHermes]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(McpServerSupported);
+    fixture = TestBed.createComponent(McpClientsHermes);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

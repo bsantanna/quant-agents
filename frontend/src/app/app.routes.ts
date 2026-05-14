@@ -19,9 +19,9 @@ import {PageWaitlist} from './page-waitlist';
 import {AccountProfile} from './page-account-profile/account-profile';
 import {authGuard} from './shared/guards/auth.guard';
 import {Privacy} from './page-privacy/privacy';
-import {McpClientsSupported} from './page-mcp-clients-supported/mcp-clients-supported';
 import {McpClientsClaude} from './page-mcp-clients-claude/mcp-clients-claude';
 import {McpClientsHowTo} from './page-mcp-clients-how-to/mcp-clients-how-to';
+import {McpClientsHermes} from './page-mcp-clients-hermes/mcp-clients-hermes';
 
 export const routes: Routes = [
   {
@@ -29,7 +29,7 @@ export const routes: Routes = [
     path: 'account',
     children: [
       {
-        title: 'Account Profile',
+        title: 'Profile',
         path: 'profile',
         component: AccountProfile,
         canActivate: [authGuard]
@@ -41,19 +41,19 @@ export const routes: Routes = [
     path: 'mcp-clients',
     children: [
       {
-        title: 'MCP Clients: How to use',
+        title: 'How to use',
         path: 'how-to',
         component: McpClientsHowTo
-      },
-      {
-        title: 'MCP Clients Supported',
-        path: 'supported',
-        component: McpClientsSupported
       },
       {
         title: 'Claude',
         path: 'claude',
         component: McpClientsClaude
+      },
+      {
+        title: 'Hermes Agent',
+        path: 'hermes',
+        component: McpClientsHermes
       }
     ]
   },
@@ -62,7 +62,7 @@ export const routes: Routes = [
     path: 'insights',
     children: [
       {
-        title: 'Insights Agents',
+        title: 'Quaks Agents',
         path: 'agents',
         component: InsightsAgents
       },
@@ -72,17 +72,17 @@ export const routes: Routes = [
         component: InsightsAgentsPersonal
       },
       {
-        title: 'Insights Agent Profile',
+        title: 'Agent Profile',
         path: 'profile/:agentName',
         component: InsightsProfile
       },
       {
-        title: 'News Insights',
+        title: 'News',
         path: 'news',
         component: InsightsNews
       },
       {
-        title: 'News Insight',
+        title: 'News',
         path: 'news/item/:indexName/:newsItemId',
         component: InsightsNewsItem
       },
@@ -92,12 +92,12 @@ export const routes: Routes = [
         component: InsightsPreview
       },
       {
-        title: 'Financial Insights',
+        title: 'Financial',
         path: 'financial',
         component: InsightsFinance
       },
       {
-        title: 'Financial Insight',
+        title: 'Financial',
         path: 'financial/item/:indexName/:newsItemId',
         component: InsightsNewsItem
       }
@@ -123,12 +123,12 @@ export const routes: Routes = [
         component: MarketsNewsItem
       },
       {
-        title: 'News feed',
+        title: 'Feed',
         path: 'news/related/:keyTicker',
         component: MarketsNewsRelated
       },
       {
-        title: 'Stocks Market',
+        title: 'Stocks',
         path: 'stocks',
         component: MarketsStocks
       },

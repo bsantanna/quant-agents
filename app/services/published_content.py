@@ -21,6 +21,13 @@ class PublishedContentService:
     def _dated_index(self) -> str:
         return f"quaks_published-content_{datetime.now(timezone.utc).strftime('%d_%m_%Y')}"
 
+    def _canonical_skill(self, skill_name: str) -> str:
+        normalized = skill_name.replace("-", "_")
+        for allowed in self.ALLOWED_SKILLS:
+            if normalized.endswith(allowed):
+                return allowed
+        raise UnauthorizedSkillError(skill_name)
+
     def publish(
         self,
         executive_summary: str,
@@ -29,15 +36,14 @@ class PublishedContentService:
         author_username: str,
         language_model_name: str,
     ) -> str:
-        if not any(skill_name.endswith(allowed) for allowed in self.ALLOWED_SKILLS):
-            raise UnauthorizedSkillError(skill_name)
+        canonical_skill = self._canonical_skill(skill_name)
         doc_id = hashlib.sha256(
-            (executive_summary + author_username + skill_name).encode()
+            (executive_summary + author_username + canonical_skill).encode()
         ).hexdigest()
         doc = {
             "text_executive_summary": executive_summary,
             "text_report_html": report_html,
-            "key_skill_name": skill_name,
+            "key_skill_name": canonical_skill,
             "key_author_username": author_username,
             "key_language_model_name": language_model_name,
             "date_timestamp": datetime.now(timezone.utc).isoformat(),

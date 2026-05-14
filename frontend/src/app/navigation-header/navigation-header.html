@@ -21,6 +21,7 @@
                     <div class="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-2">
                         <app-markets-dropdown></app-markets-dropdown>
                         <app-insights-dropdown></app-insights-dropdown>
+                        <app-mcp-dropdown></app-mcp-dropdown>
                         <app-share-button></app-share-button>
                     </div>
 
@@ -64,7 +65,7 @@
         <div class="mx-auto px-4 sm:px-6 lg:px-8">
             <div class="md:flex md:items-center md:justify-between">
                 <div class="min-w-0 flex-1 hidden sm:block">
-                    <span class="nav-title text-2xl/7 font-bold sm:truncate sm:text-3xl sm:tracking-tight">{{ title() }}</span>
+                    <app-page-header [eyebrow]="eyebrow()" [title]="title()" />
                 </div>
 
                 <div class="w-full max-w-lg lg:max-w-xs">
