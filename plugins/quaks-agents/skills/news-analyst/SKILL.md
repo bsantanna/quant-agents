@@ -60,7 +60,7 @@ Answers the user's financial question using previously generated investor briefi
 
 1. **Load prompt**: Load the `news_analyst_coordinator` prompt (see "How to load a prompt" above). Use the returned text as your system instructions.
 2. **Retrieve context**: Call `get_insights_news_mcp` to fetch recent investor briefings. Use `include_report_html=true` if the question requires detailed analysis. Paginate with `cursor` if needed.
-4. **Answer**: Respond to the user's question following the coordinator prompt's guidelines — concise, factual, within the financial scope defined in the prompt.
+3. **Answer**: Respond to the user's question following the coordinator prompt's guidelines — concise, factual, within the financial scope defined in the prompt.
 
 ---
 
@@ -76,25 +76,25 @@ Generates a full investor briefing through four sequential steps. The output of 
 ### Step 2: Aggregator
 
 1. **Load prompt**: Load the `news_analyst_aggregator` prompt (see "How to load a prompt" above). Use the returned text as your system instructions for this step.
-3. **Collect news**: Call `get_markets_news_mcp` repeatedly to gather articles:
+2. **Collect news**: Call `get_markets_news_mcp` repeatedly to gather articles:
    - Start with a general call (no filters) to get the latest news.
    - Use the returned `cursor` to paginate through additional pages.
    - Make additional calls with different `search_term` values for broad coverage (e.g. "technology", "energy", "earnings", "federal reserve").
    - Collect up to 15 articles total.
-4. **Prioritize**: Sort collected articles by economic impact following the priority order in the prompt: macroeconomic policy > mega-cap earnings > M&A > regulatory shifts > sector trends > individual stocks.
-5. **Market mood**: Write a 2-3 paragraph summary of the overall market mood and key themes.
-6. **Output**: Present ALL collected articles in full (headline, summary, content, source, date, tickers) below the market mood summary. Do not omit or compress any article — the reporter step needs complete data.
+3. **Prioritize**: Sort collected articles by economic impact following the priority order in the prompt: macroeconomic policy > mega-cap earnings > M&A > regulatory shifts > sector trends > individual stocks.
+4. **Market mood**: Write a 2-3 paragraph summary of the overall market mood and key themes.
+5. **Output**: Present ALL collected articles in full (headline, summary, content, source, date, tickers) below the market mood summary. Do not omit or compress any article — the reporter step needs complete data.
 
 ### Step 3: Reporter
 
 1. **Load prompt**: Load the `news_analyst_reporter` prompt (see "How to load a prompt" above). Use the returned text as your system instructions for this step.
-3. **Group and headline**: Analyze the aggregated articles from Step 2. Group by similarity of subject, sector, or industry. Create clear, attention-capturing headlines for each group.
-4. **Write**: For each topic group, write exactly 4 paragraphs:
+2. **Group and headline**: Analyze the aggregated articles from Step 2. Group by similarity of subject, sector, or industry. Create clear, attention-capturing headlines for each group.
+3. **Write**: For each topic group, write exactly 4 paragraphs:
    - **What happened**: Explain the news simply.
    - **Why it matters**: How could this affect stock prices or the broader market?
    - **The bigger picture**: How does this fit into recent trends?
    - **What to keep an eye on**: Upcoming dates, decisions, or trends to watch.
-5. **Format**: Output the final report as Markdown:
+4. **Format**: Output the final report as Markdown:
 
 ```
 # Quaks Investor Briefing — [Today's Date]
@@ -140,8 +140,8 @@ This step is REQUIRED. Step 3's Markdown briefing is intermediate output, not th
 1. **Prepare the payload**:
    - `text_executive_summary`: the one-sentence summary from the blockquote at the top of the Step 3 report (the `> [One-sentence plain-language summary...]` line).
    - `text_report_html`: the full Step 3 Markdown report converted to well-formed HTML.
-   - `key_skill_name`: `/news_analyst`
-   - `language_model_name`: the model ID you are running as (e.g. `claude-opus-4-7`, `gpt-5`, `grok-4-1-fast-non-reasoning`, `hermes-4-405b`). Self-identify with the exact model ID — do not guess.
+   - `key_skill_name`: `/news-analyst`
+   - `language_model_name`: the exact model identifier exposed by your runtime. Use it verbatim — do not paraphrase or guess if uncertain.
 2. **Call `publish_content_mcp`** with that payload. This call is non-optional.
 3. **Deliver the result to the user**, branching on the publish response:
 

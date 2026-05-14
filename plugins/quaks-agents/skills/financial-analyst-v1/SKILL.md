@@ -83,12 +83,12 @@ Produces a full fundamental + technical report for the requested tickers. Seven 
 ### Step 2: Data Collector
 
 1. **Load prompt**: Load the `financial_analyst_v1_data_collector` prompt (see "How to load a prompt" above). Substitute `{{ TICKERS }}` with the canonical ticker string in the returned text. Use the result as your system instructions for this step.
-3. **Collect data**: For EACH ticker in the list, call in sequence:
+2. **Collect data**: For EACH ticker in the list, call in sequence:
    - `fetch_company_profile_mcp(ticker=T)`
    - `fetch_stats_close_mcp(ticker=T)` — defaults to the last 365 days
    - `fetch_technical_indicators_mcp(ticker=T)` — defaults to the last 365 days
    - `get_markets_news_mcp(search_term=T)` — a handful of recent headlines for context
-4. **Present ALL collected data structured by ticker**. Do not analyze — just collect. If a tool returns empty or null fields for a ticker, note it explicitly so later steps know to skip those sub-scores.
+3. **Present ALL collected data structured by ticker**. Do not analyze — just collect. If a tool returns empty or null fields for a ticker, note it explicitly so later steps know to skip those sub-scores.
 
 ### Step 3: Portfolio X-Ray
 
@@ -98,21 +98,21 @@ Produces a full fundamental + technical report for the requested tickers. Seven 
 ### Step 4: Fundamental Analyst
 
 1. **Load prompt**: Load the `financial_analyst_v1_fundamental_analyst` prompt (see "How to load a prompt" above). Substitute `{{ TICKERS }}` with the canonical ticker string in the returned text. Use the result as your system instructions for this step.
-3. **Analyze**: Feed the collected data (Step 2) and the X-Ray (Step 3). Execute the 5-step valuation → profitability → growth → risk → recommendation analysis **per ticker** exactly as the prompt prescribes. Show your work — the prompt requires explicit intermediate calculations.
-4. **Output**: One `FUNDAMENTAL_RECOMMENDATION[TICKER]:` block per ticker, following the EXACT format in the prompt (Signal, Conviction, Valuation/Profitability/Growth/Risk, Thesis, Key Risk).
+2. **Analyze**: Feed the collected data (Step 2) and the X-Ray (Step 3). Execute the 5-step valuation → profitability → growth → risk → recommendation analysis **per ticker** exactly as the prompt prescribes. Show your work — the prompt requires explicit intermediate calculations.
+3. **Output**: One `FUNDAMENTAL_RECOMMENDATION[TICKER]:` block per ticker, following the EXACT format in the prompt (Signal, Conviction, Valuation/Profitability/Growth/Risk, Thesis, Key Risk).
 
 ### Step 5: Technical Analyst
 
 1. **Load prompt**: Load the `financial_analyst_v1_technical_analyst` prompt (see "How to load a prompt" above). Substitute `{{ TICKERS }}` with the canonical ticker string in the returned text. Use the result as your system instructions for this step.
-3. **Analyze**: Feed the collected indicator data (Step 2) and the X-Ray (Step 3). Execute the 5-step trend → momentum → range → confluence → recommendation analysis per ticker. Show your work.
-4. **Output**: One `TECHNICAL_RECOMMENDATION[TICKER]:` block per ticker, following the EXACT format in the prompt (Signal, Conviction, Scorecard, Thesis, Key Risk).
+2. **Analyze**: Feed the collected indicator data (Step 2) and the X-Ray (Step 3). Execute the 5-step trend → momentum → range → confluence → recommendation analysis per ticker. Show your work.
+3. **Output**: One `TECHNICAL_RECOMMENDATION[TICKER]:` block per ticker, following the EXACT format in the prompt (Signal, Conviction, Scorecard, Thesis, Key Risk).
 
 ### Step 6: Consensus Reporter
 
 1. **Load prompt**: Load the `financial_analyst_v1_consensus_reporter` prompt (see "How to load a prompt" above). Substitute `{{ TICKERS }}` with the canonical ticker string in the returned text. Use the result as your system instructions for this step.
-3. **Combine**: Merge the fundamental (Step 4) and technical (Step 5) recommendations into one voice per ticker. Use the X-Ray (Step 3) to write the Portfolio Overview section (what we're looking at / investment style / geographic exposure / key portfolio stats).
-4. **Allocate**: Allocate USD 10,000 across the tickers, weighted by conviction. BUY = positive weight, SELL = 0, HOLD = small weight. Integer percentages must sum to exactly 100.
-5. **Output**: Pure HTML following the EXACT structure in the prompt — no Markdown, no text outside tags. The last line MUST be `<p>ALLOCATION: T1=INT,T2=INT,...</p>` with integer percentages summing to 100.
+2. **Combine**: Merge the fundamental (Step 4) and technical (Step 5) recommendations into one voice per ticker. Use the X-Ray (Step 3) to write the Portfolio Overview section (what we're looking at / investment style / geographic exposure / key portfolio stats).
+3. **Allocate**: Allocate USD 10,000 across the tickers, weighted by conviction. BUY = positive weight, SELL = 0, HOLD = small weight. Integer percentages must sum to exactly 100.
+4. **Output**: Pure HTML following the EXACT structure in the prompt — no Markdown, no text outside tags. The last line MUST be `<p>ALLOCATION: T1=INT,T2=INT,...</p>` with integer percentages summing to 100.
 
 ### Writing Guidelines (reporter)
 
@@ -131,8 +131,8 @@ This step is REQUIRED. Step 6's HTML report is intermediate output, not the user
 1. **Prepare the payload**:
    - `text_executive_summary`: the one-sentence summary from the `<blockquote>` at the top of the Step 6 report.
    - `text_report_html`: the full HTML report from Step 6 (already HTML — no conversion needed).
-   - `key_skill_name`: `/financial_analyst_v1`
-   - `language_model_name`: the model ID you are running as (e.g. `claude-opus-4-7`, `gpt-5`, `grok-4-1-fast-non-reasoning`, `hermes-4-405b`). Self-identify with the exact model ID — do not guess.
+   - `key_skill_name`: `/financial-analyst-v1`
+   - `language_model_name`: the exact model identifier exposed by your runtime. Use it verbatim — do not paraphrase or guess if uncertain.
 2. **Call `publish_content_mcp`** with that payload. This call is non-optional.
 3. **Deliver the result to the user**, branching on the publish response:
 

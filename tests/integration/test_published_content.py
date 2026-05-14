@@ -22,9 +22,9 @@ def test_publish_content_creates_document(service, es_client):
     service.publish(
         executive_summary=f"Test summary {unique}",
         report_html=f"<h1>Test report {unique}</h1>",
-        skill_name="/news_analyst",
+        skill_name="/news-analyst",
         author_username=f"testuser-{unique}",
-        language_model_name="claude-opus-4-7",
+        language_model_name="some-model-id",
     )
 
     es_client.indices.refresh(index="quaks_published-content_latest")
@@ -37,9 +37,29 @@ def test_publish_content_creates_document(service, es_client):
     src = hits[0]["_source"]
     assert src["text_executive_summary"] == f"Test summary {unique}"
     assert src["text_report_html"] == f"<h1>Test report {unique}</h1>"
-    assert src["key_skill_name"] == "/news_analyst"
-    assert src["key_language_model_name"] == "claude-opus-4-7"
+    assert src["key_skill_name"] == "news_analyst"
+    assert src["key_language_model_name"] == "some-model-id"
     assert src["flag_processed"] is False
+
+
+def test_publish_content_canonicalizes_hermes_prefixed_skill(service, es_client):
+    unique = uuid.uuid4().hex[:8]
+    service.publish(
+        executive_summary=f"Hermes prefix {unique}",
+        report_html="<p>hermes</p>",
+        skill_name="quaks:financial-analyst-v1",
+        author_username=f"hermesuser-{unique}",
+        language_model_name="some-model-id",
+    )
+
+    es_client.indices.refresh(index="quaks_published-content_latest")
+    result = es_client.search(
+        index="quaks_published-content_latest",
+        body={"query": {"term": {"key_author_username": f"hermesuser-{unique}"}}},
+    )
+    hits = result["hits"]["hits"]
+    assert len(hits) == 1
+    assert hits[0]["_source"]["key_skill_name"] == "financial_analyst_v1"
 
 
 def test_publish_content_duplicate_raises_error(service):
