@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.39 (2026-05-14)
+
+### Bug Fixes
+
+- Adjust publishing post processing ([#153](https://github.com/bsantanna/quaks/pull/153),
+  [`d14b59c`](https://github.com/bsantanna/quaks/commit/d14b59cd45b0b04425ab4fd365a0374fe5bf2ab3))
+
+
 ## v1.5.38 (2026-05-14)
 
 ### Bug Fixes

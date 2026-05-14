@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Quaks financial agents platform plugins for Claude Code",
-    "version": "1.5.38",
+    "version": "1.5.39",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -14,7 +14,7 @@
       "name": "quaks-agents",
       "source": "./plugins/quaks-agents",
       "description": "Collection of Financial Insights Agents for market analysis, investor briefings, and financial news updates.",
-      "version": "1.5.38",
+      "version": "1.5.39",
       "category": "finance",
       "tags": ["finance", "markets", "news", "investing"],
       "keywords": ["financial analysis", "investor briefing", "market news", "stocks"]
