@@ -12,7 +12,7 @@ default_args = {
 dag = DAG(
     "quaks_published_content",
     default_args=default_args,
-    schedule="0 */6 * * *",
+    schedule="*/15 * * * *",
     catchup=False,
 )
 
@@ -81,15 +81,24 @@ def process_published_content():
         }
 
     skill_routing = {
-        "/news_analyst": {
+        "news_analyst": {
             "index": "quaks_insights-news",
             "build_doc": build_news_analyst_doc,
         },
-        "/financial_analyst_v1": {
+        "financial_analyst_v1": {
             "index": "quaks_insights-finance",
             "build_doc": build_news_analyst_doc,
         },
     }
+
+    def resolve_route(name):
+        if not name:
+            return None
+        normalized = name.replace("-", "_")
+        for key, route in skill_routing.items():
+            if normalized.endswith(key):
+                return route
+        return None
 
     def mark_processed(doc_index, doc_id):
         update_resp = requests.post(
@@ -128,7 +137,7 @@ def process_published_content():
                 continue
 
             # Route to destination index based on skill name
-            route = skill_routing.get(skill_name)
+            route = resolve_route(skill_name)
             if route is None:
                 print(f"Unknown skill name: {skill_name}, rejecting {doc_id}")
                 mark_processed(doc_index, doc_id)
