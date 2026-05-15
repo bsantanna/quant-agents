@@ -32,6 +32,8 @@ Success depends on the mode (see Mode Selection below):
 
 ## MCP Server Prompts
 
+> **These names identify MCP prompt templates, not the skill itself.** They are used only to load system instructions for each pipeline step via the loader above. The value to send as `key_skill_name` when publishing in Step 4 is a different, fixed string (`news-analyst`) — never substitute a name from this list for `key_skill_name`, and never load these as if they were skills.
+
 Each prompt is exposed three ways (spec-compliant primitives first, tool fallback last — see "How to load a prompt" above):
 
 - `news_analyst_coordinator` — also at resource `prompt://news_analyst_coordinator`
@@ -139,9 +141,9 @@ This step is REQUIRED. Step 3's Markdown briefing is intermediate output, not th
 
 1. **Prepare the payload**:
    - `text_executive_summary`: the one-sentence summary from the blockquote at the top of the Step 3 report (the `> [One-sentence plain-language summary...]` line).
-   - `text_report_html`: the full Step 3 Markdown report converted to well-formed HTML.
-   - `key_skill_name`: `/news-analyst`
-   - `language_model_name`: the exact model identifier exposed by your runtime. Use it verbatim — do not paraphrase or guess if uncertain.
+   - `text_report_html`: the full Step 3 Markdown report converted to well-formed HTML. Only use these tags: `h1 h2 h3 p b i em blockquote hr ul ol li`. No `<style>`, `<script>`, inline `style=` attributes, or class names — the server's renderer strips or rejects them. Escape any literal `<`, `>`, `&` inside text content.
+   - `key_skill_name`: the literal string `news-analyst`. Send this value verbatim. The server matches `key_skill_name` against an exact-string authorization list, so any variation is rejected — do not prefix with `/`, do not swap hyphens for underscores (`news_analyst` is wrong), do not substitute the name of an MCP prompt or step here (e.g. `news_analyst_reporter`, `news_analyst_aggregator`, `news_analyst_coordinator` are all wrong), do not append a step or version suffix. The value is `news-analyst` and nothing else.
+   - `language_model_name`: the exact model identifier exposed by your runtime. Use it verbatim. If your runtime does not expose a model identifier, send the literal string `unknown` — do not invent or guess a specific model name.
 2. **Call `publish_content_mcp`** with that payload. This call is non-optional.
 3. **Deliver the result to the user**, branching on the publish response:
 

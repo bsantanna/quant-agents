@@ -33,6 +33,8 @@ Success depends on the mode (see Mode Selection below):
 
 ## MCP Server Prompts
 
+> **These names identify MCP prompt templates, not the skill itself.** They are used only to load system instructions for each pipeline step via the loader above. The value to send as `key_skill_name` when publishing in Step 7 is a different, fixed string (`financial-analyst-v1`) — never substitute a name from this list for `key_skill_name`, and never load these as if they were skills.
+
 Each prompt is exposed three ways (spec-compliant primitives first, tool fallback last — see "How to load a prompt" above):
 
 - `financial_analyst_v1_coordinator` — also at resource `prompt://financial_analyst_v1_coordinator`
@@ -131,8 +133,8 @@ This step is REQUIRED. Step 6's HTML report is intermediate output, not the user
 1. **Prepare the payload**:
    - `text_executive_summary`: the one-sentence summary from the `<blockquote>` at the top of the Step 6 report.
    - `text_report_html`: the full HTML report from Step 6 (already HTML — no conversion needed).
-   - `key_skill_name`: `/financial-analyst-v1`
-   - `language_model_name`: the exact model identifier exposed by your runtime. Use it verbatim — do not paraphrase or guess if uncertain.
+   - `key_skill_name`: the literal string `financial-analyst-v1`. Send this value verbatim. The server matches `key_skill_name` against an exact-string authorization list, so any variation is rejected — do not prefix with `/`, do not swap hyphens for underscores (`financial_analyst_v1` is wrong), do not drop the `-v1` suffix (`financial-analyst` is wrong), do not substitute the name of an MCP prompt or step here (e.g. `financial_analyst_v1_coordinator`, `financial_analyst_v1_data_collector`, `financial_analyst_v1_fundamental_analyst`, `financial_analyst_v1_technical_analyst`, `financial_analyst_v1_consensus_reporter` are all wrong), and do not borrow another skill's name (`news-analyst` is wrong here). The value is `financial-analyst-v1` and nothing else.
+   - `language_model_name`: the exact model identifier exposed by your runtime. Use it verbatim. If your runtime does not expose a model identifier, send the literal string `unknown` — do not invent or guess a specific model name.
 2. **Call `publish_content_mcp`** with that payload. This call is non-optional.
 3. **Deliver the result to the user**, branching on the publish response:
 
