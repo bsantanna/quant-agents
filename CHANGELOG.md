@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.42 (2026-05-15)
+
+### Bug Fixes
+
+- Adjust mcp tech indicators response format ([#156](https://github.com/bsantanna/quaks/pull/156),
+  [`d82240c`](https://github.com/bsantanna/quaks/commit/d82240ccf043e6a8e4d9d189578685210c299a97))
+
+
 ## v1.5.41 (2026-05-15)
 
 ### Bug Fixes
