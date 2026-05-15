@@ -43,9 +43,13 @@ class TestBuildAuth:
         result = _build_auth(config)
         assert result is None
 
+    @patch("key_value.aio.wrappers.encryption.FernetEncryptionWrapper")
+    @patch("key_value.aio.stores.redis.RedisStore")
     @patch("fastmcp.server.auth.providers.jwt.JWTVerifier")
     @patch("fastmcp.server.auth.OAuthProxy")
-    def test_build_auth_enabled(self, mock_oauth, mock_jwt):
+    def test_build_auth_enabled(
+        self, mock_oauth, mock_jwt, mock_redis_store, mock_fernet_wrapper
+    ):
         config = {
             "auth": {
                 "enabled": True,
@@ -55,17 +59,24 @@ class TestBuildAuth:
                 "client_secret": "test-secret",
             },
             "api_base_url": "http://localhost:8000",
+            "broker": {"url": "redis://localhost:6379/0"},
         }
 
         _build_auth(config)
 
         mock_jwt.assert_called_once()
         mock_oauth.assert_called_once()
+        mock_redis_store.assert_called_once_with(url="redis://localhost:6379/0")
+        mock_fernet_wrapper.assert_called_once()
+        wrapper_kwargs = mock_fernet_wrapper.call_args[1]
+        assert wrapper_kwargs["key_value"] is mock_redis_store.return_value
+        assert wrapper_kwargs["raise_on_decryption_error"] is False
         call_kwargs = mock_oauth.call_args[1]
         assert "test-realm" in call_kwargs["upstream_authorization_endpoint"]
         assert "test-realm" in call_kwargs["upstream_token_endpoint"]
         assert call_kwargs["upstream_client_id"] == "test-client"
         assert call_kwargs["base_url"] == "http://localhost:8000/mcp"
+        assert call_kwargs["client_storage"] is mock_fernet_wrapper.return_value
 
 
 class TestGetMcpSchema:
