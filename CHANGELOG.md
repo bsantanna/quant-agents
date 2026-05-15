@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.40 (2026-05-15)
+
+### Bug Fixes
+
+- Adjust persistent mcp auth ([#154](https://github.com/bsantanna/quaks/pull/154),
+  [`3639329`](https://github.com/bsantanna/quaks/commit/3639329432e758a60db6d0c092ad54a072a94708))
+
+
 ## v1.5.39 (2026-05-14)
 
 ### Bug Fixes
