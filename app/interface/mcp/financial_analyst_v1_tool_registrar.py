@@ -10,6 +10,12 @@ from pydantic import Field
 from app.interface.mcp.prompt_registry import PromptRegistry
 from app.interface.mcp.registrar import McpRegistrar
 from app.interface.mcp.user_prompt_resolver import UserPromptResolver
+from app.services.agent_types.quaks.insights.financial_analyst.v1.company_profile_summary import (
+    summarize_company_profile,
+)
+from app.services.agent_types.quaks.insights.financial_analyst.v1.indicators_summary import (
+    summarize_technical_indicators,
+)
 from app.services.agent_types.quaks.insights.financial_analyst.v1.portfolio_xray import (
     compute_xray_data,
     format_xray_text,
@@ -98,10 +104,11 @@ class FinancialAnalystV1ToolRegistrar(McpRegistrar):
             ],
         ) -> dict:
             svc = container.markets_stats_service()
-            return svc.get_company_profile(
+            doc = svc.get_company_profile(
                 index_name="quaks_stocks-metadata_latest",
                 key_ticker=ticker.upper(),
             )
+            return summarize_company_profile(doc)
 
         @mcp.tool(
             name="fetch_stats_close_mcp",
@@ -169,39 +176,38 @@ class FinancialAnalystV1ToolRegistrar(McpRegistrar):
             ).strftime("%Y-%m-%d")
             index_name = "quaks_stocks-eod_latest"
             key = ticker.upper()
-            return {
-                "rsi": svc.get_indicator_rsi(
-                    index_name=index_name,
-                    key_ticker=key,
-                    start_date=resolved_start,
-                    end_date=resolved_end,
-                    period=14,
-                ),
-                "macd": svc.get_indicator_macd(
-                    index_name=index_name,
-                    key_ticker=key,
-                    start_date=resolved_start,
-                    end_date=resolved_end,
-                    short_window=12,
-                    long_window=26,
-                    signal_window=9,
-                ),
-                "ema": svc.get_indicator_ema(
-                    index_name=index_name,
-                    key_ticker=key,
-                    start_date=resolved_start,
-                    end_date=resolved_end,
-                    short_window=10,
-                    long_window=20,
-                ),
-                "adx": svc.get_indicator_adx(
-                    index_name=index_name,
-                    key_ticker=key,
-                    start_date=resolved_start,
-                    end_date=resolved_end,
-                    period=14,
-                ),
-            }
+            rsi = svc.get_indicator_rsi(
+                index_name=index_name,
+                key_ticker=key,
+                start_date=resolved_start,
+                end_date=resolved_end,
+                period=14,
+            )
+            macd = svc.get_indicator_macd(
+                index_name=index_name,
+                key_ticker=key,
+                start_date=resolved_start,
+                end_date=resolved_end,
+                short_window=12,
+                long_window=26,
+                signal_window=9,
+            )
+            ema = svc.get_indicator_ema(
+                index_name=index_name,
+                key_ticker=key,
+                start_date=resolved_start,
+                end_date=resolved_end,
+                short_window=10,
+                long_window=20,
+            )
+            adx = svc.get_indicator_adx(
+                index_name=index_name,
+                key_ticker=key,
+                start_date=resolved_start,
+                end_date=resolved_end,
+                period=14,
+            )
+            return summarize_technical_indicators(rsi, macd, ema, adx)
 
         @mcp.tool(
             name="fetch_portfolio_xray_mcp",

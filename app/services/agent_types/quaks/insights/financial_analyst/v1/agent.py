@@ -31,6 +31,12 @@ from app.services.agent_types.quaks.insights.financial_analyst.v1.prompts import
 from app.services.agent_types.quaks.insights.financial_analyst.v1.state import (
     FinancialAnalystState,
 )
+from app.services.agent_types.quaks.insights.financial_analyst.v1.company_profile_summary import (
+    summarize_company_profile,
+)
+from app.services.agent_types.quaks.insights.financial_analyst.v1.indicators_summary import (
+    summarize_technical_indicators,
+)
 from app.services.agent_types.quaks.insights.financial_analyst.v1.portfolio_xray import (
     compute_xray_data,
     format_xray_html,
@@ -163,11 +169,13 @@ class QuaksFinancialAnalystV1Agent(SupervisedWorkflowAgentBase):
             Returns:
                 JSON string with company profile data.
             """
-            result = markets_stats_service.get_company_profile(
+            doc = markets_stats_service.get_company_profile(
                 index_name="quaks_stocks-metadata_latest",
                 key_ticker=ticker,
             )
-            return json.dumps(result, ensure_ascii=False, default=str)
+            return json.dumps(
+                summarize_company_profile(doc), ensure_ascii=False, default=str
+            )
 
         @tool("fetch_stats_close")
         def fetch_stats_close(ticker: str) -> str:
@@ -201,40 +209,42 @@ class QuaksFinancialAnalystV1Agent(SupervisedWorkflowAgentBase):
             """
             end_date = datetime.now().strftime("%Y-%m-%d")
             start_date = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d")
-            indicators = {
-                "rsi": markets_stats_service.get_indicator_rsi(
-                    index_name="quaks_stocks-eod_latest",
-                    key_ticker=ticker,
-                    start_date=start_date,
-                    end_date=end_date,
-                    period=14,
-                ),
-                "macd": markets_stats_service.get_indicator_macd(
-                    index_name="quaks_stocks-eod_latest",
-                    key_ticker=ticker,
-                    start_date=start_date,
-                    end_date=end_date,
-                    short_window=12,
-                    long_window=26,
-                    signal_window=9,
-                ),
-                "ema": markets_stats_service.get_indicator_ema(
-                    index_name="quaks_stocks-eod_latest",
-                    key_ticker=ticker,
-                    start_date=start_date,
-                    end_date=end_date,
-                    short_window=10,
-                    long_window=20,
-                ),
-                "adx": markets_stats_service.get_indicator_adx(
-                    index_name="quaks_stocks-eod_latest",
-                    key_ticker=ticker,
-                    start_date=start_date,
-                    end_date=end_date,
-                    period=14,
-                ),
-            }
-            return json.dumps(indicators, ensure_ascii=False, default=str)
+            rsi = markets_stats_service.get_indicator_rsi(
+                index_name="quaks_stocks-eod_latest",
+                key_ticker=ticker,
+                start_date=start_date,
+                end_date=end_date,
+                period=14,
+            )
+            macd = markets_stats_service.get_indicator_macd(
+                index_name="quaks_stocks-eod_latest",
+                key_ticker=ticker,
+                start_date=start_date,
+                end_date=end_date,
+                short_window=12,
+                long_window=26,
+                signal_window=9,
+            )
+            ema = markets_stats_service.get_indicator_ema(
+                index_name="quaks_stocks-eod_latest",
+                key_ticker=ticker,
+                start_date=start_date,
+                end_date=end_date,
+                short_window=10,
+                long_window=20,
+            )
+            adx = markets_stats_service.get_indicator_adx(
+                index_name="quaks_stocks-eod_latest",
+                key_ticker=ticker,
+                start_date=start_date,
+                end_date=end_date,
+                period=14,
+            )
+            return json.dumps(
+                summarize_technical_indicators(rsi, macd, ema, adx),
+                ensure_ascii=False,
+                default=str,
+            )
 
         return [
             fetch_company_profile,

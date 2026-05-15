@@ -144,11 +144,14 @@ class TestFinancialAnalystV1ToolRegistrar:
 
 class TestFetchCompanyProfileMcp:
     @pytest.mark.asyncio
-    async def test_calls_service_with_uppercased_ticker(self):
+    async def test_calls_service_with_uppercased_ticker_and_summarizes(self):
         container = MagicMock()
         container.markets_stats_service.return_value.get_company_profile.return_value = {
+            "key_ticker": "AAPL",
             "name": "Apple",
             "sector": "Technology",
+            "description": "A long description that should be dropped",
+            "pe_ratio": 30.0,
         }
         mcp, tools, _, _ = _capturing_mcp()
         FinancialAnalystV1ToolRegistrar(
@@ -157,7 +160,10 @@ class TestFetchCompanyProfileMcp:
 
         result = await tools["fetch_company_profile_mcp"](ticker="aapl")
 
-        assert result == {"name": "Apple", "sector": "Technology"}
+        assert result["identity"]["ticker"] == "AAPL"
+        assert result["identity"]["name"] == "Apple"
+        assert result["identity"]["sector"] == "Technology"
+        assert "description" not in str(result)
         call_kwargs = (
             container.markets_stats_service.return_value.get_company_profile.call_args[
                 1
@@ -165,6 +171,18 @@ class TestFetchCompanyProfileMcp:
         )
         assert call_kwargs["key_ticker"] == "AAPL"
         assert call_kwargs["index_name"] == "quaks_stocks-metadata_latest"
+
+    @pytest.mark.asyncio
+    async def test_empty_doc_returns_empty_dict(self):
+        container = MagicMock()
+        container.markets_stats_service.return_value.get_company_profile.return_value = {}
+        mcp, tools, _, _ = _capturing_mcp()
+        FinancialAnalystV1ToolRegistrar(
+            _passthrough_resolver(), PromptRegistry()
+        ).register_tools(mcp, container)
+
+        result = await tools["fetch_company_profile_mcp"](ticker="XYZ")
+        assert result == {}
 
 
 class TestFetchStatsCloseMcp:
@@ -211,13 +229,36 @@ class TestFetchStatsCloseMcp:
 
 class TestFetchTechnicalIndicatorsMcp:
     @pytest.mark.asyncio
-    async def test_calls_all_four_indicators(self):
+    async def test_calls_all_four_indicators_and_summarizes(self):
         container = MagicMock()
         svc = container.markets_stats_service.return_value
-        svc.get_indicator_rsi.return_value = {"rsi": 50}
-        svc.get_indicator_macd.return_value = {"macd": 1}
-        svc.get_indicator_ema.return_value = {"ema": 2}
-        svc.get_indicator_adx.return_value = {"adx": 3}
+        svc.get_indicator_rsi.return_value = [
+            {"date": "2025-01-01", "rsi": 50.0, "position": 1},
+            {"date": "2025-01-02", "rsi": 55.0, "position": 1},
+        ]
+        svc.get_indicator_macd.return_value = [
+            {
+                "date": "2025-01-01",
+                "macd": 1.0,
+                "signal": 0.5,
+                "histogram": 0.5,
+                "short_ema": 0.0,
+                "long_ema": 0.0,
+                "position": 1,
+            }
+        ]
+        svc.get_indicator_ema.return_value = [
+            {"date": "2025-01-01", "ema_short": 110.0, "ema_long": 105.0, "position": 1}
+        ]
+        svc.get_indicator_adx.return_value = [
+            {
+                "date": "2025-01-01",
+                "adx": 30.0,
+                "plus_di": 25.0,
+                "minus_di": 15.0,
+                "position": 1,
+            }
+        ]
         mcp, tools, _, _ = _capturing_mcp()
         FinancialAnalystV1ToolRegistrar(
             _passthrough_resolver(), PromptRegistry()
@@ -226,6 +267,11 @@ class TestFetchTechnicalIndicatorsMcp:
         result = await tools["fetch_technical_indicators_mcp"](ticker="nvda")
 
         assert set(result.keys()) == {"rsi", "macd", "ema", "adx"}
+        assert result["rsi"]["latest"]["value"] == 55.0
+        assert result["rsi"]["latest"]["regime"] == "BULLISH"
+        assert result["macd"]["latest"]["regime"] == "BULLISH"
+        assert result["ema"]["latest"]["regime"] == "BULLISH"
+        assert result["adx"]["latest"]["regime"] == "TRENDING"
         assert svc.get_indicator_rsi.call_args[1]["key_ticker"] == "NVDA"
         assert svc.get_indicator_rsi.call_args[1]["period"] == 14
         assert svc.get_indicator_macd.call_args[1]["short_window"] == 12
