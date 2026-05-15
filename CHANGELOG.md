@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.41 (2026-05-15)
+
+### Bug Fixes
+
+- Adjust plugin skills ([#155](https://github.com/bsantanna/quaks/pull/155),
+  [`f855e9a`](https://github.com/bsantanna/quaks/commit/f855e9a4f4a068ebaf6c4445beba2cbab5fedd63))
+
+
 ## v1.5.40 (2026-05-15)
 
 ### Bug Fixes
