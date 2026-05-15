@@ -75,9 +75,14 @@ You receive collected financial data and a Portfolio X-Ray. Use both.
 
 For EACH ticker, execute ALL steps below IN ORDER. Show your work.
 
+## INPUT DATA SHAPE
+The company profile is delivered as a grouped dict with keys:
+identity, size, valuation, profitability, earnings, growth, risk, dividend, ownership, analyst.
+Refer to fields with dotted paths (e.g. valuation.pe, profitability.roe, risk.beta).
+
 ## HANDLING MISSING DATA
 If ANY field is null, missing, "-", or 0 when it should not be zero:
-- Write: "[field_name] = NOT AVAILABLE"
+- Write: "[field_path] = NOT AVAILABLE"
 - SKIP that sub-score — do NOT guess or infer the value.
 - Reduce the denominator: if 1 of 3 sub-scores is unavailable, score out of /2 not /3.
 - Apply the same thresholds to the reduced denominator (e.g., 2/2 = UNDERVALUED).
@@ -86,10 +91,10 @@ If ANY field is null, missing, "-", or 0 when it should not be zero:
 STEP 1: VALUATION — Is the stock cheap or expensive?
 ====================================================================
 
-Read these fields from the data: pe_ratio, forward_pe, price_to_book_ratio, price_to_sales_ratio_ttm.
+Read: valuation.pe, valuation.forward_pe, valuation.pb, valuation.ps.
 
 A) P/E RATIO ASSESSMENT
-   - Trailing P/E (pe_ratio): the price investors pay per dollar of current earnings.
+   - Trailing P/E (valuation.pe): the price investors pay per dollar of current earnings.
    - Apply these thresholds:
      * P/E < 12: CHEAP (deep value territory)
      * P/E 12-18: FAIR VALUE (reasonable)
@@ -99,14 +104,14 @@ A) P/E RATIO ASSESSMENT
    - Write: "Trailing P/E = [value] → [CHEAP/FAIR/PREMIUM/EXPENSIVE/UNPROFITABLE]"
 
 B) FORWARD P/E vs TRAILING P/E
-   - Forward P/E (forward_pe) uses expected future earnings.
-   - Compare: forward_pe < trailing_pe means earnings expected to GROW.
-   - Compare: forward_pe > trailing_pe means earnings expected to SHRINK.
-   - Ratio: trailing_pe / forward_pe. If > 1.2 → strong growth expected. If < 0.8 → deterioration.
+   - Forward P/E (valuation.forward_pe) uses expected future earnings.
+   - Compare: valuation.forward_pe < valuation.pe means earnings expected to GROW.
+   - Compare: valuation.forward_pe > valuation.pe means earnings expected to SHRINK.
+   - Ratio: valuation.pe / valuation.forward_pe. If > 1.2 → strong growth expected. If < 0.8 → deterioration.
    - Write: "Forward P/E = [value], ratio = [trailing/forward] → [growth/stable/deterioration]"
 
 C) PRICE-TO-BOOK (P/B)
-   - price_to_book_ratio: what you pay per dollar of net assets.
+   - valuation.pb: what you pay per dollar of net assets.
    - P/B < 1: trading below liquidation value (deep value or distressed)
    - P/B 1-3: reasonable for most sectors
    - P/B 3-10: asset-light business (tech, services) — acceptable if ROE is high
@@ -124,10 +129,10 @@ D) VALUATION SCORE (sum the signals)
 STEP 2: PROFITABILITY — Is the business high quality?
 ====================================================================
 
-Read: profit_margin, operating_margin_ttm, return_on_equity_ttm, return_on_assets_ttm.
+Read: profitability.profit_margin, profitability.operating_margin, profitability.roe, profitability.roa.
 
 A) PROFIT MARGIN
-   - profit_margin: percentage of revenue that becomes profit.
+   - profitability.profit_margin: percentage of revenue that becomes profit.
    - > 20%: EXCELLENT (pricing power, competitive moat)
    - 10-20%: GOOD (healthy business)
    - 5-10%: MEDIOCRE (thin margins, vulnerable to cost pressure)
@@ -135,13 +140,13 @@ A) PROFIT MARGIN
    - Write: "Profit margin = [value]% → [EXCELLENT/GOOD/MEDIOCRE/POOR]"
 
 B) OPERATING MARGIN
-   - operating_margin_ttm: profitability from core operations.
+   - profitability.operating_margin: profitability from core operations.
    - Same thresholds as profit margin. If operating margin >> profit margin, \
      the company has high interest or tax burden.
    - Write: "Operating margin = [value]% → [assessment]"
 
 C) RETURN ON EQUITY (ROE)
-   - return_on_equity_ttm: profit generated per dollar of shareholder equity.
+   - profitability.roe: profit generated per dollar of shareholder equity.
    - This is the single most important quality metric (Warren Buffett's favorite).
    - > 25%: EXCEPTIONAL (elite capital allocator)
    - 15-25%: STRONG (above average)
@@ -161,10 +166,10 @@ D) PROFITABILITY SCORE
 STEP 3: GROWTH — Is the business growing or shrinking?
 ====================================================================
 
-Read: quarterly_earnings_growth_yoy, quarterly_revenue_growth_yoy.
+Read: growth.revenue_growth_yoy, growth.earnings_growth_yoy.
 
 A) REVENUE GROWTH
-   - quarterly_revenue_growth_yoy: year-over-year revenue change.
+   - growth.revenue_growth_yoy: year-over-year revenue change.
    - > 25%: HYPERGROWTH
    - 10-25%: STRONG GROWTH
    - 0-10%: MODERATE GROWTH
@@ -172,7 +177,7 @@ A) REVENUE GROWTH
    - Write: "Revenue growth = [value]% YoY → [assessment]"
 
 B) EARNINGS GROWTH
-   - quarterly_earnings_growth_yoy: year-over-year earnings change.
+   - growth.earnings_growth_yoy: year-over-year earnings change.
    - Same thresholds. If earnings growth >> revenue growth → operating leverage (positive). \
      If earnings growth << revenue growth → margin compression (negative).
    - Write: "Earnings growth = [value]% YoY → [assessment]"
@@ -186,31 +191,31 @@ C) GROWTH vs VALUATION CHECK
 STEP 4: RISK PROFILE
 ====================================================================
 
-Read: beta, week_52_high, week_52_low, dividend_yield, market_capitalization.
+Read: risk.beta, risk.week_52_high, risk.week_52_low, dividend.yield, size.market_cap_usd.
 
 A) BETA (systematic risk)
-   - beta < 0.8: DEFENSIVE (moves less than market — utilities, staples)
-   - beta 0.8-1.2: MARKET-LIKE (average risk)
-   - beta 1.2-1.8: AGGRESSIVE (amplifies market moves — tech, growth)
-   - beta > 1.8: HIGHLY VOLATILE (speculative, leveraged exposure)
+   - risk.beta < 0.8: DEFENSIVE (moves less than market — utilities, staples)
+   - risk.beta 0.8-1.2: MARKET-LIKE (average risk)
+   - risk.beta 1.2-1.8: AGGRESSIVE (amplifies market moves — tech, growth)
+   - risk.beta > 1.8: HIGHLY VOLATILE (speculative, leveraged exposure)
    - Write: "Beta = [value] → [DEFENSIVE/MARKET-LIKE/AGGRESSIVE/HIGHLY VOLATILE]"
 
 B) 52-WEEK RANGE POSITION
-   - Calculate: position = (current_price - week_52_low) / (week_52_high - week_52_low).
-   - Use price data if available, otherwise note unavailable.
+   - Calculate: position = (current_price - risk.week_52_low) / (risk.week_52_high - risk.week_52_low).
+   - Use price data from fetch_stats_close if available, otherwise note unavailable.
    - > 0.8: NEAR HIGHS (momentum but limited upside to prior peak)
    - 0.4-0.8: MID-RANGE (neutral positioning)
    - < 0.4: NEAR LOWS (potential value if fundamentals intact, or falling knife if deteriorating)
    - Write: "52-week position: [value] → [assessment]"
 
 C) DIVIDEND YIELD
-   - dividend_yield > 3%: income-oriented, often signals mature/stable business
-   - dividend_yield 1-3%: modest income component
-   - dividend_yield < 1% or null: growth-oriented, reinvesting profits
+   - dividend.yield > 3%: income-oriented, often signals mature/stable business
+   - dividend.yield 1-3%: modest income component
+   - dividend.yield < 1% or null: growth-oriented, reinvesting profits
    - Write: "Dividend yield = [value]% → [assessment]"
 
 D) SIZE
-   - market_capitalization > 200B: MEGA-CAP (most liquid, lowest execution risk)
+   - size.market_cap_usd > 200B: MEGA-CAP (most liquid, lowest execution risk)
    - 10B-200B: LARGE-CAP
    - 2B-10B: MID-CAP
    - < 2B: SMALL-CAP (higher risk, lower liquidity)
@@ -247,12 +252,13 @@ WORKED EXAMPLE — NVDA (using real data)
 This example shows how to execute all 5 steps. Follow this exact pattern.
 
 Data provided:
-  pe_ratio: 36.48, forward_pe: 274.21, price_to_book_ratio: 28.81,
-  price_to_sales_ratio_ttm: 20.28, profit_margin: 55.6%, operating_margin_ttm: 60.38%,
-  return_on_equity_ttm: 104.37%, return_on_assets_ttm: 75.76%,
-  quarterly_earnings_growth_yoy: 96.66%, quarterly_revenue_growth_yoy: 73.21%,
-  beta: 2.39, week_52_high: 212.19, week_52_low: 86.62,
-  dividend_yield: 0.02%, market_capitalization: 4,380B
+  valuation.pe: 36.48, valuation.forward_pe: 274.21, valuation.pb: 28.81,
+  valuation.ps: 20.28, profitability.profit_margin: 55.6%, profitability.operating_margin: 60.38%,
+  profitability.roe: 104.37%, profitability.roa: 75.76%,
+  growth.earnings_growth_yoy: 96.66%, growth.revenue_growth_yoy: 73.21%,
+  risk.beta: 2.39, risk.week_52_high: 212.19, risk.week_52_low: 86.62,
+  dividend.yield: 0.02%, size.market_cap_usd: 4,380B,
+  analyst.consensus: BULLISH (55 bullish / 8 hold / 1 bearish)
 
 STEP 1: VALUATION
 A) Trailing P/E = 36.48 → EXPENSIVE (>30, needs high growth to justify)
@@ -316,9 +322,24 @@ You receive collected indicator data (RSI, MACD, EMA, ADX) and a Portfolio X-Ray
 
 For EACH ticker, execute ALL steps below IN ORDER. Show your work.
 
+## INPUT DATA SHAPE
+Each indicator is a reduced summary, not a daily time series. The shape is:
+  rsi:  { latest: {date, value, regime}, stats: {mean, median, std, min, max, percentile_rank},
+          trend: {slope_20d, direction}, recent_events: {last_overbought_date, last_oversold_date,
+          days_in_current_regime} }
+  macd: { latest: {date, macd, signal, histogram, regime}, stats: {histogram_mean, ...},
+          trend: {histogram_slope_20d, momentum}, recent_events: {last_bullish_cross_date,
+          last_bearish_cross_date, days_since_last_cross} }
+  ema:  { latest: {date, ema_short, ema_long, gap, gap_pct, regime}, stats: {gap_mean, gap_std},
+          recent_events: {last_bullish_cross_date, last_bearish_cross_date, days_since_last_cross} }
+  adx:  { latest: {date, adx, plus_di, minus_di, regime, direction}, stats: {adx_mean, adx_max,
+          pct_time_trending}, trend: {adx_slope_20d, trend_strength_change} }
+
+Regime labels are pre-computed. Quote them when convenient, but still reason from raw values.
+
 ## HANDLING MISSING DATA
 If ANY indicator field is null, missing, "-", or 0 when it should not be zero:
-- Write: "[field_name] = NOT AVAILABLE"
+- Write: "[field_path] = NOT AVAILABLE"
 - SKIP that signal row in the scorecard — do NOT guess or infer the value.
 - Reduce the scorecard range accordingly (e.g., 3 signals instead of 4).
 - Adjust decision thresholds proportionally.
@@ -327,54 +348,61 @@ If ANY indicator field is null, missing, "-", or 0 when it should not be zero:
 STEP 1: TREND IDENTIFICATION — Is there a clear trend?
 ====================================================================
 
-Read the ADX and EMA data from the collected indicators.
+Read adx.latest and ema.latest from the collected indicators.
 
 A) ADX (Average Directional Index) — measures trend STRENGTH, not direction.
-   - ADX > 40: STRONG TREND (powerful move in progress — trade with it, not against it)
-   - ADX 25-40: TRENDING (clear direction established)
-   - ADX 20-25: WEAK TREND (trend forming or fading — be cautious)
-   - ADX < 20: NO TREND / RANGING (price chopping sideways — momentum signals unreliable)
-   - Write: "ADX = [value] → [STRONG TREND/TRENDING/WEAK TREND/RANGING]"
+   - adx.latest.adx > 40: STRONG TREND (powerful move in progress — trade with it, not against it)
+   - 25 < adx.latest.adx <= 40: TRENDING (clear direction established)
+   - 20 < adx.latest.adx <= 25: WEAK TREND (trend forming or fading — be cautious)
+   - adx.latest.adx <= 20: NO TREND / RANGING (price chopping sideways — momentum signals unreliable)
+   - Optional context: adx.trend.trend_strength_change (STRENGTHENING/WEAKENING/FLAT),
+     adx.stats.pct_time_trending (% of window in trend).
+   - Write: "ADX = [value] → [STRONG_TREND/TRENDING/WEAK_TREND/RANGING]"
 
 B) EMA CROSSOVER — determines trend DIRECTION.
-   - Short EMA (10-day) > Long EMA (20-day): BULLISH crossover (uptrend)
-   - Short EMA < Long EMA: BEARISH crossover (downtrend)
-   - The wider the gap between short and long EMA, the stronger the trend.
-   - Write: "EMA short=[value] vs long=[value] → [BULLISH/BEARISH] crossover"
+   - ema.latest.ema_short > ema.latest.ema_long: BULLISH (uptrend)
+   - ema.latest.ema_short < ema.latest.ema_long: BEARISH (downtrend)
+   - ema.latest.gap_pct quantifies separation. ema.recent_events.days_since_last_cross
+     tells you how mature the regime is.
+   - Write: "EMA short=[value] vs long=[value] (gap_pct=[%]) → [BULLISH/BEARISH]"
 
 C) TREND VERDICT
-   - ADX > 25 AND bullish EMA → UPTREND CONFIRMED (1 bullish point)
-   - ADX > 25 AND bearish EMA → DOWNTREND CONFIRMED (1 bearish point)
-   - ADX < 25 → TREND NOT CONFIRMED (0 points — trend signals are noise)
+   - adx.latest.adx > 25 AND ema bullish → UPTREND CONFIRMED (1 bullish point)
+   - adx.latest.adx > 25 AND ema bearish → DOWNTREND CONFIRMED (1 bearish point)
+   - adx.latest.adx <= 25 → TREND NOT CONFIRMED (0 points — trend signals are noise)
    - Write: "Trend: [UPTREND CONFIRMED / DOWNTREND CONFIRMED / NO TREND]"
 
 ====================================================================
 STEP 2: MOMENTUM — What is the directional force?
 ====================================================================
 
-Read the RSI and MACD data.
+Read rsi.latest and macd.latest from the collected indicators.
 
 A) RSI (Relative Strength Index, 14-period)
-   - RSI measures speed and magnitude of price changes on a 0-100 scale.
-   - RSI > 70: OVERBOUGHT (price has risen too fast — pullback likely)
+   - rsi.latest.value measures speed and magnitude of price changes on a 0-100 scale.
+   - > 70: OVERBOUGHT (price has risen too fast — pullback likely)
      * Bearish signal, BUT in strong uptrends RSI can stay >70 for weeks. \
        Only bearish if ADX is weakening.
-   - RSI 50-70: BULLISH MOMENTUM (healthy buying pressure)
-   - RSI 30-50: BEARISH MOMENTUM (selling pressure dominant)
-   - RSI < 30: OVERSOLD (price has fallen too fast — bounce likely)
+   - 50-70: BULLISH MOMENTUM (healthy buying pressure)
+   - 30-50: BEARISH MOMENTUM (selling pressure dominant)
+   - < 30: OVERSOLD (price has fallen too fast — bounce likely)
      * Bullish signal, BUT in strong downtrends RSI can stay <30. \
        Only bullish if ADX is weakening.
-   - Write: "RSI = [value] → [OVERBOUGHT/BULLISH/BEARISH/OVERSOLD]"
+   - Optional context: rsi.stats.percentile_rank (rank in 365d window),
+     rsi.trend.direction (RISING/FALLING/FLAT), rsi.recent_events.days_in_current_regime.
+   - Write: "RSI = [value] (rank=[pct]th, [direction]) → [OVERBOUGHT/BULLISH/BEARISH/OVERSOLD]"
 
 B) MACD (Moving Average Convergence Divergence)
-   - MACD line = difference between fast and slow exponential moving averages.
-   - Signal line = smoothed MACD.
-   - MACD > signal line: BULLISH momentum (buying accelerating)
-   - MACD < signal line: BEARISH momentum (selling accelerating)
-   - MACD histogram (MACD - signal): magnitude of momentum.
+   - macd.latest.macd = difference between fast and slow exponential moving averages.
+   - macd.latest.signal = smoothed MACD.
+   - macd.latest.macd > macd.latest.signal: BULLISH momentum (buying accelerating)
+   - macd.latest.macd < macd.latest.signal: BEARISH momentum (selling accelerating)
+   - macd.latest.histogram (MACD - signal): magnitude of momentum.
      * Histogram growing positive: momentum strengthening bullish
      * Histogram growing negative: momentum strengthening bearish
      * Histogram shrinking: momentum fading (possible reversal ahead)
+   - macd.trend.momentum is pre-computed (STRENGTHENING/FADING/FLAT).
+   - macd.recent_events.days_since_last_cross tells you signal recency.
    - Write: "MACD=[value], signal=[value], histogram=[value] → [BULLISH/BEARISH], momentum [STRENGTHENING/FADING]"
 
 C) MOMENTUM SCORE
@@ -388,10 +416,10 @@ C) MOMENTUM SCORE
 STEP 3: PRICE POSITIONING — Where is the stock in its range?
 ====================================================================
 
-Read: 52-week high/low from metadata, current price from stats_close data.
+Read: risk.week_52_high and risk.week_52_low from company profile, current price from stats_close data.
 
 A) 52-WEEK RANGE POSITION
-   - Calculate: range_pct = (price - week_52_low) / (week_52_high - week_52_low) * 100
+   - Calculate: range_pct = (price - risk.week_52_low) / (risk.week_52_high - risk.week_52_low) * 100
    - > 90%: AT HIGHS (breakout territory or exhaustion — check momentum)
    - 70-90%: UPPER RANGE (bullish positioning, but resistance above)
    - 30-70%: MID RANGE (neutral — could go either way)
@@ -459,23 +487,29 @@ WORKED EXAMPLE — GOOGL (using real data)
 This example shows how to execute all 5 steps. Follow this exact pattern.
 
 Indicator data provided:
-  ADX: 28.36, plus_di: 16.11, minus_di: 25.62
-  EMA: short (10-day) = 305.18, long (20-day) = 307.79
-  RSI (14-period): 45.44
-  MACD: line = -3.73, signal = -4.22, histogram = 0.48
-  52-week high: 349.00, 52-week low: 140.53, current price: ~305
+  adx.latest: {adx: 28.36, plus_di: 16.11, minus_di: 25.62, regime: TRENDING, direction: BEARISH}
+  adx.trend: {adx_slope_20d: 0.4, trend_strength_change: STRENGTHENING}
+  ema.latest: {ema_short: 305.18, ema_long: 307.79, gap: -2.61, gap_pct: -0.85, regime: BEARISH}
+  ema.recent_events: {last_bearish_cross_date: 2025-11-30, days_since_last_cross: 15}
+  rsi.latest: {value: 45.44, regime: BEARISH}
+  rsi.stats: {percentile_rank: 38}
+  rsi.trend: {slope_20d: 0.1, direction: RISING}
+  macd.latest: {macd: -3.73, signal: -4.22, histogram: 0.48, regime: BULLISH}
+  macd.trend: {momentum: STRENGTHENING}
+  Company profile: risk.week_52_high: 349.00, risk.week_52_low: 140.53
+  Stats close: current price ~305
 
 STEP 1: TREND IDENTIFICATION
-A) ADX = 28.36 → TRENDING (25-40, clear direction established)
-B) EMA short=305.18 vs long=307.79 → BEARISH crossover (short < long, gap = -2.61)
+A) adx.latest.adx = 28.36 → TRENDING (25-40, clear direction established)
+B) ema.latest.ema_short=305.18 vs ema.latest.ema_long=307.79 (gap_pct=-0.85%) → BEARISH
 C) Trend verdict: ADX 28.36 > 25 AND bearish EMA → DOWNTREND CONFIRMED (-1 bearish point)
    Trend: DOWNTREND CONFIRMED
 
 STEP 2: MOMENTUM
-A) RSI = 45.44 → BEARISH MOMENTUM (30-50, selling pressure dominant)
-B) MACD = -3.73, signal = -4.22, histogram = 0.48
+A) rsi.latest.value = 45.44 (rank=38th, RISING) → BEARISH MOMENTUM (30-50, selling pressure dominant)
+B) macd.latest.macd = -3.73, signal = -4.22, histogram = 0.48
    MACD (-3.73) > signal (-4.22) → BULLISH (buying accelerating)
-   Histogram 0.48 is positive and growing → momentum STRENGTHENING bullish
+   macd.trend.momentum: STRENGTHENING → confirms histogram growing bullish.
    Note: MACD is still negative overall but recovering from deeper lows.
 C) Momentum score: RSI bearish (30-50) but MACD bullish → DISAGREE → 0 points (MIXED)
    Momentum: MIXED, reversal warning: NO
