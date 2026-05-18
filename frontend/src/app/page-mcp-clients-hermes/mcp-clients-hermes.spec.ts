@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { McpClientsHermes } from './mcp-clients-hermes';
 
@@ -8,7 +9,8 @@ describe('McpClientsHermes', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [McpClientsHermes]
+      imports: [McpClientsHermes],
+      providers: [provideRouter([])],
     })
     .compileComponents();
 
