@@ -19,5 +19,6 @@ export {StockEodActions} from './components/stock-eod-actions/stock-eod-actions'
 export {StockEodInsights} from './components/stock-eod-actions/stock-eod-insights/stock-eod-insights';
 export {StockEodTools} from './components/stock-eod-actions/stock-eod-tools/stock-eod-tools';
 export {PageHeader} from './components/page-header/page-header';
+export {TableOfContents, type TocItem} from './components/table-of-contents/table-of-contents';
 export {SmallScreenMessage} from './components/small-screen-message/small-screen-message';
 export {StockInfoHeader} from './components/stock-info-header/stock-info-header';

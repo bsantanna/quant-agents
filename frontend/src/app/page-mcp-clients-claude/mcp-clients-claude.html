@@ -1,20 +1,287 @@
 <div class="claude-page mx-auto sm:px-6 lg:px-8 py-8">
-    <section class="claude-panel">
-        <h2 class="claude-section-title">How to use with Claude</h2>
-        <ol class="claude-steps">
-            <li>
-                Install the Quaks Claude plugin from the marketplace:
-                <code class="claude-code">/plugin install quaks-agents&#64;quaks</code>
-            </li>
-            <li>
-                Authenticate in Claude:
-                <code class="claude-code">/quaks-ai:authenticate</code>
-                then complete the flow with
-                <code class="claude-code">/quaks-ai:complete-authentication</code>.
-            </li>
-            <li>
-                Your personal agent is now reachable via Claude's MCP tools and prompts.
-            </li>
-        </ol>
-    </section>
+  <div class="claude-main">
+
+    <p class="claude-disclaimer">
+      <strong>Disclaimer:</strong> Quaks is an independent project and is not affiliated with, endorsed by, or
+      sponsored by Anthropic, PBC. &ldquo;Claude&rdquo; and &ldquo;Claude Code&rdquo;
+      are trademarks of Anthropic, PBC, used here for identification purposes only.
+    </p>
+
+  <section class="claude-panel" id="overview">
+    <h2 class="claude-section-title">What you get</h2>
+    <p class="claude-paragraph">
+      Quaks ships an agentic financial-analysis layer for Claude. The
+      <span class="claude-code">quaks-agents</span> plugin bundles two skills
+      that drive Claude through multi-step workflows on the Quaks MCP server,
+      pulling market news, fundamentals, prices, and technical indicators from
+      the live data feed.
+    </p>
+    <table class="claude-table">
+      <thead>
+        <tr>
+          <th>Skill</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="claude-code">/quaks-agents:news-analyst</span></td>
+          <td>
+            Daily investor briefing or Q&amp;A on market events, earnings,
+            economic indicators, and stock-specific news.
+          </td>
+        </tr>
+        <tr>
+          <td><span class="claude-code">/quaks-agents:financial-analyst-v1</span></td>
+          <td>
+            Full fundamental + technical analysis (P/E, ROE, RSI, MACD, EMA,
+            ADX) with BUY/HOLD/SELL signals and a USD&nbsp;10,000 portfolio
+            allocation.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="claude-paragraph">
+      Want a different tone or focus? Edit any agent's prompts at
+      <a class="claude-link" routerLink="/insights/agents">/insights/agents</a>
+      &mdash; changes sync straight to the Quaks MCP server, so the next time
+      you run the skill in Claude the new prompts are already live. No plugin
+      update, no redeploy.
+    </p>
+  </section>
+
+  <section class="claude-panel" id="request-access">
+    <h2 class="claude-section-title">Request access</h2>
+    <p class="claude-paragraph">
+      Quaks is invite-only while we ramp up. Join the waiting list and we'll email
+      your account credentials once access is granted &mdash; you'll need them on
+      first sign-in from Claude.
+    </p>
+    <a class="claude-cta claude-cta-outline" routerLink="/waitlist">
+      Join the waiting list
+    </a>
+  </section>
+
+  <section class="claude-panel" id="install-cowork">
+    <h2 class="claude-section-title">Install in Claude Cowork</h2>
+    <p class="claude-paragraph">
+      Cowork uses a GUI-driven install flow &mdash; plugins and connectors are
+      added from <span class="claude-code">Customize</span> in the left sidebar,
+      not via slash commands. Complete both steps below in order: install the
+      Quaks plugin first, then add the MCP connector so its tools can reach the
+      Quaks server.
+    </p>
+
+    <h3 class="claude-subsection-title">1. Install the Quaks plugin</h3>
+    <p class="claude-paragraph">
+      The plugin bundles the Quaks skills and agents. Because
+      <span class="claude-code">bsantanna/quaks</span> is a GitHub-hosted
+      marketplace, a Team or Enterprise admin registers it once for the
+      organization; after that, every member can self-install from the Cowork
+      plugin catalog.
+    </p>
+    <p class="claude-paragraph"><strong>Admin (one-time setup):</strong></p>
+    <ol class="claude-steps">
+      <li>Install the Claude GitHub App on the
+        <span class="claude-code">bsantanna/quaks</span> repository (required
+        for Cowork to sync the marketplace contents).
+      </li>
+      <li>Go to <span class="claude-code">Organization settings</span> &rarr;
+        <span class="claude-code">Plugins</span>.
+      </li>
+      <li>Click <span class="claude-code">Add plugin</span> and choose
+        <span class="claude-code">GitHub</span> as the source.
+      </li>
+      <li>Enter the repository in <span class="claude-code">owner/repo</span> format:
+        <pre class="claude-pre">bsantanna/quaks</pre>
+      </li>
+      <li>Verify GitHub access when prompted, then set the distribution preference
+        to <span class="claude-code">Available for install</span> (members opt in),
+        <span class="claude-code">Installed by default</span> (members can uninstall),
+        or <span class="claude-code">Required</span> (members cannot remove).
+      </li>
+    </ol>
+    <p class="claude-paragraph"><strong>Members:</strong></p>
+    <ol class="claude-steps">
+      <li>Open the <span class="claude-code">Cowork</span> tab.</li>
+      <li>Click <span class="claude-code">Customize</span> in the left sidebar.</li>
+      <li>Click <span class="claude-code">Browse plugins</span>.</li>
+      <li>Find <span class="claude-code">quaks-agents</span> and click
+        <span class="claude-code">Install</span>.
+      </li>
+    </ol>
+
+    <h3 class="claude-subsection-title">2. Add the Quaks MCP connector</h3>
+    <p class="claude-paragraph">
+      With the plugin installed, wire its tools to the Quaks MCP server by
+      adding a custom connector. Available on Pro, Max, Team, and Enterprise
+      plans (Free plans are limited to one custom connector).
+    </p>
+    <ol class="claude-steps">
+      <li>Still in the <span class="claude-code">Cowork</span> tab, click
+        <span class="claude-code">Customize</span> &rarr;
+        <span class="claude-code">Connectors</span>.
+      </li>
+      <li>Click <span class="claude-code">+</span>, then choose
+        <span class="claude-code">Add custom connector</span>.
+      </li>
+      <li>Paste the Quaks MCP server URL:
+        <pre class="claude-pre">https://quaks.ai/mcp/</pre>
+      </li>
+      <li>Click <span class="claude-code">Add</span>. Cowork prompts you to sign in on first use.
+      </li>
+      <li>Enable the connector in a Cowork chat with
+        <span class="claude-code">+</span> &rarr;
+        <span class="claude-code">Connectors</span>. The plugin's skills can
+        now call into the Quaks tools.
+      </li>
+    </ol>
+
+    <p class="claude-helper">
+      References:
+      <a class="claude-link" href="https://support.claude.com/en/articles/13837440-use-plugins-in-claude-cowork" target="_blank" rel="noopener">Use plugins in Claude Cowork</a>
+      &middot;
+      <a class="claude-link" href="https://support.claude.com/en/articles/13837433-manage-claude-cowork-plugins-for-your-organization" target="_blank" rel="noopener">Manage Cowork plugins for your organization</a>
+      &middot;
+      <a class="claude-link" href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp" target="_blank" rel="noopener">Get started with custom connectors using remote MCP</a>
+    </p>
+  </section>
+
+  <section class="claude-panel claude-hero" id="install-code">
+    <h2 class="claude-section-title">Install in Claude Code</h2>
+    <p class="claude-paragraph">
+      Claude Code registers a <span class="claude-code">claude-cli://</span>
+      deep-link handler with your operating system the first time you run
+      <span class="claude-code">claude</span>. Clicking the button below opens
+      a new Claude Code terminal session with the marketplace-add slash command
+      pre-filled.
+    </p>
+    <a
+      class="claude-cta"
+      href="claude-cli://open?q=%2Fplugin%20marketplace%20add%20bsantanna%2Fquaks"
+    >
+      Open in Claude Code
+    </a>
+    <p class="claude-helper">
+      Press <span class="claude-code">Enter</span> in the Claude Code window to
+      add the marketplace, then run
+      <span class="claude-code">/plugin install quaks-agents&#64;quaks</span>
+      to install the plugin (see <em>Install manually</em> below). Requires
+      <a class="claude-link" href="https://claude.com/product/claude-code" target="_blank" rel="noopener">Claude Code</a>
+      v2.1.91 or later.
+    </p>
+  </section>
+
+  <section class="claude-panel" id="install-manually">
+    <h2 class="claude-section-title">Install manually</h2>
+    <p class="claude-paragraph">
+      Already in a Claude Code session? Run these two slash commands:
+    </p>
+    <ol class="claude-steps">
+      <li>
+        Register the Quaks marketplace from its GitHub repository
+        (<span class="claude-code">owner/repo</span> format).
+        <pre class="claude-pre">/plugin marketplace add bsantanna/quaks</pre>
+      </li>
+      <li>
+        Install the <span class="claude-code">quaks-agents</span> plugin to
+        your user scope (the default).
+        <pre class="claude-pre">/plugin install quaks-agents&#64;quaks</pre>
+      </li>
+    </ol>
+    <p class="claude-paragraph">
+      Prefer a browser? Run <span class="claude-code">/plugin</span> to open the
+      interactive plugin manager. The <strong>Discover</strong> tab lists
+      installable plugins from every registered marketplace; press
+      <span class="claude-code">Enter</span> on
+      <span class="claude-code">quaks-agents</span> to pick an installation
+      scope (user, project, or local).
+    </p>
+    <p class="claude-helper">
+      References:
+      <a class="claude-link" href="https://code.claude.com/docs/en/discover-plugins" target="_blank" rel="noopener">Discover and install prebuilt plugins through marketplaces</a>
+      &middot;
+      <a class="claude-link" href="https://code.claude.com/docs/en/deep-links" target="_blank" rel="noopener">Launch sessions from links</a>
+      &middot;
+      <a class="claude-link" href="https://claude.com/blog/claude-code-plugins" target="_blank" rel="noopener">Customize Claude Code with plugins</a>
+    </p>
+  </section>
+
+  <section class="claude-panel" id="install-terminal">
+    <h2 class="claude-section-title">From your terminal</h2>
+    <p class="claude-paragraph">
+      Fire the deep link from your shell &mdash; the OS hands it to the
+      <span class="claude-code">claude-cli://</span> handler:
+    </p>
+    <pre class="claude-pre"># macOS
+open "claude-cli://open?q=%2Fplugin%20marketplace%20add%20bsantanna%2Fquaks"
+
+# Linux
+xdg-open "claude-cli://open?q=%2Fplugin%20marketplace%20add%20bsantanna%2Fquaks"
+
+# Windows (PowerShell)
+Start-Process "claude-cli://open?q=%2Fplugin%20marketplace%20add%20bsantanna%2Fquaks"</pre>
+    <p class="claude-paragraph">
+      Just want the MCP server, without the plugin and skills? This adds the
+      Quaks endpoint directly to Claude Code's MCP config &mdash; no interactive
+      session needed:
+    </p>
+    <pre class="claude-pre">claude mcp add-json quaks-ai '&#123;"type":"http","url":"https://quaks.ai/mcp/"&#125;'</pre>
+  </section>
+
+  <section class="claude-panel" id="sign-in">
+    <h2 class="claude-section-title">Sign in on first use</h2>
+    <p class="claude-paragraph">
+      The Quaks MCP server uses OAuth 2.1 with PKCE. The first time you invoke
+      a Quaks tool, Claude opens your browser to the Quaks sign-in page.
+    </p>
+    <ol class="claude-steps">
+      <li>
+        In Claude Code, run any Quaks command &mdash; for example
+        <span class="claude-code">/quaks-agents:news-analyst</span>.
+      </li>
+      <li>
+        Claude opens
+        <a class="claude-link" href="https://quaks.ai/mcp/authorize" target="_blank" rel="noopener">quaks.ai/mcp/authorize</a>
+        in your default browser.
+      </li>
+      <li>
+        Sign in with the credentials emailed to you after joining the waiting list,
+        then approve the requested scopes
+        (<span class="claude-code">openid</span>,
+        <span class="claude-code">profile</span>,
+        <span class="claude-code">email</span>).
+      </li>
+      <li>
+        Claude caches the access &amp; refresh tokens locally &mdash; you won't be
+        prompted again unless you revoke or uninstall the plugin.
+      </li>
+    </ol>
+  </section>
+
+  <section class="claude-panel" id="manage">
+    <h2 class="claude-section-title">Update, disable &amp; uninstall</h2>
+    <p class="claude-paragraph">
+      Refresh the Quaks marketplace listing so new plugin versions show up:
+    </p>
+    <pre class="claude-pre">/plugin marketplace update quaks</pre>
+    <p class="claude-paragraph">
+      Temporarily disable the plugin without removing its config (re-enable
+      with <span class="claude-code">/plugin enable</span>):
+    </p>
+    <pre class="claude-pre">/plugin disable quaks-agents&#64;quaks</pre>
+    <p class="claude-paragraph">Remove the plugin entirely:</p>
+    <pre class="claude-pre">/plugin uninstall quaks-agents&#64;quaks</pre>
+    <p class="claude-paragraph">
+      Apply install, enable, or disable changes without restarting the
+      Claude Code session:
+    </p>
+    <pre class="claude-pre">/reload-plugins</pre>
+  </section>
+
+  </div>
+
+  <aside class="claude-toc-aside">
+    <app-table-of-contents [items]="tocItems" title="On this page" />
+  </aside>
 </div>
