@@ -41,7 +41,7 @@ export const routes: Routes = [
     path: 'mcp-clients',
     children: [
       {
-        title: 'How to use',
+        title: 'Overview',
         path: 'how-to',
         component: McpClientsHowTo
       },
