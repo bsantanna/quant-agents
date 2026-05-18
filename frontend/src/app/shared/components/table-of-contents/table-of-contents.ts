@@ -48,7 +48,7 @@ export class TableOfContents {
     if (typeof target.scrollIntoView === 'function') {
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    const url = window.location.pathname + window.location.search + '#' + id;
+    const url = globalThis.location.pathname + globalThis.location.search + '#' + id;
     history.replaceState(null, '', url);
     this.activeId.set(id);
   }
