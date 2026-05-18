@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { McpClientsHowTo } from './mcp-clients-how-to';
 
@@ -8,7 +9,8 @@ describe('McpClientsHowTo', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [McpClientsHowTo]
+      imports: [McpClientsHowTo],
+      providers: [provideRouter([])],
     })
     .compileComponents();
 

@@ -1,1 +1,167 @@
-<p>mcp-clients-hermes works!</p>
+<div class="hermes-page mx-auto sm:px-6 lg:px-8 py-8">
+  <div class="hermes-main">
+
+    <p class="hermes-disclaimer">
+      <strong>Disclaimer:</strong> Quaks is an independent project and is not affiliated with, endorsed by, or
+      sponsored by Nous Research. &ldquo;Hermes&rdquo; and &ldquo;Hermes Agent&rdquo;
+      are products of Nous Research, referenced here for identification purposes only.
+    </p>
+
+  <section class="hermes-panel" id="overview">
+    <h2 class="hermes-section-title">What you get</h2>
+    <p class="hermes-paragraph">
+      Quaks ships an agentic financial-analysis layer for Hermes Agent. The
+      <span class="hermes-code">bsantanna/quaks</span> plugin bundles two
+      skills that drive Hermes through multi-step workflows on the Quaks MCP
+      server, pulling market news, fundamentals, prices, and technical
+      indicators from the live data feed.
+    </p>
+    <table class="hermes-table">
+      <thead>
+        <tr>
+          <th>Skill</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="hermes-code">quaks:news-analyst</span></td>
+          <td>
+            Daily investor briefing or Q&amp;A on market events, earnings,
+            economic indicators, and stock-specific news.
+          </td>
+        </tr>
+        <tr>
+          <td><span class="hermes-code">quaks:financial-analyst-v1</span></td>
+          <td>
+            Full fundamental + technical analysis (P/E, ROE, RSI, MACD, EMA,
+            ADX) with BUY/HOLD/SELL signals and a USD&nbsp;10,000 portfolio
+            allocation.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="hermes-paragraph">
+      Plugin skills are opt-in &mdash; they don't appear in
+      <span class="hermes-code">hermes skills list</span>. Hermes loads one
+      when its <span class="hermes-code">skill_view</span> tool is called, or
+      when your prompt clearly maps to it (e.g.&nbsp;<em>&ldquo;give me a quaks
+      news briefing&rdquo;</em> or
+      <em>&ldquo;analyze AAPL, MSFT, NVDA with quaks financial analyst&rdquo;</em>).
+    </p>
+    <p class="hermes-paragraph">
+      Want a different tone or focus? Edit any agent's prompts at
+      <a class="hermes-link" routerLink="/insights/agents">/insights/agents</a>
+      &mdash; changes sync straight to the Quaks MCP server, so the next time
+      you run the skill in Hermes the new prompts are already live. No plugin
+      update, no redeploy.
+    </p>
+  </section>
+
+  <section class="hermes-panel" id="request-access">
+    <h2 class="hermes-section-title">Request access</h2>
+    <p class="hermes-paragraph">
+      Quaks is invite-only while we ramp up. Join the waiting list and we'll email
+      your account credentials once access is granted &mdash; you'll need them on
+      first sign-in from Hermes.
+    </p>
+    <a class="hermes-cta hermes-cta-outline" routerLink="/waitlist">
+      Join the waiting list
+    </a>
+  </section>
+
+  <section class="hermes-panel hermes-hero" id="install">
+    <h2 class="hermes-section-title">Install in Hermes Agent</h2>
+    <p class="hermes-paragraph">
+      Requires
+      <a class="hermes-link" href="https://hermes-agent.nousresearch.com/" target="_blank" rel="noopener">Hermes Agent</a>
+      v0.10.0 or later, and an interactive session for the first MCP
+      connection (browser-based OAuth). Run this from any
+      <span class="hermes-code">hermes</span> session:
+    </p>
+    <pre class="hermes-pre">hermes plugins install bsantanna/quaks --enable</pre>
+    <p class="hermes-paragraph">
+      The install command clones the plugin into
+      <span class="hermes-code">~/.hermes/plugins/quaks/</span>, registers the
+      two skills with Hermes' plugin manager, and patches
+      <span class="hermes-code">~/.hermes/config.yaml</span> with the Quaks
+      MCP server entry:
+    </p>
+    <pre class="hermes-pre">mcp_servers:
+  quaks.ai:
+    url: https://quaks.ai/mcp/
+    auth: oauth</pre>
+    <p class="hermes-paragraph">
+      The patch is idempotent and non-destructive &mdash; it only adds the
+      <span class="hermes-code">quaks.ai</span> entry if absent, preserves the
+      rest of your config, and writes atomically. If the existing YAML is
+      malformed Hermes skips the patch with a warning rather than overwrite
+      your file.
+    </p>
+    <p class="hermes-helper">
+      References:
+      <a class="hermes-link" href="https://github.com/bsantanna/quaks/blob/main/doc/HERMES_PLUGIN.md" target="_blank" rel="noopener">Quaks Hermes plugin docs</a>
+      &middot;
+      <a class="hermes-link" href="https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp" target="_blank" rel="noopener">Hermes Agent MCP guide</a>
+    </p>
+  </section>
+
+  <section class="hermes-panel" id="sign-in">
+    <h2 class="hermes-section-title">Sign in on first use</h2>
+    <p class="hermes-paragraph">
+      The <span class="hermes-code">auth: oauth</span> entry triggers Hermes'
+      built-in OAuth 2.1 + PKCE flow with dynamic client registration and
+      on-disk token persistence.
+    </p>
+    <ol class="hermes-steps">
+      <li>
+        In a Hermes session, run any prompt that triggers a Quaks skill &mdash;
+        for example
+        <em>&ldquo;give me a quaks news briefing&rdquo;</em> &mdash; or call
+        <span class="hermes-code">skill_view(name=&quot;quaks:news-analyst&quot;)</span>
+        directly.
+      </li>
+      <li>
+        Hermes opens (or prints) the authorization URL at
+        <a class="hermes-link" href="https://quaks.ai/mcp/authorize" target="_blank" rel="noopener">quaks.ai/mcp/authorize</a>
+        in your default browser.
+      </li>
+      <li>
+        Sign in with the credentials emailed to you after joining the waiting list,
+        then approve the requested scopes
+        (<span class="hermes-code">openid</span>,
+        <span class="hermes-code">profile</span>,
+        <span class="hermes-code">email</span>).
+      </li>
+      <li>
+        Hermes caches the access &amp; refresh tokens on disk &mdash; you won't be
+        prompted again unless you remove the plugin or revoke access from the
+        Quaks side.
+      </li>
+    </ol>
+  </section>
+
+  <section class="hermes-panel" id="manage">
+    <h2 class="hermes-section-title">Update &amp; uninstall</h2>
+    <p class="hermes-paragraph">
+      Pull the latest plugin and skill revisions:
+    </p>
+    <pre class="hermes-pre">hermes plugins update quaks</pre>
+    <p class="hermes-paragraph">Remove the plugin entirely:</p>
+    <pre class="hermes-pre">hermes plugins remove quaks</pre>
+    <p class="hermes-paragraph">
+      Removing the plugin does <strong>not</strong> strip the
+      <span class="hermes-code">quaks.ai</span> entry from
+      <span class="hermes-code">~/.hermes/config.yaml</span>. To fully clean
+      up, also delete the <span class="hermes-code">mcp_servers.quaks.ai</span>
+      block from your config and reload with
+      <span class="hermes-code">/reload-mcp</span>.
+    </p>
+  </section>
+
+  </div>
+
+  <aside class="hermes-toc-aside">
+    <app-table-of-contents [items]="tocItems" title="On this page" />
+  </aside>
+</div>

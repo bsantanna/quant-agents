@@ -1,1 +1,310 @@
-<p>mcp-clients-how-to works!</p>
+<div class="howto-page mx-auto sm:px-6 lg:px-8 py-8">
+  <div class="howto-main">
+
+    <p class="howto-lead">
+      <strong>Your AI assistant, upgraded for the market.</strong>
+      Quaks is a first-class MCP server for financial intelligence. Wire it
+      into Claude, Hermes Agent, or any MCP-compatible client and your chat
+      gains live market news, company fundamentals, technical indicators,
+      and portfolio-grade analysis &mdash; powered by a multi-agent analyst
+      backend at <span class="howto-code">https://quaks.ai/mcp/</span>. The
+      workflows are configurable, the prompts are yours to edit, and access
+      is OAuth-secured by default. Bring your client &mdash; we'll bring
+      the analysts.
+    </p>
+
+  <section class="howto-panel" id="what-is-mcp">
+    <h2 class="howto-section-title">What is MCP</h2>
+    <p class="howto-paragraph">
+      Model Context Protocol is the wire format that lets an AI host (Claude
+      Code, Claude Cowork, Hermes Agent, Cursor, and others) discover and call
+      capabilities published by an external server. The
+      <a class="howto-link" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">official specification</a>
+      defines three server-side primitives:
+    </p>
+    <table class="howto-table">
+      <thead>
+        <tr>
+          <th>Primitive</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="howto-code">Tools</span></td>
+          <td>Executable functions an AI can invoke to perform actions &mdash; API calls, queries, computations.</td>
+        </tr>
+        <tr>
+          <td><span class="howto-code">Resources</span></td>
+          <td>Data sources that provide contextual information by URI &mdash; file contents, database rows, prompt templates.</td>
+        </tr>
+        <tr>
+          <td><span class="howto-code">Prompts</span></td>
+          <td>Reusable templates that structure interactions with the language model.</td>
+        </tr>
+      </tbody>
+    </table>
+    <details class="howto-details">
+      <summary>How the protocol works</summary>
+      <p class="howto-paragraph">
+        MCP runs over <a class="howto-link" href="https://www.jsonrpc.org/" target="_blank" rel="noopener">JSON-RPC&nbsp;2.0</a>.
+        After a client connects, both sides negotiate capabilities through an
+        <span class="howto-code">initialize</span> handshake, then the client
+        discovers what's available via <span class="howto-code">tools/list</span>,
+        <span class="howto-code">resources/list</span>, and
+        <span class="howto-code">prompts/list</span>. Quaks uses the
+        <strong>Streamable HTTP</strong> transport with OAuth&nbsp;2.1 + PKCE,
+        which is the same model the protocol recommends for remote servers.
+      </p>
+      <p class="howto-helper">
+        Spec references:
+        <a class="howto-link" href="https://modelcontextprotocol.io/specification/latest" target="_blank" rel="noopener">latest specification</a>
+        &middot;
+        <a class="howto-link" href="https://modelcontextprotocol.io/docs/concepts/architecture" target="_blank" rel="noopener">architecture overview</a>.
+      </p>
+    </details>
+  </section>
+
+  <section class="howto-panel" id="what-quaks-exposes">
+    <h2 class="howto-section-title">What Quaks exposes</h2>
+    <p class="howto-paragraph">
+      The Quaks MCP server is the single entry point for every workflow on the
+      platform. It exposes a tool surface for market data and content
+      publishing, plus a set of system prompts that drive the multi-step
+      analyst pipelines.
+    </p>
+    <table class="howto-table">
+      <thead>
+        <tr>
+          <th>Workflow</th>
+          <th>Prompts</th>
+          <th>Tools used</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>News Analyst</strong></td>
+          <td>
+            <span class="howto-code">news_analyst_coordinator</span>,
+            <span class="howto-code">news_analyst_aggregator</span>,
+            <span class="howto-code">news_analyst_reporter</span>
+          </td>
+          <td>
+            <span class="howto-code">get_markets_news_mcp</span>,
+            <span class="howto-code">get_insights_news_mcp</span>,
+            <span class="howto-code">publish_content_mcp</span>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Financial Analyst v1</strong></td>
+          <td>
+            <span class="howto-code">financial_analyst_v1_coordinator</span>,
+            <span class="howto-code">…_data_collector</span>,
+            <span class="howto-code">…_fundamental_analyst</span>,
+            <span class="howto-code">…_technical_analyst</span>,
+            <span class="howto-code">…_consensus_reporter</span>
+          </td>
+          <td>
+            <span class="howto-code">fetch_company_profile_mcp</span>,
+            <span class="howto-code">fetch_stats_close_mcp</span>,
+            <span class="howto-code">fetch_technical_indicators_mcp</span>,
+            <span class="howto-code">fetch_portfolio_xray_mcp</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <details class="howto-details">
+      <summary>Three ways to load a Quaks prompt</summary>
+      <p class="howto-paragraph">
+        Each workflow prompt is registered with the MCP server in three
+        parallel forms so it reaches every client, even the ones that don't
+        surface prompts or resources as first-class objects:
+      </p>
+      <ol class="howto-steps">
+        <li>
+          As an <strong>MCP Prompt</strong> &mdash; surfaced by
+          <span class="howto-code">prompts/list</span> and selectable in
+          prompt-aware clients.
+        </li>
+        <li>
+          As an <strong>MCP Resource</strong> at the URI
+          <span class="howto-code">prompt://&lt;name&gt;</span> &mdash; readable
+          by clients that support resource browsing.
+        </li>
+        <li>
+          As an argument to the universal
+          <span class="howto-code">read_prompt_mcp</span> tool &mdash; the
+          guaranteed-callable fallback for clients that only know how to invoke
+          tools. Skills use this form so the same workflow runs everywhere.
+        </li>
+      </ol>
+    </details>
+  </section>
+
+  <section class="howto-panel" id="what-is-skill">
+    <h2 class="howto-section-title">What is a Skill</h2>
+    <p class="howto-paragraph">
+      A <strong>Skill</strong> is a packaged recipe that teaches an AI agent
+      how to perform a specific task end-to-end. Instead of writing out every
+      instruction by hand, you trigger the skill &mdash; and the agent follows
+      a proven sequence of prompts and tool calls to deliver a polished
+      result. Think of it like a saved playbook: the same request produces
+      the same quality of work every time, whether you're asking for a
+      market briefing, a stock analysis, or a portfolio review.
+    </p>
+  </section>
+
+  <section class="howto-panel" id="skills-vs-mcp">
+    <h2 class="howto-section-title">How skills and MCP work together</h2>
+    <p class="howto-paragraph">
+      MCP and skills solve two different problems. MCP gives the agent
+      <em>access</em> &mdash; a live connection to Quaks data and operations.
+      A skill gives the agent <em>know-how</em> &mdash; the workflow that
+      turns that access into a useful answer. They're complementary: a skill
+      with no MCP has nothing to call, and MCP with no skill leaves the agent
+      to improvise the workflow each time.
+    </p>
+    <table class="howto-table howto-table-prose">
+      <thead>
+        <tr>
+          <th>MCP (Connectivity)</th>
+          <th>Skills (Knowledge)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Connects the agent to Quaks services (market news, prices, fundamentals, indicators).</td>
+          <td>Teaches the agent how to use those services effectively.</td>
+        </tr>
+        <tr>
+          <td>Provides real-time data access and tool invocation.</td>
+          <td>Captures workflows and best practices.</td>
+        </tr>
+        <tr>
+          <td>What the agent <em>can</em> do.</td>
+          <td>How the agent <em>should</em> do it.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="howto-panel" id="use-via-skills">
+    <h2 class="howto-section-title">Use the workflows via skills</h2>
+    <p class="howto-paragraph">
+      Each supported client ships a <strong>Quaks plugin</strong> that bundles
+      the workflow as a <em>skill</em> &mdash; a step-by-step recipe the agent
+      follows automatically. The skill drives the model through the right
+      sequence of prompts and tool calls so you don't have to orchestrate the
+      pipeline by hand.
+    </p>
+    <p class="howto-paragraph">
+      A natural-language prompt is usually enough to trigger the right skill.
+      For example, <em>&ldquo;give me a quaks news briefing&rdquo;</em>
+      launches the News Analyst, and
+      <em>&ldquo;analyze AAPL, MSFT, NVDA with quaks financial analyst&rdquo;</em>
+      launches Financial Analyst&nbsp;v1.
+    </p>
+    <p class="howto-paragraph">
+      Pick your client to see the install steps:
+    </p>
+    <div class="howto-cta-row">
+      <a class="howto-cta" routerLink="/mcp-clients/claude">
+        Install in Claude
+      </a>
+      <a class="howto-cta howto-cta-outline" routerLink="/mcp-clients/hermes">
+        Install in Hermes Agent
+      </a>
+    </div>
+  </section>
+
+  <section class="howto-panel howto-hero" id="customize-prompts">
+    <h2 class="howto-section-title">Customize prompts in the web UI</h2>
+    <p class="howto-paragraph">
+      Every workflow ships with a default prompt template, but each Quaks
+      account can override any step from the web app. Changes propagate to the
+      MCP server on the next call &mdash; no plugin update, no client restart,
+      no redeploy.
+    </p>
+    <ol class="howto-steps">
+      <li>
+        Open
+        <a class="howto-link" routerLink="/insights/agents">/insights/agents</a>,
+        pick the analyst you want to customize, and step through the
+        configuration wizard.
+      </li>
+      <li>
+        Edit the system prompt for any pipeline step
+        (<em>coordinator</em>, <em>aggregator</em>, <em>reporter</em>,
+        <em>fundamental analyst</em>, etc.). Save when you're happy with the
+        wording.
+      </li>
+      <li>
+        Run the skill again from your MCP client. The MCP server reads your
+        tenant-scoped template and serves it back through the
+        <span class="howto-code">prompts/get</span>,
+        <span class="howto-code">resources/read</span>, and
+        <span class="howto-code">read_prompt_mcp</span> surfaces &mdash; your
+        version is now live everywhere the skill is used.
+      </li>
+    </ol>
+    <details class="howto-details">
+      <summary>How the live sync works</summary>
+      <p class="howto-paragraph">
+        Every MCP call is resolved per request against the authenticated user's
+        tenant schema. The server first looks for a customized prompt belonging
+        to the calling user; if it finds one, that template is returned
+        verbatim. If the user hasn't customized that step (or isn't signed in),
+        the bundled default is returned instead.
+      </p>
+      <p class="howto-paragraph">
+        Because the lookup happens at call time, there is no cache to invalidate
+        and nothing to push: saving a prompt in
+        <a class="howto-link" routerLink="/insights/agents">/insights/agents</a>
+        updates the row that the MCP handler is about to read.
+      </p>
+    </details>
+  </section>
+
+  <section class="howto-panel" id="choose-client">
+    <h2 class="howto-section-title">Choose your client</h2>
+    <p class="howto-paragraph">
+      Quaks supports any MCP host that implements OAuth&nbsp;2.1 + PKCE for
+      remote servers. Two clients ship with first-class Quaks plugins today:
+    </p>
+    <table class="howto-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Install page</th>
+          <th>Distribution</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Claude Code / Claude Cowork</strong></td>
+          <td><a class="howto-link" routerLink="/mcp-clients/claude">/mcp-clients/claude</a></td>
+          <td><span class="howto-code">/plugin marketplace add bsantanna/quaks</span></td>
+        </tr>
+        <tr>
+          <td><strong>Hermes Agent</strong></td>
+          <td><a class="howto-link" routerLink="/mcp-clients/hermes">/mcp-clients/hermes</a></td>
+          <td><span class="howto-code">hermes plugins install bsantanna/quaks --enable</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="howto-helper">
+      References:
+      <a class="howto-link" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">Model Context Protocol</a>
+      &middot;
+      <a class="howto-link" href="https://modelcontextprotocol.io/specification/latest" target="_blank" rel="noopener">MCP specification</a>
+      &middot;
+      <a class="howto-link" href="https://github.com/bsantanna/quaks" target="_blank" rel="noopener">Quaks plugin repository</a>
+    </p>
+  </section>
+
+  </div>
+
+  <aside class="howto-toc-aside">
+    <app-table-of-contents [items]="tocItems" title="On this page" />
+  </aside>
+</div>

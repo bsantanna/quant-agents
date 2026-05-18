@@ -85,6 +85,7 @@ def setup_auth(container, application):
                 ".*\\.svg$",
                 ".*\\.json$",
                 ".*\\.png$",
+                ".*\\.webp$",
                 ".*\\.webmanifest$",
                 ".*\\.txt$",
                 "/insights/",

@@ -1,0 +1,22 @@
+<nav class="toc" aria-label="Table of contents">
+  @if (title()) {
+    <p class="toc__title">{{ title() }}</p>
+  }
+  <ul class="toc__list">
+    @for (item of items(); track item.id) {
+      <li
+        class="toc__item"
+        [class.toc__item--level-2]="item.level === 2"
+      >
+        <a
+          class="toc__link"
+          [class.toc__link--active]="activeId() === item.id"
+          [href]="'#' + item.id"
+          (click)="scrollTo($event, item.id)"
+        >
+          {{ item.label }}
+        </a>
+      </li>
+    }
+  </ul>
+</nav>
