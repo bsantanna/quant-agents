@@ -2,6 +2,32 @@
 
 <!-- version list -->
 
+## v1.5.43 (2026-05-18)
+
+### Bug Fixes
+
+- Claude setup description ([#161](https://github.com/bsantanna/quaks/pull/161),
+  [`8d5272c`](https://github.com/bsantanna/quaks/commit/8d5272c13d92ed767b29d3a0f1f57c11545a8a95))
+
+- Hermes setup description ([#161](https://github.com/bsantanna/quaks/pull/161),
+  [`8d5272c`](https://github.com/bsantanna/quaks/commit/8d5272c13d92ed767b29d3a0f1f57c11545a8a95))
+
+- Mcp pages (claude, hermes, overview) ([#161](https://github.com/bsantanna/quaks/pull/161),
+  [`8d5272c`](https://github.com/bsantanna/quaks/commit/8d5272c13d92ed767b29d3a0f1f57c11545a8a95))
+
+- Overview setup description ([#161](https://github.com/bsantanna/quaks/pull/161),
+  [`8d5272c`](https://github.com/bsantanna/quaks/commit/8d5272c13d92ed767b29d3a0f1f57c11545a8a95))
+
+- Overview setup description (2) ([#161](https://github.com/bsantanna/quaks/pull/161),
+  [`8d5272c`](https://github.com/bsantanna/quaks/commit/8d5272c13d92ed767b29d3a0f1f57c11545a8a95))
+
+- Overview setup description (3) ([#161](https://github.com/bsantanna/quaks/pull/161),
+  [`8d5272c`](https://github.com/bsantanna/quaks/commit/8d5272c13d92ed767b29d3a0f1f57c11545a8a95))
+
+- Overview setup description (4) ([#161](https://github.com/bsantanna/quaks/pull/161),
+  [`8d5272c`](https://github.com/bsantanna/quaks/commit/8d5272c13d92ed767b29d3a0f1f57c11545a8a95))
+
+
 ## v1.5.42 (2026-05-15)
 
 ### Bug Fixes
