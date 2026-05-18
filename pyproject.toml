@@ -5,7 +5,7 @@ description = "Multi-agent financial agents platform"
 requires-python = ">=3.12"
 dependencies = [
   "browser-use",
-  "charset-normalizer==3.4.2",
+  "charset-normalizer==3.4.7",
   "dependency-injector~=4.48.3",
   "eland~=9.2.0",
   "fastapi-keycloak-middleware~=1.6.0",
