@@ -14,6 +14,18 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   {
+    path: 'mcp-clients/how-to',
+    renderMode: RenderMode.Prerender
+  },
+  {
+    path: 'mcp-clients/claude',
+    renderMode: RenderMode.Prerender
+  },
+  {
+    path: 'mcp-clients/hermes',
+    renderMode: RenderMode.Prerender
+  },
+  {
     path: 'terms',
     renderMode: RenderMode.Prerender
   },
