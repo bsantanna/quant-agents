@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {Meta, Title} from '@angular/platform-browser';
 import {DOCUMENT} from '@angular/common';
 
@@ -11,6 +11,7 @@ export interface SeoConfig {
   description?: string;
   path?: string;
   image?: string;
+  eyebrow?: string;
 }
 
 export interface NewsArticleSchema {
@@ -27,6 +28,16 @@ export class SeoService {
   private readonly meta = inject(Meta);
   private readonly title = inject(Title);
   private readonly doc = inject(DOCUMENT);
+
+  private readonly _pageTitle = signal<string | null>(null);
+  private readonly _pageEyebrow = signal<string | null>(null);
+  readonly pageTitle = this._pageTitle.asReadonly();
+  readonly pageEyebrow = this._pageEyebrow.asReadonly();
+
+  clearDynamicTitle(): void {
+    this._pageTitle.set(null);
+    this._pageEyebrow.set(null);
+  }
 
   update(config: SeoConfig): void {
     const fullTitle = `${config.title} | Quaks`;
@@ -59,6 +70,10 @@ export class SeoService {
 
     // BreadcrumbList
     this.setBreadcrumbs(config.title, config.path);
+
+    // Visible page-header signals (consumed by NavigationHeader)
+    this._pageTitle.set(config.title);
+    this._pageEyebrow.set(config.eyebrow ?? null);
   }
 
   setNewsArticleSchema(article: NewsArticleSchema): void {
@@ -121,5 +136,7 @@ export class SeoService {
     this.removeJsonLd();
     this.doc.getElementById('seo-breadcrumbs')?.remove();
     this.update({title: 'AI-Powered Quantitative Finance Platform'});
+    this._pageTitle.set(null);
+    this._pageEyebrow.set(null);
   }
 }

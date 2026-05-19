@@ -81,4 +81,22 @@ describe('SeoService', () => {
     expect(title.getTitle()).toBe('AI-Powered Quantitative Finance Platform | Quaks');
     expect(meta.getTag('property="og:url"')?.content).toBe('https://quaks.ai/');
   });
+
+  it('should publish pageTitle and pageEyebrow signals on update', () => {
+    service.update({title: 'Tesla earnings beat', eyebrow: 'News'});
+    expect(service.pageTitle()).toBe('Tesla earnings beat');
+    expect(service.pageEyebrow()).toBe('News');
+  });
+
+  it('should clear pageTitle and pageEyebrow on reset', () => {
+    service.update({title: 'Some title', eyebrow: 'Some eyebrow'});
+    service.reset();
+    expect(service.pageTitle()).toBeNull();
+    expect(service.pageEyebrow()).toBeNull();
+  });
+
+  it('should leave pageEyebrow null when eyebrow is not provided', () => {
+    service.update({title: 'No eyebrow'});
+    expect(service.pageEyebrow()).toBeNull();
+  });
 });

@@ -3,8 +3,8 @@
 
         <div class="profile-layout">
             <div class="profile-main">
-                <h1 class="profile-name">{{ agent.name }}</h1>
-                <h2 class="profile-role">{{ agent.role }}</h2>
+                <h2 class="profile-name">{{ agent.name }}</h2>
+                <p class="profile-role">{{ agent.role }}</p>
                 @for (paragraph of agent.bio; track $index) {
                     <p class="profile-bio">{{ paragraph }}</p>
                 }

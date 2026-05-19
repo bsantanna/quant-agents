@@ -3,6 +3,9 @@
     "/markets/news": {},
     "/markets/performance": {},
     "/markets/stocks": {},
+    "/mcp-clients/claude": {},
+    "/mcp-clients/hermes": {},
+    "/mcp-clients/how-to": {},
     "/privacy": {},
     "/terms": {},
     "/waitlist": {}
