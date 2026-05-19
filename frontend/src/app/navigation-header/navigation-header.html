@@ -61,30 +61,32 @@
         </div>
     }
 
-    <div #subHeader class="mt-16 py-4">
-        <div class="mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="md:flex md:items-center md:justify-between">
-                <div class="min-w-0 flex-1 hidden sm:block">
-                    <app-page-header [eyebrow]="eyebrow()" [title]="title()" />
-                </div>
+    @if (path() !== '/' && path() !== '') {
+        <div #subHeader class="mt-16 py-4">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="md:flex md:items-center md:justify-between">
+                    <div class="min-w-0 flex-1 hidden sm:block">
+                        <app-page-header [eyebrow]="eyebrow()" [title]="title()" />
+                    </div>
 
-                <div class="w-full max-w-lg lg:max-w-xs">
-                    @if (path().indexOf('stocks') >-1) {
-                        <app-stock-autocomplete
-                                [inputPlaceholder]="'Search stocks (e.g., NVDA, GOOG)'"
-                                (stockSelected)="onKeyTickerSelected($event)">
-                        </app-stock-autocomplete>
-                    }
-                    @if (path().indexOf('markets/news') > -1) {
-                        <app-news-autocomplete
-                                [inputPlaceholder]="'Search news (e.g., Tesla, earnings)'">
-                        </app-news-autocomplete>
-                    }
-                </div>
+                    <div class="w-full max-w-lg lg:max-w-xs">
+                        @if (path().indexOf('stocks') >-1) {
+                            <app-stock-autocomplete
+                                    [inputPlaceholder]="'Search stocks (e.g., NVDA, GOOG)'"
+                                    (stockSelected)="onKeyTickerSelected($event)">
+                            </app-stock-autocomplete>
+                        }
+                        @if (path().indexOf('markets/news') > -1) {
+                            <app-news-autocomplete
+                                    [inputPlaceholder]="'Search news (e.g., Tesla, earnings)'">
+                            </app-news-autocomplete>
+                        }
+                    </div>
 
+                </div>
             </div>
         </div>
-    </div>
+    }
 
 
 </div>

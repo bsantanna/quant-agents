@@ -12,7 +12,7 @@ import {TableOfContents, TocItem} from '../shared/components/table-of-contents/t
 export class McpClientsHermes {
   readonly tocItems: TocItem[] = [
     {id: 'overview', label: 'What you get'},
-    {id: 'request-access', label: 'Request access'},
+    {id: 'signup', label: 'Sign up'},
     {id: 'install', label: 'Install in Hermes Agent'},
     {id: 'sign-in', label: 'Sign in on first use'},
     {id: 'manage', label: 'Update & uninstall'},

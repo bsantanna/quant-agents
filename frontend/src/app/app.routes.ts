@@ -15,15 +15,24 @@ import {InsightsNewsItem} from './page-insights-news-item/insights-news-item';
 import {InsightsPreview} from './page-insights-preview/insights-preview';
 import {InsightsFinance} from './page-insights-finance/insights-finance';
 import {AuthCallback} from './page-auth-callback';
-import {PageWaitlist} from './page-waitlist';
+import {PageSignup} from './page-signup';
 import {AccountProfile} from './page-account-profile/account-profile';
 import {authGuard} from './shared/guards/auth.guard';
 import {Privacy} from './page-privacy/privacy';
 import {McpClientsClaude} from './page-mcp-clients-claude/mcp-clients-claude';
 import {McpClientsHowTo} from './page-mcp-clients-how-to/mcp-clients-how-to';
 import {McpClientsHermes} from './page-mcp-clients-hermes/mcp-clients-hermes';
+import {ProductFeatures} from './page-product-features/product-features';
+import {ProductPricing} from './page-product-pricing/product-pricing';
+import {PageLanding} from './page-landing';
 
 export const routes: Routes = [
+  {
+    title: 'Financial Intelligence for AI Agents & Assistants',
+    path: '',
+    pathMatch: 'full',
+    component: PageLanding
+  },
   {
     title: 'Account',
     path: 'account',
@@ -33,6 +42,22 @@ export const routes: Routes = [
         path: 'profile',
         component: AccountProfile,
         canActivate: [authGuard]
+      }
+    ]
+  },
+  {
+    title: 'Product',
+    path: 'product',
+    children: [
+      {
+        title: 'Features',
+        path: 'features',
+        component: ProductFeatures,
+      },
+      {
+        title: 'Pricing',
+        path: 'pricing',
+        component: ProductPricing
       }
     ]
   },
@@ -77,12 +102,12 @@ export const routes: Routes = [
         component: InsightsProfile
       },
       {
-        title: 'News',
+        title: 'News Insights',
         path: 'news',
         component: InsightsNews
       },
       {
-        title: 'News',
+        title: 'News Insights',
         path: 'news/item/:indexName/:newsItemId',
         component: InsightsNewsItem
       },
@@ -92,12 +117,12 @@ export const routes: Routes = [
         component: InsightsPreview
       },
       {
-        title: 'Financial',
+        title: 'Financial Insights',
         path: 'financial',
         component: InsightsFinance
       },
       {
-        title: 'Financial',
+        title: 'Financial Insights',
         path: 'financial/item/:indexName/:newsItemId',
         component: InsightsNewsItem
       }
@@ -108,7 +133,7 @@ export const routes: Routes = [
     path: 'markets',
     children: [
       {
-        title: 'Performance comparison',
+        title: 'Performance',
         path: 'performance',
         component: MarketsPerformanceComparison
       },
@@ -160,9 +185,9 @@ export const routes: Routes = [
     component: AuthCallback
   },
   {
-    title: 'Waiting List',
-    path: 'waitlist',
-    component: PageWaitlist
+    title: 'Sign Up',
+    path: 'signup',
+    component: PageSignup
   },
   { path: '**', redirectTo: '' }
 ];

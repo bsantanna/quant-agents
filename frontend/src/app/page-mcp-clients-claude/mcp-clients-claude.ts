@@ -12,7 +12,7 @@ import {TableOfContents, TocItem} from '../shared/components/table-of-contents/t
 export class McpClientsClaude {
   readonly tocItems: TocItem[] = [
     {id: 'overview', label: 'What you get'},
-    {id: 'request-access', label: 'Request access'},
+    {id: 'signup', label: 'Sign up'},
     {id: 'install-cowork', label: 'Install in Claude Cowork'},
     {id: 'install-code', label: 'Install in Claude Code'},
     {id: 'install-manually', label: 'Install manually'},
