@@ -1,10 +1,11 @@
-import {Component, computed, inject, PLATFORM_ID, signal} from '@angular/core';
+import {Component, computed, effect, inject, PLATFORM_ID, signal} from '@angular/core';
 import {isPlatformBrowser} from '@angular/common';
 import {ActivatedRoute} from '@angular/router';
 import {AgentProfile} from '../shared/models/insights.model';
 import {InsightsAgentProfileService} from '../shared/services/insights-agent-profile.service';
 import {PersonalAgentService} from '../shared/services/personal-agent.service';
 import {AuthService} from '../shared/services/auth.service';
+import {SeoService} from '../shared';
 
 @Component({
   selector: 'app-insights-profile',
@@ -34,6 +35,20 @@ export class InsightsProfile {
   }
 
   constructor() {
+    const seo = inject(SeoService);
+    effect(() => {
+      const agent = this.profile();
+      if (agent) {
+        const bio = agent.bio?.[0] ?? '';
+        seo.update({
+          title: agent.name,
+          description: `${agent.role}${bio ? ` — ${bio}` : ''}`,
+          path: `/insights/profile/${this.agentSlug(agent)}`,
+          eyebrow: 'Insights',
+        });
+      }
+    });
+
     if (this.isBrowser) {
       const agentName = this.route.snapshot.paramMap.get('agentName');
       if (agentName) {

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
+import {SeoService} from '../shared';
 import {TableOfContents, TocItem} from '../shared/components/table-of-contents/table-of-contents';
 
 @Component({
@@ -18,4 +19,12 @@ export class McpClientsHowTo {
     {id: 'customize-prompts', label: 'Customize prompts'},
     {id: 'choose-client', label: 'Choose your client'},
   ];
+
+  constructor() {
+    inject(SeoService).update({
+      title: 'MCP Clients Overview',
+      description: 'How to use Quaks via the Model Context Protocol — install the plugin in your AI agent and run financial-analysis workflows.',
+      path: '/mcp-clients/how-to',
+    });
+  }
 }

@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, inject, OnDestroy, PLATFORM_ID, si
 import {isPlatformBrowser} from '@angular/common';
 import {StockAutocompleteComponent} from './stock-autocomplete/stock-autocomplete';
 import {NewsAutocompleteComponent} from './news-autocomplete/news-autocomplete';
-import {IndexedKeyTicker} from '../shared';
+import {IndexedKeyTicker, SeoService} from '../shared';
 import {STOCK_MARKETS} from '../constants';
 import {ShareButtonComponent} from './share-button/share-button';
 import {InsightsDropdownComponent} from './insights-dropdown/insights-dropdown';
@@ -26,6 +26,7 @@ import {PageHeader} from '../shared/components/page-header/page-header';
 export class NavigationHeader implements AfterViewInit, OnDestroy {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly router = inject(Router);
+  private readonly seo = inject(SeoService);
   readonly subHeader = viewChild<ElementRef>('subHeader');
   readonly stickyVisible = signal(false);
   private observer: IntersectionObserver | null = null;
@@ -54,8 +55,8 @@ export class NavigationHeader implements AfterViewInit, OnDestroy {
   );
 
   readonly path = () => this.routeInfo().path;
-  readonly title = () => this.routeInfo().title;
-  readonly eyebrow = () => this.routeInfo().eyebrow;
+  readonly title = () => this.seo.pageTitle() ?? this.routeInfo().title;
+  readonly eyebrow = () => this.seo.pageEyebrow() ?? this.routeInfo().eyebrow;
 
   onKeyTickerSelected(indexedKeyTicker: IndexedKeyTicker): void {
     if (STOCK_MARKETS.filter(market => market === indexedKeyTicker.index)) {

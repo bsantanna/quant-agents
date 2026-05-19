@@ -2,14 +2,14 @@
 
   @if (state() === 'success') {
     <div class="text-center py-16">
-      <h1 class="text-3xl font-bold mb-4">Thank you!</h1>
+      <h2 class="text-3xl font-bold mb-4">Thank you!</h2>
       <p class="text-lg">You are on the waiting list. We will send account credentials to your email once access is granted.</p>
     </div>
   }
 
   @if (state() === 'duplicate') {
     <div class="text-center py-16">
-      <h1 class="text-3xl font-bold mb-4">Already registered</h1>
+      <h2 class="text-3xl font-bold mb-4">Already registered</h2>
       <p class="text-lg">This email is already on the waiting list. We will be in touch soon.</p>
     </div>
   }
@@ -21,7 +21,7 @@
   }
 
   @if (state() === 'form' || state() === 'error') {
-    <h1 class="text-3xl font-bold mb-6 text-center">Join the Waiting List</h1>
+    <h2 class="text-3xl font-bold mb-6 text-center">Join the Waiting List</h2>
     <p class="mb-6 text-center waitlist-description">Request early access to Quaks. We will create your account and send login instructions by email.</p>
 
     <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">

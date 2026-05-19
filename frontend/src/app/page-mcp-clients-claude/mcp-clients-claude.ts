@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {PageHeader} from '../shared/components/page-header/page-header';
+import {SeoService} from '../shared';
 import {TableOfContents, TocItem} from '../shared/components/table-of-contents/table-of-contents';
 
 @Component({
   selector: 'app-mcp-clients-claude',
-  imports: [PageHeader, RouterLink, TableOfContents],
+  imports: [RouterLink, TableOfContents],
   templateUrl: './mcp-clients-claude.html',
   styleUrl: './mcp-clients-claude.scss',
 })
@@ -20,4 +20,12 @@ export class McpClientsClaude {
     {id: 'sign-in', label: 'Sign in on first use'},
     {id: 'manage', label: 'Update, disable & uninstall'},
   ];
+
+  constructor() {
+    inject(SeoService).update({
+      title: 'Use Quaks with Claude',
+      description: 'Install the Quaks plugin and connect Claude Code or Claude Cowork to your personal financial agents via MCP.',
+      path: '/mcp-clients/claude',
+    });
+  }
 }

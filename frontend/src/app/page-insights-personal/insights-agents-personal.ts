@@ -93,12 +93,15 @@ export class InsightsAgentsPersonal {
     const seo = inject(SeoService);
     effect(() => {
       const isEdit = this.mode() === 'edit';
+      const profile = this.agentProfile();
+      const name = profile?.name ?? (isEdit ? 'Configure Personal Agent' : 'Create Personal Agent');
       seo.update({
-        title: isEdit ? 'Configure Personal Agent' : 'Create Personal Agent',
+        title: name,
         description: isEdit
-          ? 'Configure your personal Quaks AI agent.'
-          : 'Create your personal Quaks AI agent.',
+          ? `Configure your personal ${profile?.name ?? 'Quaks AI'} agent.`
+          : `Create your personal ${profile?.name ?? 'Quaks AI'} agent.`,
         path: '/insights/agents/personal',
+        eyebrow: 'Personal Agent',
       });
     });
     if (this.isBrowser) {
