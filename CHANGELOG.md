@@ -2,6 +2,25 @@
 
 <!-- version list -->
 
+## v1.5.44 (2026-05-19)
+
+### Bug Fixes
+
+- Add TitleStrategy fallback and backfill SeoService on Insights pages (#20, #28)
+  ([#162](https://github.com/bsantanna/quaks/pull/162),
+  [`6eb5a64`](https://github.com/bsantanna/quaks/commit/6eb5a64224135307a968b1a7829235c8212aa30e))
+
+- Resolve SEO audit critical regressions (R1, R2, #25)
+  ([#162](https://github.com/bsantanna/quaks/pull/162),
+  [`6eb5a64`](https://github.com/bsantanna/quaks/commit/6eb5a64224135307a968b1a7829235c8212aa30e))
+
+- SEO analysis landing page 2 ([#162](https://github.com/bsantanna/quaks/pull/162),
+  [`6eb5a64`](https://github.com/bsantanna/quaks/commit/6eb5a64224135307a968b1a7829235c8212aa30e))
+
+- SEO audit findings (1) ([#162](https://github.com/bsantanna/quaks/pull/162),
+  [`6eb5a64`](https://github.com/bsantanna/quaks/commit/6eb5a64224135307a968b1a7829235c8212aa30e))
+
+
 ## v1.5.43 (2026-05-18)
 
 ### Bug Fixes
