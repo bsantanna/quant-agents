@@ -4,6 +4,7 @@ import {AgentProfile} from '../shared/models/insights.model';
 import {InsightsAgentProfileService} from '../shared/services/insights-agent-profile.service';
 import {PersonalAgentService} from '../shared/services/personal-agent.service';
 import {AuthService} from '../shared/services/auth.service';
+import {SeoService} from '../shared';
 
 @Component({
   selector: 'app-insights-agents',
@@ -23,6 +24,11 @@ export class InsightsAgents {
   readonly hasAnyConfigured = computed(() => this.configuredTypes().size > 0);
 
   constructor() {
+    inject(SeoService).update({
+      title: 'Quaks AI Agents',
+      description: 'Browse and configure Quaks financial AI agents — news analyst, financial analyst, and more.',
+      path: '/insights/agents',
+    });
     if (this.isBrowser) {
       this.agentProfileService.getAllAgentProfiles()
         .subscribe(data => this.agents.set(data));

@@ -12,8 +12,8 @@ import {FeedbackMessageComponent} from './feedback-message/feedback-message';
 import {SettingsDropdownComponent} from './settings-dropdown/settings-dropdown';
 import {HamburgerMenuComponent} from './hamburger-menu/hamburger-menu';
 import {AuthDropdownComponent} from './auth-dropdown/auth-dropdown';
-import {NavigationEnd, Router} from '@angular/router';
-import {toSignal} from '@angular/core/rxjs-interop';
+import {NavigationEnd, NavigationStart, Router} from '@angular/router';
+import {toSignal, takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter, map, startWith} from 'rxjs';
 import {PageHeader} from '../shared/components/page-header/page-header';
 
@@ -57,6 +57,15 @@ export class NavigationHeader implements AfterViewInit, OnDestroy {
   readonly path = () => this.routeInfo().path;
   readonly title = () => this.seo.pageTitle() ?? this.routeInfo().title;
   readonly eyebrow = () => this.seo.pageEyebrow() ?? this.routeInfo().eyebrow;
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationStart => e instanceof NavigationStart),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.seo.clearDynamicTitle());
+  }
 
   onKeyTickerSelected(indexedKeyTicker: IndexedKeyTicker): void {
     if (STOCK_MARKETS.filter(market => market === indexedKeyTicker.index)) {

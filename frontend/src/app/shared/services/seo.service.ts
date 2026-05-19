@@ -1,8 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {Meta, Title} from '@angular/platform-browser';
 import {DOCUMENT} from '@angular/common';
-import {NavigationStart, Router} from '@angular/router';
-import {filter} from 'rxjs';
 
 const BASE_URL = 'https://quaks.ai';
 const DEFAULT_DESCRIPTION = 'AI-powered financial agents platform for real-time market data analysis, stock insights, technical indicators, and financial news.';
@@ -30,23 +28,15 @@ export class SeoService {
   private readonly meta = inject(Meta);
   private readonly title = inject(Title);
   private readonly doc = inject(DOCUMENT);
-  private readonly router = inject(Router, {optional: true});
 
   private readonly _pageTitle = signal<string | null>(null);
   private readonly _pageEyebrow = signal<string | null>(null);
   readonly pageTitle = this._pageTitle.asReadonly();
   readonly pageEyebrow = this._pageEyebrow.asReadonly();
 
-  constructor() {
-    const events = this.router?.events;
-    if (events) {
-      events
-        .pipe(filter((e): e is NavigationStart => e instanceof NavigationStart))
-        .subscribe(() => {
-          this._pageTitle.set(null);
-          this._pageEyebrow.set(null);
-        });
-    }
+  clearDynamicTitle(): void {
+    this._pageTitle.set(null);
+    this._pageEyebrow.set(null);
   }
 
   update(config: SeoConfig): void {
