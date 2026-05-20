@@ -16,6 +16,9 @@ interface DuckParticle {
   ox: number;
   oy: number;
   oz: number;
+  sx: number;
+  sy: number;
+  sz: number;
   alpha: number;
   phase: number;
 }
@@ -31,6 +34,7 @@ interface Triangle {
 
 const PARTICLE_COUNT = 2800;
 const EDGE_RATIO = 0.7;
+const FORMATION_END = 0.25;
 const FOCAL = 900;
 const DUCK_ASPECT = 1.4;
 
@@ -169,10 +173,14 @@ export class PageLanding {
     for (let i = 0; i < n; i++) {
       const u = Math.random();
       const t = Math.random() < 0.5 ? u * u : 1 - u * u;
+      const s = this.randomScatter();
       out.push({
         ox: a[0] + (b[0] - a[0]) * t,
         oy: a[1] + (b[1] - a[1]) * t,
         oz: a[2] + (b[2] - a[2]) * t,
+        sx: s[0],
+        sy: s[1],
+        sz: s[2],
         alpha: alpha * (0.85 + Math.random() * 0.15),
         phase: Math.random() * Math.PI * 2,
       });
@@ -300,14 +308,26 @@ export class PageLanding {
         v = 1 - v;
       }
       const w = 1 - u - v;
+      const s = this.randomScatter();
       out.push({
         ox: t.a[0] * w + t.b[0] * u + t.c[0] * v,
         oy: t.a[1] * w + t.b[1] * u + t.c[1] * v,
         oz: t.a[2] * w + t.b[2] * u + t.c[2] * v,
+        sx: s[0],
+        sy: s[1],
+        sz: s[2],
         alpha: t.alpha * (0.8 + Math.random() * 0.2),
         phase: Math.random() * Math.PI * 2,
       });
     }
+  }
+
+  private randomScatter(): Vec3 {
+    return [
+      Math.random() * 5.0 - 2.5,
+      Math.random() * 3.2 - 1.6,
+      Math.random() * 3.0 - 1.5,
+    ];
   }
 
   private readAccentColor(el: HTMLElement): [number, number, number] {
@@ -446,6 +466,9 @@ export class PageLanding {
 
     const p = this.progress;
     const easeInOut = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    const formProgress = Math.min(1, p / FORMATION_END);
+    const formEase = formProgress * formProgress * (3 - 2 * formProgress);
+    const driftAmp = (1 - formEase) * 0.06;
 
     const rotY = p * Math.PI * 4;
     const tilt = Math.sin(p * Math.PI) * 0.32;
@@ -467,9 +490,12 @@ export class PageLanding {
     for (let i = 0; i < this.particles.length; i++) {
       const pt = this.particles[i];
       const breath = Math.sin(t + pt.phase) * 0.005;
-      const x0 = pt.ox + breath;
-      const y0 = pt.oy + breath * 0.5;
-      const z0 = pt.oz;
+      const driftX = Math.sin(t * 0.4 + pt.phase * 1.7) * driftAmp;
+      const driftY = Math.cos(t * 0.35 + pt.phase * 1.3) * driftAmp * 0.7;
+      const driftZ = Math.sin(t * 0.45 + pt.phase * 2.1) * driftAmp * 0.5;
+      const x0 = pt.sx + (pt.ox - pt.sx) * formEase + breath + driftX;
+      const y0 = pt.sy + (pt.oy - pt.sy) * formEase + breath * 0.5 + driftY;
+      const z0 = pt.sz + (pt.oz - pt.sz) * formEase + driftZ;
 
       const x1 = x0 * cosY + z0 * sinY;
       const z1 = -x0 * sinY + z0 * cosY;
@@ -477,14 +503,14 @@ export class PageLanding {
       const z2 = y0 * sinX + z1 * cosX;
 
       const persp = FOCAL / (FOCAL + z2 * drawScale * 0.55);
-      const sx = cx + x1 * drawScale * persp;
-      const sy = cy + y2 * drawScale * persp;
+      const px = cx + x1 * drawScale * persp;
+      const py = cy + y2 * drawScale * persp;
       const size = Math.max(0.7, 1.6 * persp * (0.85 + easeInOut * 0.35));
       const a = pt.alpha * persp * (0.55 + easeInOut * 0.35);
 
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
       ctx.beginPath();
-      ctx.arc(sx, sy, size, 0, Math.PI * 2);
+      ctx.arc(px, py, size, 0, Math.PI * 2);
       ctx.fill();
     }
   }
