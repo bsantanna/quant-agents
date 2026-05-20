@@ -227,6 +227,46 @@
 
 .landing-cta:hover .landing-cta-arrow { transform: translateX(3px); }
 
+/* ── Particle stage ── */
+
+.landing-stage { margin: 24px -8px 0; }
+.landing-stage-track { position: relative; height: 400vh; }
+.landing-stage-pin {
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.landing-stage-scene { position: relative; width: 100%; height: 100%; }
+.landing-stage-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.landing-stage-fallback {
+  position: absolute; top: 50%; left: 50%; width: clamp(220px, 32vw, 380px);
+  transform: translate(-50%, -50%); opacity: 0; pointer-events: none;
+  filter: drop-shadow(0 24px 48px rgba(0,0,0,0.35));
+}
+.landing-stage-captions {
+  position: absolute; left: 50%; bottom: 8vh; transform: translateX(-50%);
+  width: min(560px, 86vw); height: 48px; text-align: center; pointer-events: none;
+}
+.landing-stage-caption {
+  position: absolute; inset: 0; margin: 0;
+  font-family: var(--font-heading); font-size: clamp(1rem, 2.2vw, 1.45rem);
+  letter-spacing: -0.01em; color: var(--text-primary);
+  opacity: 0; transform: translateY(14px);
+  transition: opacity 360ms ease, transform 360ms ease;
+}
+.landing-stage[data-step="0"] .landing-stage-caption[data-step="0"],
+.landing-stage[data-step="1"] .landing-stage-caption[data-step="1"],
+.landing-stage[data-step="2"] .landing-stage-caption[data-step="2"],
+.landing-stage[data-step="3"] .landing-stage-caption[data-step="3"] {
+  opacity: 1; transform: translateY(0);
+}
+@media (max-width: 720px) { .landing-stage-track { height: 280vh; } }
+@media (prefers-reduced-motion: reduce) {
+  .landing-stage-track { height: auto; }
+  .landing-stage-pin { position: relative; height: clamp(360px, 56vh, 520px); }
+  .landing-stage-canvas, .landing-stage-captions { display: none; }
+  .landing-stage-fallback { opacity: 1; }
+}
+
 /* ── Section primitives ── */
 
 .landing-hr {

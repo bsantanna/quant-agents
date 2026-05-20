@@ -56,6 +56,27 @@
     </div>
   </section>
 
+  <section class="landing-stage" #stage [attr.data-step]="step()">
+    <div class="landing-stage-track">
+      <div class="landing-stage-pin">
+        <div class="landing-stage-scene">
+          <canvas #canvas class="landing-stage-canvas" aria-hidden="true"></canvas>
+          <img
+            class="landing-stage-fallback"
+            src="/logo_large.png"
+            alt="Quaks duck mascot"
+          />
+          <div class="landing-stage-captions" aria-hidden="true">
+            <p class="landing-stage-caption" data-step="0">Live market news, ticker-tagged.</p>
+            <p class="landing-stage-caption" data-step="1">Fundamentals, resolved per call.</p>
+            <p class="landing-stage-caption" data-step="2">Indicators on any window.</p>
+            <p class="landing-stage-caption" data-step="3">Portfolio math, agent-ready.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <hr class="landing-hr" aria-hidden="true" />
 
   <section class="landing-section">
