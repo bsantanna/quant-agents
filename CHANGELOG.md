@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.46 (2026-05-21)
+
+### Bug Fixes
+
+- Landing page (11) ([#164](https://github.com/bsantanna/quaks/pull/164),
+  [`6ea4ae0`](https://github.com/bsantanna/quaks/commit/6ea4ae0eb8aa1b4f5313c0d2edb50047e3710f56))
+
+
 ## v1.5.45 (2026-05-21)
 
 ### Bug Fixes
