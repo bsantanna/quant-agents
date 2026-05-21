@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
-import {provideRouter, TitleStrategy} from '@angular/router';
+import {provideRouter, TitleStrategy, withInMemoryScrolling} from '@angular/router';
 
 import { routes } from './app.routes';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
@@ -11,7 +11,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(routes, withInMemoryScrolling({anchorScrolling: 'enabled'})),
     provideHttpClient(withInterceptors([authInterceptor])), provideClientHydration(withEventReplay()),
     {provide: TitleStrategy, useClass: QuaksTitleStrategy},
   ]
