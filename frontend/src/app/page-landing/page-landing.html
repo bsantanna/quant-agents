@@ -1,0 +1,198 @@
+<article class="landing">
+
+    <section class="landing-hero">
+    <div class="landing-hero-grid">
+
+      <div class="landing-hero-headline">
+        <p class="landing-rubric">Presenting Quaks</p>
+        <h1 class="landing-h1">
+          <span class="landing-h1-line">Financial Intelligence,</span>
+          <span class="landing-h1-line landing-h1-line-accent">Now Built for AI Agents &amp; Assistants.</span>
+        </h1>
+      </div>
+
+      <div class="landing-hero-body">
+        <p class="landing-lede">
+          <strong>Your AI assistant, upgraded for the market.</strong>
+          Quaks is a first-class MCP server for financial intelligence. Wire it into Claude, Hermes Agent, or any MCP-compatible client and your chat gains live market news, company fundamentals, technical indicators, and portfolio-grade analysis &mdash; powered by a multi-agent analyst backend.
+        </p>
+
+        <div class="landing-cta-row">
+          <a class="landing-cta landing-cta-primary" routerLink="/product/features">
+            <span>See features</span>
+            <span class="landing-cta-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a class="landing-cta landing-cta-outline" routerLink="/mcp-clients/how-to">
+            <span>See how it works</span>
+          </a>
+        </div>
+
+        <dl class="landing-hero-stats">
+          <div class="landing-hero-stat">
+            <dt>Surface</dt>
+            <dd>Tools · Resources · Prompts</dd>
+          </div>
+          <div class="landing-hero-stat">
+            <dt>Transport</dt>
+            <dd>Streamable HTTP · OAuth 2.1 + PKCE</dd>
+          </div>
+          <div class="landing-hero-stat">
+            <dt>Hosts</dt>
+            <dd>Any MCP-compatible client</dd>
+          </div>
+        </dl>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="landing-stage" #stage [attr.data-step]="step()">
+    <div class="landing-stage-track">
+      <div class="landing-stage-pin">
+        <div class="landing-stage-scene">
+          <canvas #canvas class="landing-stage-canvas" aria-hidden="true"></canvas>
+          <img
+            class="landing-stage-final"
+            src="/logo.svg"
+            alt=""
+            aria-hidden="true"
+            [style.--svg-fade]="svgFade()"
+          />
+          <img
+            class="landing-stage-fallback"
+            src="/logo_large.png"
+            alt="Quaks duck mascot"
+          />
+          <div class="landing-stage-captions" aria-hidden="true">
+            <p class="landing-stage-caption" data-step="0">Without Quaks, the smartest LLM is still a brilliant generalist.</p>
+            <p class="landing-stage-caption" data-step="1">With Quaks, it reads the tape &mdash; news, fundamentals, technicals.</p>
+            <p class="landing-stage-caption" data-step="2">And it does the math &mdash; allocation, beta, risk, on demand.</p>
+            <p class="landing-stage-caption" data-step="3">Generalist in. Market strategist out.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="landing-hr" aria-hidden="true" />
+
+  <section class="landing-section">
+    <header class="landing-section-head">
+      <p class="landing-rubric">Why Quaks Exists</p>
+      <h2 class="landing-h2">A Financial Terminal for your AI agents and assistants.</h2>
+    </header>
+
+    <div class="landing-analogy">
+      <p class="landing-analogy-step">
+        <span class="landing-analogy-from">A top LLM model without market access</span>
+        <span class="landing-analogy-arrow" aria-hidden="true">&rarr;</span>
+        <span class="landing-analogy-to">a great generalist.</span>
+      </p>
+      <p class="landing-analogy-step landing-analogy-step-strong">
+        <span class="landing-analogy-from">A top LLM model with Quaks</span>
+        <span class="landing-analogy-arrow" aria-hidden="true">&rarr;</span>
+        <span class="landing-analogy-to">a market-beating quant.</span>
+      </p>
+    </div>
+
+    <p class="landing-analogy-coda">
+      That&rsquo;s the point of Quaks &mdash; a set of tools that turn the agent or assistant in your client into a working quant. Live market news, fundamentals, technicals, portfolio math, all callable as native MCP functions. Think of it as the desk every good analyst takes for granted, now wired straight into your AI.
+    </p>
+  </section>
+
+  <hr class="landing-hr" aria-hidden="true" />
+
+  <section class="landing-section">
+    <header class="landing-section-head">
+      <p class="landing-rubric">What Quaks Brings</p>
+      <h2 class="landing-h2">What your AI agent or assistant gains the moment it connects.</h2>
+    </header>
+
+    <ul class="landing-capability-grid">
+      <li class="landing-capability">
+        <span class="landing-capability-no">01</span>
+        <h3 class="landing-capability-title">Market News</h3>
+        <p class="landing-capability-body">A live wire of multi-source market reporting, ranked and ticker-tagged, ready to summarize on demand.</p>
+      </li>
+      <li class="landing-capability">
+        <span class="landing-capability-no">02</span>
+        <h3 class="landing-capability-title">Fundamentals</h3>
+        <p class="landing-capability-body">Company profiles, financial statements, insider trades, estimated earnings &mdash; resolved per ticker in a single call.</p>
+      </li>
+      <li class="landing-capability">
+        <span class="landing-capability-no">03</span>
+        <h3 class="landing-capability-title">Technical Indicators</h3>
+        <p class="landing-capability-body">RSI, MACD, EMA, ADX, OBV, Stochastic, CCI, A/D &mdash; rendered straight from end-of-day series, on any window.</p>
+      </li>
+      <li class="landing-capability">
+        <span class="landing-capability-no">04</span>
+        <h3 class="landing-capability-title">Portfolio X-Ray</h3>
+        <p class="landing-capability-body">Allocation, beta, sector overlap, concentration risk &mdash; the kind of read your agent or assistant can act on, not just describe.</p>
+      </li>
+    </ul>
+  </section>
+
+  <hr class="landing-hr" aria-hidden="true" />
+
+  <section class="landing-section">
+    <header class="landing-section-head">
+      <p class="landing-rubric">Where Quaks Runs</p>
+      <h2 class="landing-h2">Operate from any client. Customize in the open.</h2>
+    </header>
+
+    <div class="landing-desk-grid">
+      <div class="landing-desk-col">
+        <p class="landing-desk-label">Supported clients</p>
+        <ul class="landing-clients">
+          <li class="landing-client">
+            <span class="landing-client-name">Claude Code &amp; Claude Cowork</span>
+            <code class="landing-client-cmd">/plugin marketplace add bsantanna/quaks</code>
+          </li>
+          <li class="landing-client">
+            <span class="landing-client-name">Hermes Agent</span>
+            <code class="landing-client-cmd">hermes plugins install bsantanna/quaks --enable</code>
+          </li>
+          <li class="landing-client">
+            <span class="landing-client-name">Any MCP-compatible host</span>
+            <span class="landing-client-cmd landing-client-cmd-muted">Connect to https://quaks.ai/mcp/</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="landing-desk-col">
+        <p class="landing-desk-label">Prompts, edited live</p>
+        <p class="landing-desk-body">
+          Every workflow ships with a default prompt template &mdash; and every Quaks account can override any step from the web app. Save in
+          <a class="landing-link" routerLink="/insights/agents">/insights/agents</a>
+          and the change reaches the MCP server on the next call. No plugin update, no client restart, no redeploy.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="landing-hr" aria-hidden="true" />
+
+  <section class="landing-close">
+    <p class="landing-rubric">Join Quaks</p>
+    <p class="landing-close-line">
+      <span>Smarter agents &amp; assistants,</span>
+      <span class="landing-close-emph">one click away.</span>
+    </p>
+    <p class="landing-close-pitch">
+      Spin up a free Quaks account in under a minute &mdash; no card, no commitment. Bring any MCP-compatible client and your prompts, workflows, and customisations stay yours from day one.
+    </p>
+    <div class="landing-cta-row landing-cta-row-close">
+      <a class="landing-cta landing-cta-primary" routerLink="/signup">
+        <span>Create your free account</span>
+        <span class="landing-cta-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+      <a class="landing-cta landing-cta-outline" routerLink="/product/features">
+        <span>Take a tour</span>
+      </a>
+    </div>
+    <p class="landing-colophon">
+      Quaks works with Claude, Hermes Agent, and any MCP-compatible host. Free while we finalise plans.
+    </p>
+  </section>
+
+</article>

@@ -1,17 +1,17 @@
 import {Component, inject, signal} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SeoService} from '../shared';
-import {WaitlistService} from '../shared/services/waitlist.service';
+import {SignupService} from '../shared/services/signup.service';
 
 @Component({
-  selector: 'app-page-waitlist',
+  selector: 'app-page-signup',
   imports: [ReactiveFormsModule],
-  templateUrl: './page-waitlist.html',
-  styleUrl: './page-waitlist.scss',
+  templateUrl: './page-signup.html',
+  styleUrl: './page-signup.scss',
 })
-export class PageWaitlist {
+export class PageSignup {
   private readonly fb = inject(FormBuilder);
-  private readonly waitlistService = inject(WaitlistService);
+  private readonly signupService = inject(SignupService);
 
   readonly state = signal<'form' | 'success' | 'duplicate' | 'error'>('form');
   readonly submitting = signal(false);
@@ -25,16 +25,16 @@ export class PageWaitlist {
 
   constructor() {
     inject(SeoService).update({
-      title: 'Join the Waiting List',
-      description: 'Sign up to get early access to the Quaks financial agents platform.',
-      path: '/waitlist',
+      title: 'Sign Up',
+      description: 'Sign up to use the Quaks financial agents platform.',
+      path: '/signup',
     });
   }
 
   submit(): void {
     if (this.form.invalid || this.submitting()) return;
     this.submitting.set(true);
-    this.waitlistService.register(this.form.getRawValue()).subscribe({
+    this.signupService.register(this.form.getRawValue()).subscribe({
       next: () => {
         this.submitting.set(false);
         this.state.set('success');

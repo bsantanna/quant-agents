@@ -90,6 +90,7 @@ def setup_auth(container, application):
                 ".*\\.txt$",
                 "/insights/",
                 "/waitlist(/|$)",
+                "/signup(/|$)",
                 "/terms(/|$)",
                 "/privacy(/|$)",
                 "/account/",

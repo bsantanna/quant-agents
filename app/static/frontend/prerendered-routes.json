@@ -1,5 +1,6 @@
 {
   "routes": {
+    "/": {},
     "/markets/news": {},
     "/markets/performance": {},
     "/markets/stocks": {},
@@ -7,7 +8,9 @@
     "/mcp-clients/hermes": {},
     "/mcp-clients/how-to": {},
     "/privacy": {},
-    "/terms": {},
-    "/waitlist": {}
+    "/product/features": {},
+    "/product/pricing": {},
+    "/signup": {},
+    "/terms": {}
   }
 }

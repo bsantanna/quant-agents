@@ -1,0 +1,98 @@
+.product-stub {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 80px 12px 96px;
+  text-align: center;
+  color: var(--text-primary);
+
+  @media (max-width: 640px) {
+    padding: 48px 8px 64px;
+  }
+}
+
+.product-stub-rubric {
+  font-family: var(--font-data);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-accent);
+  display: inline-block;
+  margin: 0 0 28px;
+}
+
+.product-stub-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0 0 24px;
+}
+
+.product-stub-body {
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0 0 36px;
+}
+
+.product-stub-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.product-stub-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius);
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.product-stub-cta-primary {
+  color: var(--surface-base);
+  background: var(--accent-primary);
+
+  &:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+}
+
+.product-stub-cta-outline {
+  color: var(--accent-primary);
+  background: transparent;
+
+  &:hover {
+    color: var(--surface-base);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+}
+
+.product-stub-cta-arrow {
+  font-family: var(--font-data);
+  font-size: 1.1em;
+  transition: transform 140ms ease;
+}
+
+.product-stub-cta:hover .product-stub-cta-arrow {
+  transform: translateX(3px);
+}

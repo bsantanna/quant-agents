@@ -2,16 +2,16 @@ import {TestBed} from '@angular/core/testing';
 import {provideHttpClient} from '@angular/common/http';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 
-import {WaitlistService, WaitlistRequest, WaitlistResponse} from './waitlist.service';
+import {SignupService, SignupRequest, SignupResponse} from './signup.service';
 import {environment} from '../../../environments/environment';
 
-describe('WaitlistService', () => {
-  let service: WaitlistService;
+describe('SignupService', () => {
+  let service: SignupService;
   let httpTesting: HttpTestingController;
 
   const url = `${environment.apiBaseUrl}/waitlist`;
 
-  const payload: WaitlistRequest = {
+  const payload: SignupRequest = {
     email: 'test@example.com',
     first_name: 'Test',
     last_name: 'User',
@@ -22,7 +22,7 @@ describe('WaitlistService', () => {
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
-    service = TestBed.inject(WaitlistService);
+    service = TestBed.inject(SignupService);
     httpTesting = TestBed.inject(HttpTestingController);
   });
 
@@ -34,8 +34,8 @@ describe('WaitlistService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should POST to the waitlist endpoint with the payload', () => {
-    const mockResponse: WaitlistResponse = {status: 'registered'};
+  it('should POST to the signup endpoint with the payload', () => {
+    const mockResponse: SignupResponse = {status: 'registered'};
 
     service.register(payload).subscribe((result) => {
       expect(result).toEqual(mockResponse);

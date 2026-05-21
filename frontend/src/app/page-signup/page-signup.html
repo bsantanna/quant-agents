@@ -1,16 +1,16 @@
-<div class="container mx-auto sm:px-4 py-8 max-w-lg waitlist-content">
+<div class="container mx-auto sm:px-4 py-8 max-w-lg signup-content">
 
   @if (state() === 'success') {
     <div class="text-center py-16">
       <h2 class="text-3xl font-bold mb-4">Thank you!</h2>
-      <p class="text-lg">You are on the waiting list. We will send account credentials to your email once access is granted.</p>
+      <p class="text-lg">Your account is being created. We'll send your login credentials by email in a few minutes.</p>
     </div>
   }
 
   @if (state() === 'duplicate') {
     <div class="text-center py-16">
       <h2 class="text-3xl font-bold mb-4">Already registered</h2>
-      <p class="text-lg">This email is already on the waiting list. We will be in touch soon.</p>
+      <p class="text-lg">This email is already registered. Check your inbox for your login credentials.</p>
     </div>
   }
 
@@ -21,14 +21,14 @@
   }
 
   @if (state() === 'form' || state() === 'error') {
-    <h2 class="text-3xl font-bold mb-6 text-center">Join the Waiting List</h2>
-    <p class="mb-6 text-center waitlist-description">Request early access to Quaks. We will create your account and send login instructions by email.</p>
+    <h2 class="text-3xl font-bold mb-6 text-center">Sign Up</h2>
+    <p class="mb-6 text-center signup-description">Create your Quaks account. We'll send your login credentials by email in a few minutes.</p>
 
     <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
 
       <div>
         <label class="block mb-1 font-medium" for="email">Email</label>
-        <input id="email" type="email" formControlName="email" class="waitlist-field w-full" placeholder="you&#64;example.com" />
+        <input id="email" type="email" formControlName="email" class="signup-field w-full" placeholder="you&#64;example.com" />
         @if (form.controls.email.invalid && form.controls.email.touched) {
           <p class="field-error">Valid email is required.</p>
         }
@@ -36,7 +36,7 @@
 
       <div>
         <label class="block mb-1 font-medium" for="first_name">First Name</label>
-        <input id="first_name" type="text" formControlName="first_name" class="waitlist-field w-full" />
+        <input id="first_name" type="text" formControlName="first_name" class="signup-field w-full" />
         @if (form.controls.first_name.invalid && form.controls.first_name.touched) {
           <p class="field-error">First name is required.</p>
         }
@@ -44,7 +44,7 @@
 
       <div>
         <label class="block mb-1 font-medium" for="last_name">Last Name</label>
-        <input id="last_name" type="text" formControlName="last_name" class="waitlist-field w-full" />
+        <input id="last_name" type="text" formControlName="last_name" class="signup-field w-full" />
         @if (form.controls.last_name.invalid && form.controls.last_name.touched) {
           <p class="field-error">Last name is required.</p>
         }
@@ -52,14 +52,14 @@
 
       <div>
         <label class="block mb-1 font-medium" for="username">Username</label>
-        <input id="username" type="text" formControlName="username" class="waitlist-field w-full" placeholder="at least 3 characters" />
+        <input id="username" type="text" formControlName="username" class="signup-field w-full" placeholder="at least 3 characters" />
         @if (form.controls.username.invalid && form.controls.username.touched) {
           <p class="field-error">Username must be at least 3 characters.</p>
         }
       </div>
 
-      <button type="submit" class="waitlist-btn mt-2" [disabled]="submitting()">
-        {{ submitting() ? 'Submitting...' : 'Request Access' }}
+      <button type="submit" class="signup-btn mt-2" [disabled]="submitting()">
+        {{ submitting() ? 'Submitting...' : 'Sign Up' }}
       </button>
 
     </form>

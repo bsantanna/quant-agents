@@ -1,16 +1,16 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {PageWaitlist} from './page-waitlist';
+import {PageSignup} from './page-signup';
 import {provideHttpClient} from '@angular/common/http';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {provideRouter} from '@angular/router';
 
-describe('PageWaitlist', () => {
-  let component: PageWaitlist;
-  let fixture: ComponentFixture<PageWaitlist>;
+describe('PageSignup', () => {
+  let component: PageSignup;
+  let fixture: ComponentFixture<PageSignup>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PageWaitlist],
+      imports: [PageSignup],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -18,7 +18,7 @@ describe('PageWaitlist', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(PageWaitlist);
+    fixture = TestBed.createComponent(PageSignup);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -61,7 +61,6 @@ describe('PageWaitlist', () => {
     component.form.setValue({email: 'a@b.com', first_name: 'A', last_name: 'B', username: 'abc'});
     component.submitting.set(true);
     component.submit();
-    // submitting was already true, no new call
     expect(component.submitting()).toBe(true);
   });
 

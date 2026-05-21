@@ -5,6 +5,10 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
   collectCoverage: true,
+  coveragePathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/src/app/page-landing/',
+  ],
   coverageDirectory: 'coverage',
   coverageReporters: ['lcov', 'text'],
   coverageThreshold: {

@@ -24,7 +24,7 @@ describe('MarketsPerformanceComparison', () => {
     await TestBed.configureTestingModule({
       imports: [MarketsPerformanceComparison],
       providers: [
-        { provide: ActivatedRoute, useValue: { queryParams: queryParams$.asObservable(), snapshot: { title: 'Performance comparison' } } },
+        { provide: ActivatedRoute, useValue: { queryParams: queryParams$.asObservable(), snapshot: { title: 'Performance' } } },
         { provide: Router, useValue: mockRouter },
         { provide: ShareUrlService, useValue: mockShareUrlService },
       ]

@@ -1,12 +1,12 @@
-.waitlist-content {
+.signup-content {
   color: var(--text-primary);
 }
 
-.waitlist-description {
+.signup-description {
   color: var(--text-secondary);
 }
 
-.waitlist-field {
+.signup-field {
   background: var(--surface-panel);
   color: var(--text-primary);
   border: 1px solid var(--border-primary);
@@ -25,7 +25,7 @@
   margin-top: 0.25rem;
 }
 
-.waitlist-btn {
+.signup-btn {
   background: var(--accent-primary);
   color: var(--surface-base);
   font-weight: 600;

@@ -2,6 +2,18 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   {
+    path: '',
+    renderMode: RenderMode.Prerender
+  },
+  {
+    path: 'product/features',
+    renderMode: RenderMode.Prerender
+  },
+  {
+    path: 'product/pricing',
+    renderMode: RenderMode.Prerender
+  },
+  {
     path: 'markets/stocks',
     renderMode: RenderMode.Prerender
   },
@@ -34,7 +46,7 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   {
-    path: 'waitlist',
+    path: 'signup',
     renderMode: RenderMode.Prerender
   },
   {
