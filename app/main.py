@@ -89,6 +89,7 @@ def setup_auth(container, application):
                 ".*\\.webmanifest$",
                 ".*\\.txt$",
                 "/insights/",
+                "/waitlist(/|$)",
                 "/signup(/|$)",
                 "/terms(/|$)",
                 "/privacy(/|$)",
