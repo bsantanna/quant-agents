@@ -3,7 +3,6 @@
 
         <div class="profile-layout">
             <div class="profile-main">
-                <h2 class="profile-name">{{ agent.name }}</h2>
                 <p class="profile-role">{{ agent.role }}</p>
                 @for (paragraph of agent.bio; track $index) {
                     <p class="profile-bio">{{ paragraph }}</p>
