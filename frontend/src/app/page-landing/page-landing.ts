@@ -389,8 +389,8 @@ export class PageLanding {
     const formEase = formProgress * formProgress * (3 - 2 * formProgress);
     const driftAmp = (1 - formEase) * 0.06;
 
-    const rotY = p * Math.PI * 4;
-    const tilt = Math.sin(p * Math.PI) * 0.32;
+    const rotY = (p * 2 - 1) * 0.436;
+    const tilt = Math.sin(p * Math.PI) * 0.175;
     const baseFit = Math.min(h * 0.72, (w * 0.55) / this.imageAspect);
     const zoom = 0.55 + Math.sin(p * Math.PI) * 0.55 + easeInOut * 0.15;
     const drawScale = baseFit * zoom;
