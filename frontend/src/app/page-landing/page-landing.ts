@@ -19,24 +19,22 @@ interface DuckParticle {
   sx: number;
   sy: number;
   sz: number;
+  r: number;
+  g: number;
+  b: number;
   alpha: number;
   phase: number;
 }
 
 type Vec3 = [number, number, number];
 
-interface Triangle {
-  a: Vec3;
-  b: Vec3;
-  c: Vec3;
-  alpha: number;
-}
-
-const PARTICLE_COUNT = 2800;
-const EDGE_RATIO = 0.7;
+const PARTICLE_COUNT = 8500;
 const FORMATION_END = 0.25;
+const SAMPLE_STEP = 5;
+const SVG_RASTER = 440;
+const ALPHA_THRESHOLD = 32;
+const Z_MIN = 0.015;
 const FOCAL = 900;
-const DUCK_ASPECT = 1.4;
 
 @Component({
   selector: 'app-page-landing',
@@ -57,6 +55,7 @@ export class PageLanding {
   private rafId: number | null = null;
   private progress = 0;
   private accentRgb: [number, number, number] = [255, 213, 74];
+  private imageAspect = 1;
   private dpr = 1;
   private inView = true;
   private intersectionObserver: IntersectionObserver | null = null;
@@ -92,234 +91,154 @@ export class PageLanding {
 
     this.accentRgb = this.readAccentColor(stageEl);
     this.mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    this.particles = this.buildDuckGeometry();
 
-    this.fitCanvas();
-    window.addEventListener('scroll', this.handleScroll, {passive: true});
-    window.addEventListener('resize', this.handleResize, {passive: true});
-    this.observeStageVisibility(stageEl);
-    this.handleScroll();
-
-    if (this.mediaQuery?.matches) {
-      this.renderFrame();
-      return;
-    }
-    this.startLoop();
+    this.sampleDuckImage()
+      .then(() => {
+        this.fitCanvas();
+        window.addEventListener('scroll', this.handleScroll, {passive: true});
+        window.addEventListener('resize', this.handleResize, {passive: true});
+        this.observeStageVisibility(stageEl);
+        this.handleScroll();
+        if (this.mediaQuery?.matches) {
+          this.renderFrame();
+          return;
+        }
+        this.startLoop();
+      })
+      .catch(() => {});
   }
 
-  private buildDuckGeometry(): DuckParticle[] {
-    const mesh = this.buildDuckMesh();
-    const areas = mesh.map((t) => this.triangleArea(t));
-    const totalArea = areas.reduce((s, a) => s + a, 0) || 1;
-    const perims = mesh.map(
-      (t) =>
-        this.edgeLength(t.a, t.b) +
-        this.edgeLength(t.b, t.c) +
-        this.edgeLength(t.c, t.a),
-    );
-    const totalPerim = perims.reduce((s, p) => s + p, 0) || 1;
+  private sampleDuckImage(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => {
+        const aspect = img.naturalWidth / img.naturalHeight;
+        const w = aspect >= 1 ? SVG_RASTER : Math.round(SVG_RASTER * aspect);
+        const h = aspect >= 1 ? Math.round(SVG_RASTER / aspect) : SVG_RASTER;
+        const off = document.createElement('canvas');
+        off.width = w;
+        off.height = h;
+        const octx = off.getContext('2d');
+        if (!octx) {
+          reject(new Error('no offscreen ctx'));
+          return;
+        }
+        octx.drawImage(img, 0, 0, w, h);
+        const data = octx.getImageData(0, 0, w, h).data;
 
-    const edgeBudget = Math.floor(PARTICLE_COUNT * EDGE_RATIO);
-    const faceBudget = PARTICLE_COUNT - edgeBudget;
+        const collected: DuckParticle[] = [];
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minY = Infinity;
+        let maxY = -Infinity;
 
-    const out: DuckParticle[] = [];
-    for (let i = 0; i < mesh.length; i++) {
-      const nFace = Math.max(
-        1,
-        Math.round((faceBudget * areas[i]) / totalArea),
-      );
-      this.sampleTriangle(out, nFace, mesh[i]);
+        for (let y = 0; y < h; y += SAMPLE_STEP) {
+          for (let x = 0; x < w; x += SAMPLE_STEP) {
+            const i = (y * w + x) * 4;
+            if (data[i + 3] < ALPHA_THRESHOLD) continue;
 
-      const nEdge = Math.max(
-        3,
-        Math.round((edgeBudget * perims[i]) / totalPerim),
-      );
-      this.sampleTriangleEdges(out, nEdge, mesh[i]);
-    }
-    return out;
+            const ox = (x - w / 2) / h;
+            const oy = (y - h / 2) / h;
+            const z = this.classifyZ(ox, oy);
+
+            if (ox < minX) minX = ox;
+            if (ox > maxX) maxX = ox;
+            if (oy < minY) minY = oy;
+            if (oy > maxY) maxY = oy;
+
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3] / 255;
+
+            const s1 = this.randomScatter();
+            collected.push({
+              ox,
+              oy,
+              oz: z,
+              sx: s1[0],
+              sy: s1[1],
+              sz: s1[2],
+              r,
+              g,
+              b,
+              alpha: a,
+              phase: Math.random() * Math.PI * 2,
+            });
+            if (z > Z_MIN) {
+              const s2 = this.randomScatter();
+              collected.push({
+                ox,
+                oy,
+                oz: -z,
+                sx: s2[0],
+                sy: s2[1],
+                sz: s2[2],
+                r,
+                g,
+                b,
+                alpha: a * 0.75,
+                phase: Math.random() * Math.PI * 2,
+              });
+            }
+          }
+        }
+
+        this.imageAspect = maxY > minY ? (maxX - minX) / (maxY - minY) : 1;
+        this.particles = this.thinTo(collected, PARTICLE_COUNT);
+        resolve();
+      };
+      img.onerror = () => reject(new Error('image load failed'));
+      img.src = '/logo.svg';
+    });
   }
 
-  private edgeLength(a: Vec3, b: Vec3): number {
-    const dx = b[0] - a[0];
-    const dy = b[1] - a[1];
-    const dz = b[2] - a[2];
-    return Math.sqrt(dx * dx + dy * dy + dz * dz);
-  }
-
-  private sampleTriangleEdges(
-    out: DuckParticle[],
-    n: number,
-    t: Triangle,
-  ): void {
-    const l1 = this.edgeLength(t.a, t.b);
-    const l2 = this.edgeLength(t.b, t.c);
-    const l3 = this.edgeLength(t.c, t.a);
-    const total = l1 + l2 + l3 || 1;
-    const n1 = Math.max(1, Math.round((n * l1) / total));
-    const n2 = Math.max(1, Math.round((n * l2) / total));
-    const n3 = Math.max(1, n - n1 - n2);
-    this.sampleEdge(out, n1, t.a, t.b, t.alpha);
-    this.sampleEdge(out, n2, t.b, t.c, t.alpha);
-    this.sampleEdge(out, n3, t.c, t.a, t.alpha);
-  }
-
-  private sampleEdge(
-    out: DuckParticle[],
-    n: number,
-    a: Vec3,
-    b: Vec3,
-    alpha: number,
-  ): void {
-    for (let i = 0; i < n; i++) {
-      const u = Math.random();
-      const t = Math.random() < 0.5 ? u * u : 1 - u * u;
-      const s = this.randomScatter();
-      out.push({
-        ox: a[0] + (b[0] - a[0]) * t,
-        oy: a[1] + (b[1] - a[1]) * t,
-        oz: a[2] + (b[2] - a[2]) * t,
-        sx: s[0],
-        sy: s[1],
-        sz: s[2],
-        alpha: alpha * (0.85 + Math.random() * 0.15),
-        phase: Math.random() * Math.PI * 2,
-      });
-    }
-  }
-
-  private buildDuckMesh(): Triangle[] {
-    const tris: Triangle[] = [];
-
-    this.addIcosahedron(tris, 0.0, 0.08, 0.0, 0.4, 0.26, 0.28, 0.95, 0.45);
-    this.addIcosahedron(tris, 0.2, -0.22, 0.0, 0.18, 0.2, 0.18, 1.0, 0.55);
-
-    this.addPyramid(
-      tris,
-      [0.52, -0.1, 0.0],
-      [
-        [0.3, -0.2, 0.0],
-        [0.32, -0.12, 0.06],
-        [0.3, -0.04, 0.0],
-        [0.32, -0.12, -0.06],
-      ],
-      0.95,
-      0.6,
-    );
-
-    this.addPyramid(
-      tris,
-      [-0.48, -0.3, 0.0],
-      [
-        [-0.3, -0.14, 0.0],
-        [-0.28, -0.02, 0.06],
-        [-0.3, 0.1, 0.0],
-        [-0.28, -0.02, -0.06],
-      ],
-      0.9,
-      0.55,
-    );
-
-    tris.push({a: [0.08, -0.04, 0.22], b: [-0.18, 0.02, 0.22], c: [-0.04, 0.16, 0.3], alpha: 1.0});
-    tris.push({a: [0.08, -0.04, 0.22], b: [-0.04, 0.16, 0.3], c: [0.1, 0.14, 0.3], alpha: 0.85});
-    tris.push({a: [0.08, -0.04, -0.22], b: [-0.04, 0.16, -0.3], c: [-0.18, 0.02, -0.22], alpha: 1.0});
-    tris.push({a: [0.08, -0.04, -0.22], b: [0.1, 0.14, -0.3], c: [-0.04, 0.16, -0.3], alpha: 0.85});
-
-    return tris;
-  }
-
-  private addIcosahedron(
-    out: Triangle[],
-    cx: number,
-    cy: number,
-    cz: number,
-    rx: number,
-    ry: number,
-    rz: number,
-    alphaTop: number,
-    alphaBot: number,
-  ): void {
-    const phi = (1 + Math.sqrt(5)) / 2;
-    const norm = Math.sqrt(1 + phi * phi);
-    const A = 1 / norm;
-    const B = phi / norm;
-    const nat: Vec3[] = [
-      [-A, B, 0], [A, B, 0], [-A, -B, 0], [A, -B, 0],
-      [0, -A, B], [0, A, B], [0, -A, -B], [0, A, -B],
-      [B, 0, -A], [B, 0, A], [-B, 0, -A], [-B, 0, A],
-    ];
-    const v: Vec3[] = nat.map((p) => [
-      cx + rx * p[0],
-      cy - ry * p[1],
-      cz + rz * p[2],
-    ]);
-    const faces: [number, number, number][] = [
-      [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
-      [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
-      [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9],
-      [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1],
-    ];
-    for (const [i, j, k] of faces) {
-      const avgY = (nat[i][1] + nat[j][1] + nat[k][1]) / 3;
-      const tF = (avgY + B) / (2 * B);
-      out.push({
-        a: v[i],
-        b: v[j],
-        c: v[k],
-        alpha: alphaBot + (alphaTop - alphaBot) * tF,
-      });
-    }
-  }
-
-  private addPyramid(
-    out: Triangle[],
-    apex: Vec3,
-    base: Vec3[],
-    alphaSide: number,
-    alphaBase: number,
-  ): void {
-    const n = base.length;
-    for (let i = 0; i < n; i++) {
-      out.push({a: apex, b: base[i], c: base[(i + 1) % n], alpha: alphaSide});
-    }
-    for (let i = 1; i < n - 1; i++) {
-      out.push({a: base[0], b: base[i + 1], c: base[i], alpha: alphaBase});
-    }
-  }
-
-  private triangleArea(t: Triangle): number {
-    const ux = t.b[0] - t.a[0];
-    const uy = t.b[1] - t.a[1];
-    const uz = t.b[2] - t.a[2];
-    const vx = t.c[0] - t.a[0];
-    const vy = t.c[1] - t.a[1];
-    const vz = t.c[2] - t.a[2];
-    const cx = uy * vz - uz * vy;
-    const cy = uz * vx - ux * vz;
-    const cz = ux * vy - uy * vx;
-    return 0.5 * Math.sqrt(cx * cx + cy * cy + cz * cz);
-  }
-
-  private sampleTriangle(out: DuckParticle[], n: number, t: Triangle): void {
-    for (let i = 0; i < n; i++) {
-      let u = Math.random();
-      let v = Math.random();
-      if (u + v > 1) {
-        u = 1 - u;
-        v = 1 - v;
+  private classifyZ(ox: number, oy: number): number {
+    if (ox >= 0.24 && ox <= 0.44) {
+      const t = (ox - 0.24) / 0.2;
+      const beakR = 0.07 * (1 - t);
+      const dy = oy - -0.1;
+      if (Math.abs(dy) < beakR) {
+        const z2 = beakR * beakR - dy * dy;
+        if (z2 > 0) return Math.sqrt(z2);
       }
-      const w = 1 - u - v;
-      const s = this.randomScatter();
-      out.push({
-        ox: t.a[0] * w + t.b[0] * u + t.c[0] * v,
-        oy: t.a[1] * w + t.b[1] * u + t.c[1] * v,
-        oz: t.a[2] * w + t.b[2] * u + t.c[2] * v,
-        sx: s[0],
-        sy: s[1],
-        sz: s[2],
-        alpha: t.alpha * (0.8 + Math.random() * 0.2),
-        phase: Math.random() * Math.PI * 2,
-      });
     }
+    if (ox >= -0.42 && ox <= -0.22) {
+      const t = (-0.22 - ox) / 0.2;
+      const tailR = 0.08 * (1 - t);
+      const dy = oy - -0.05;
+      if (Math.abs(dy) < tailR) {
+        const z2 = tailR * tailR - dy * dy;
+        if (z2 > 0) return Math.sqrt(z2);
+      }
+    }
+    const dhx = ox - 0.15;
+    const dhy = oy - -0.2;
+    const headR2 = 0.17 * 0.17;
+    const headD2 = dhx * dhx + dhy * dhy;
+    if (headD2 < headR2) {
+      return Math.sqrt(headR2 - headD2);
+    }
+    const dbx = (ox - -0.05) / 0.3;
+    const dby = (oy - 0.07) / 0.22;
+    const bodySum = dbx * dbx + dby * dby;
+    if (bodySum < 1) {
+      return 0.24 * Math.sqrt(1 - bodySum);
+    }
+    return 0.02;
+  }
+
+  private thinTo(items: DuckParticle[], limit: number): DuckParticle[] {
+    if (items.length <= limit) return items;
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = items[i];
+      items[i] = items[j];
+      items[j] = tmp;
+    }
+    items.length = limit;
+    return items;
   }
 
   private randomScatter(): Vec3 {
@@ -472,7 +391,7 @@ export class PageLanding {
 
     const rotY = p * Math.PI * 4;
     const tilt = Math.sin(p * Math.PI) * 0.32;
-    const baseFit = Math.min(h * 0.72, (w * 0.55) / DUCK_ASPECT);
+    const baseFit = Math.min(h * 0.72, (w * 0.55) / this.imageAspect);
     const zoom = 0.55 + Math.sin(p * Math.PI) * 0.55 + easeInOut * 0.15;
     const drawScale = baseFit * zoom;
 
@@ -485,7 +404,6 @@ export class PageLanding {
     const sinX = Math.sin(tilt);
 
     const t = performance.now() * 0.0007;
-    const [r, g, b] = this.accentRgb;
 
     for (let i = 0; i < this.particles.length; i++) {
       const pt = this.particles[i];
@@ -508,7 +426,7 @@ export class PageLanding {
       const size = Math.max(0.7, 1.6 * persp * (0.85 + easeInOut * 0.35));
       const a = pt.alpha * persp * (0.55 + easeInOut * 0.35);
 
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
+      ctx.fillStyle = `rgba(${pt.r}, ${pt.g}, ${pt.b}, ${a})`;
       ctx.beginPath();
       ctx.arc(px, py, size, 0, Math.PI * 2);
       ctx.fill();
