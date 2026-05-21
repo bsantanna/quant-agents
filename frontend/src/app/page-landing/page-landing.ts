@@ -44,6 +44,7 @@ const FOCAL = 900;
 })
 export class PageLanding {
   readonly step = signal(0);
+  readonly svgFade = signal(0);
 
   private readonly stage = viewChild<ElementRef<HTMLElement>>('stage');
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
@@ -54,6 +55,7 @@ export class PageLanding {
   private ctx: CanvasRenderingContext2D | null = null;
   private rafId: number | null = null;
   private progress = 0;
+  private svgFadeValue = 0;
   private accentRgb: [number, number, number] = [255, 213, 74];
   private imageAspect = 1;
   private dpr = 1;
@@ -337,6 +339,9 @@ export class PageLanding {
     }
     const p = Math.max(0, Math.min(1, -rect.top / span));
     this.progress = p;
+    const fade = Math.max(0, Math.min(1, (p - 0.75) / 0.25));
+    this.svgFadeValue = fade * fade * (3 - 2 * fade);
+    this.svgFade.set(this.svgFadeValue);
     const next = Math.min(3, Math.floor(p * 4));
     if (next !== this.step()) {
       this.step.set(next);
@@ -389,8 +394,9 @@ export class PageLanding {
     const formEase = formProgress * formProgress * (3 - 2 * formProgress);
     const driftAmp = (1 - formEase) * 0.06;
 
-    const rotY = (p * 2 - 1) * 0.436;
-    const tilt = Math.sin(p * Math.PI) * 0.175;
+    const presence = 1 - this.svgFadeValue;
+    const rotY = (p * 2 - 1) * 0.436 * presence;
+    const tilt = Math.sin(p * Math.PI) * 0.175 * presence;
     const baseFit = Math.min(h * 0.72, (w * 0.55) / this.imageAspect);
     const zoom = 0.55 + Math.sin(p * Math.PI) * 0.55 + easeInOut * 0.15;
     const drawScale = baseFit * zoom;
@@ -424,7 +430,7 @@ export class PageLanding {
       const px = cx + x1 * drawScale * persp;
       const py = cy + y2 * drawScale * persp;
       const size = Math.max(0.7, 1.6 * persp * (0.85 + easeInOut * 0.35));
-      const a = pt.alpha * persp * (0.55 + easeInOut * 0.35);
+      const a = pt.alpha * persp * (0.55 + easeInOut * 0.35) * presence;
 
       ctx.fillStyle = `rgba(${pt.r}, ${pt.g}, ${pt.b}, ${a})`;
       ctx.beginPath();

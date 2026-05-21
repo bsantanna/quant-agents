@@ -62,6 +62,13 @@
         <div class="landing-stage-scene">
           <canvas #canvas class="landing-stage-canvas" aria-hidden="true"></canvas>
           <img
+            class="landing-stage-final"
+            src="/logo.svg"
+            alt=""
+            aria-hidden="true"
+            [style.--svg-fade]="svgFade()"
+          />
+          <img
             class="landing-stage-fallback"
             src="/logo_large.png"
             alt="Quaks duck mascot"

@@ -242,6 +242,12 @@
   transform: translate(-50%, -50%); opacity: 0; pointer-events: none;
   filter: drop-shadow(0 24px 48px rgba(0,0,0,0.35));
 }
+.landing-stage-final {
+  position: absolute; top: 50%; left: 50%; height: clamp(240px, 50vh, 540px);
+  width: auto; transform: translate(-50%, -50%); pointer-events: none;
+  opacity: var(--svg-fade, 0);
+  filter: drop-shadow(0 24px 48px rgba(0,0,0,0.35));
+}
 .landing-stage-captions {
   position: absolute; left: 50%; bottom: 8vh; transform: translateX(-50%);
   width: min(560px, 86vw); height: 48px; text-align: center; pointer-events: none;
@@ -263,7 +269,7 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-stage-track { height: auto; }
   .landing-stage-pin { position: relative; height: clamp(360px, 56vh, 520px); }
-  .landing-stage-canvas, .landing-stage-captions { display: none; }
+  .landing-stage-canvas, .landing-stage-captions, .landing-stage-final { display: none; }
   .landing-stage-fallback { opacity: 1; }
 }
 
