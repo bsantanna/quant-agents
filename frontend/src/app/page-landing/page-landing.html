@@ -1,49 +1,118 @@
 <article class="landing">
 
-    <section class="landing-hero">
-    <div class="landing-hero-grid">
+  <section class="landing-prime">
+    <div class="landing-prime-glow" aria-hidden="true"></div>
 
-      <div class="landing-hero-headline">
-        <p class="landing-rubric">Presenting Quaks</p>
-        <h1 class="landing-h1">
-          <span class="landing-h1-line">Financial Intelligence,</span>
-          <span class="landing-h1-line landing-h1-line-accent">Now Built for AI Agents &amp; Assistants.</span>
+    <div class="landing-prime-grid">
+
+      <div class="landing-prime-copy">
+        <p class="landing-prime-eyebrow">
+          <span class="landing-prime-eyebrow-mark" aria-hidden="true"></span>
+          AI Financial Analysts &middot; Over MCP
+        </p>
+
+        <h1 class="landing-prime-headline">
+          <span class="landing-prime-word">Financial Intelligence.</span>
+          <span class="landing-prime-word landing-prime-word-accent">For Everyone.</span>
         </h1>
-      </div>
 
-      <div class="landing-hero-body">
-        <p class="landing-lede">
-          <strong>Your AI assistant, upgraded for the market.</strong>
-          Quaks is a first-class MCP server for financial intelligence. Wire it into Claude, Hermes Agent, or any MCP-compatible client and your chat gains live market news, company fundamentals, technical indicators, and portfolio-grade analysis &mdash; powered by a multi-agent analyst backend.
+        <p class="landing-prime-lede">
+          Quaks brings serious financial research within reach of individual investors. Analyst agents read the news, screen the fundamentals, and surface what matters for your portfolio &mdash; so you can make moves with conviction, not guesswork. Operate from the web app, or from the AI assistant you already use. Beta access today; a server-hosted plan is on the way.
         </p>
 
         <div class="landing-cta-row">
-          <a class="landing-cta landing-cta-primary" routerLink="/product/features">
-            <span>See features</span>
-            <span class="landing-cta-arrow" aria-hidden="true">&rarr;</span>
-          </a>
           <a class="landing-cta landing-cta-outline" routerLink="/mcp-clients/how-to">
             <span>See how it works</span>
           </a>
+          <a class="landing-cta landing-cta-outline" routerLink="/product/features">
+            <span>See our features</span>
+          </a>
+          <a class="landing-cta landing-cta-primary" routerLink="/product/pricing">
+            <span>Check out pricing</span>
+          </a>
         </div>
-
-        <dl class="landing-hero-stats">
-          <div class="landing-hero-stat">
-            <dt>Surface</dt>
-            <dd>Tools · Resources · Prompts</dd>
-          </div>
-          <div class="landing-hero-stat">
-            <dt>Transport</dt>
-            <dd>Streamable HTTP · OAuth 2.1 + PKCE</dd>
-          </div>
-          <div class="landing-hero-stat">
-            <dt>Hosts</dt>
-            <dd>Any MCP-compatible client</dd>
-          </div>
-        </dl>
       </div>
 
+      <aside class="landing-prime-lab" aria-hidden="true">
+        <header class="landing-prime-lab-head">
+          <span class="landing-prime-lab-dot"></span>
+          <span class="landing-prime-lab-label">Financial Analyst v1</span>
+          <span class="landing-prime-lab-status">LIVE</span>
+        </header>
+
+        <p class="landing-prime-lab-tag">Pipeline &middot; every step is a prompt</p>
+        <ul class="landing-prime-lab-list">
+          <li class="landing-prime-lab-item">coordinator</li>
+          <li class="landing-prime-lab-item">data_collector</li>
+          <li class="landing-prime-lab-item">fundamental_analyst</li>
+          <li class="landing-prime-lab-item">technical_analyst</li>
+          <li class="landing-prime-lab-item">consensus_reporter</li>
+        </ul>
+
+        <div class="landing-prime-lab-foot">
+          <div class="landing-prime-lab-row landing-prime-lab-row-meter">
+            <span class="landing-prime-lab-row-key">Prompt sync</span>
+            <span class="landing-prime-lab-meter">
+              <span class="landing-prime-lab-meter-fill"></span>
+            </span>
+            <span class="landing-prime-lab-row-val landing-prime-lab-row-pos">live</span>
+          </div>
+          <div class="landing-prime-lab-row">
+            <span class="landing-prime-lab-row-key">Transport</span>
+            <span class="landing-prime-lab-row-val">MCP &middot; OAuth 2.1</span>
+          </div>
+          <div class="landing-prime-lab-row">
+            <span class="landing-prime-lab-row-key">Plan</span>
+            <span class="landing-prime-lab-row-val">Beta &middot; <span class="landing-prime-lab-row-soft">Pro soon</span></span>
+          </div>
+        </div>
+      </aside>
+
     </div>
+
+    <div class="landing-prime-paths">
+      <p class="landing-prime-paths-label">How you&rsquo;ll use Quaks</p>
+      <div class="landing-prime-paths-grid">
+
+        <a class="landing-prime-path" routerLink="/markets/stocks">
+          <p class="landing-prime-path-no">MARKETS</p>
+          <h2 class="landing-prime-path-title">Research the markets</h2>
+          <p class="landing-prime-path-body">
+            Heatmaps, side-by-side performance, per-ticker dashboards, and a live news wire &mdash; the cockpit for your portfolio.
+          </p>
+          <span class="landing-prime-path-cta">Open the markets</span>
+        </a>
+
+        <a class="landing-prime-path" routerLink="/insights/agents">
+          <p class="landing-prime-path-no">INSIGHTS</p>
+          <h2 class="landing-prime-path-title">Personalize the analysis</h2>
+          <p class="landing-prime-path-body">
+            Pick an analyst, edit any step of its workflow, and save the prompt. Personal news briefings and equity reports come out in your voice, on your terms.
+          </p>
+          <span class="landing-prime-path-cta">See your agents</span>
+        </a>
+
+        <a class="landing-prime-path" routerLink="/mcp-clients/how-to" fragment="what-is-skill">
+          <p class="landing-prime-path-no">MCP-CLIENTS</p>
+          <h2 class="landing-prime-path-title">Automate with a skill</h2>
+          <p class="landing-prime-path-body">
+            A <em>skill</em> is a packaged recipe your AI client follows. Ask Claude or Hermes for a briefing and the full pipeline runs end-to-end.
+          </p>
+          <span class="landing-prime-path-cta">What is a skill</span>
+        </a>
+
+      </div>
+    </div>
+
+    <p class="landing-prime-manifesto" aria-hidden="true">
+      <span>Build</span>
+      <span class="landing-prime-manifesto-dot">&middot;</span>
+      <span>Customize</span>
+      <span class="landing-prime-manifesto-dot">&middot;</span>
+      <span>Call</span>
+      <span class="landing-prime-manifesto-dot">&middot;</span>
+      <span>Iterate</span>
+    </p>
   </section>
 
   <section class="landing-stage" #stage [attr.data-step]="step()">
@@ -179,11 +248,11 @@
       <span class="landing-close-emph">one click away.</span>
     </p>
     <p class="landing-close-pitch">
-      Spin up a free Quaks account in under a minute &mdash; no card, no commitment. Bring any MCP-compatible client and your prompts, workflows, and customisations stay yours from day one.
+      Spin up a Quaks beta account in under a minute &mdash; no commitment. Bring any MCP-compatible client and your prompts, workflows, and customisations stay yours from day one.
     </p>
     <div class="landing-cta-row landing-cta-row-close">
       <a class="landing-cta landing-cta-primary" routerLink="/signup">
-        <span>Create your free account</span>
+        <span>Claim your beta seat</span>
         <span class="landing-cta-arrow" aria-hidden="true">&rarr;</span>
       </a>
       <a class="landing-cta landing-cta-outline" routerLink="/product/features">
@@ -191,7 +260,7 @@
       </a>
     </div>
     <p class="landing-colophon">
-      Quaks works with Claude, Hermes Agent, and any MCP-compatible host. Free while we finalise plans.
+      Quaks works with Claude, Hermes Agent, and any MCP-compatible host. Open beta while we finalise plans.
     </p>
   </section>
 
