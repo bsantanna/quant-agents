@@ -2,6 +2,44 @@
 
 <!-- version list -->
 
+## v1.5.45 (2026-05-21)
+
+### Bug Fixes
+
+- LAnding page (1) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page (10) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page (2) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page (3) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page (4) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page (5) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page (6) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page (7) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page (8) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page (9) ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+- Landing page 2 ([#163](https://github.com/bsantanna/quaks/pull/163),
+  [`c51abb9`](https://github.com/bsantanna/quaks/commit/c51abb98afea4e38a1c221f87e24d8371ca72dfa))
+
+
 ## v1.5.44 (2026-05-19)
 
 ### Bug Fixes
