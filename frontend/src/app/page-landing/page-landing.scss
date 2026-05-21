@@ -250,12 +250,13 @@
 }
 .landing-stage-captions {
   position: absolute; left: 50%; bottom: 8vh; transform: translateX(-50%);
-  width: min(560px, 86vw); height: 48px; text-align: center; pointer-events: none;
+  width: min(820px, 92vw); height: 112px; text-align: center; pointer-events: none;
 }
 .landing-stage-caption {
   position: absolute; inset: 0; margin: 0;
-  font-family: var(--font-heading); font-size: clamp(1rem, 2.2vw, 1.45rem);
-  letter-spacing: -0.01em; color: var(--text-primary);
+  font-family: var(--font-heading); font-size: clamp(1.4rem, 3.4vw, 2.4rem);
+  font-weight: 600; line-height: 1.2;
+  letter-spacing: -0.015em; color: var(--text-primary);
   opacity: 0; transform: translateY(14px);
   transition: opacity 360ms ease, transform 360ms ease;
 }
@@ -265,7 +266,7 @@
 .landing-stage[data-step="3"] .landing-stage-caption[data-step="3"] {
   opacity: 1; transform: translateY(0);
 }
-@media (max-width: 720px) { .landing-stage-track { height: 280vh; } }
+@media (max-width: 720px) { .landing-stage { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   .landing-stage-track { height: auto; }
   .landing-stage-pin { position: relative; height: clamp(360px, 56vh, 520px); }
