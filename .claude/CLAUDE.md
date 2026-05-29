@@ -84,6 +84,14 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 Quaks is a multi-agent financial agents platform built on [Agent-Lab](https://github.com/bsantanna/agent-lab). It uses LLM-powered agents (LangChain/LangGraph) to perform asset management, market data analysis, and alpha-seeking tasks. The backend is Python/FastAPI, the frontend is Angular 20, and market data flows through Airflow DAGs into Elasticsearch.
 
+## Relationship to Agent-Lab
+
+Quaks is a reference implementation built on the generic [Agent-Lab](https://github.com/bsantanna/agent-lab) base: Quaks = Agent-Lab's generic core **plus** a financial product surface. Keep this boundary when changing shared code:
+
+- **Quaks is the source of truth for generic code.** When you improve a generic concern (auth, MCP server/transport, shared schemas, infrastructure), it should be portable back into Agent-Lab unchanged. Avoid coupling generic code to financial specifics.
+- **Specialized code stays only in Quaks** and must never be pushed to Agent-Lab: the Angular frontend (`app/static/frontend/**`), specialized agents (`app/services/agent_types/quaks/**`), markets/waitlist services and APIs, the financial MCP tools/schemas/exceptions, and the `quant`/`seo`/`quaks-generator` skills.
+- When editing generic files that also carry wiring (e.g. `app/core/container.py`, `app/services/agent_types/registry.py`, the MCP server `instructions`), separate the generic change from the financial wiring so the generic part can be synced.
+
 ## Skills
 
 - `/software-engineering` — Architecture, common commands (build, test, lint), and code conventions.
