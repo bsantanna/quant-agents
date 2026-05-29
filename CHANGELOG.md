@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.47 (2026-05-29)
+
+### Bug Fixes
+
+- Project upgrade (2) ([#170](https://github.com/bsantanna/quaks/pull/170),
+  [`8c979ef`](https://github.com/bsantanna/quaks/commit/8c979ef5f821d7dab35d005cb81d9adc8960fbfc))
+
+
 ## v1.5.46 (2026-05-21)
 
 ### Bug Fixes
