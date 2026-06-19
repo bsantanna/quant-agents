@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
   "browser-use",
   "charset-normalizer==3.4.7",
-  "dependency-injector~=4.48.3",
+  "dependency-injector~=4.49.1",
   "eland~=9.2.0",
   "fastapi-keycloak-middleware~=1.6.0",
   "fastmcp~=3.2.4",
