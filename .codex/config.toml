@@ -1,4 +1,0 @@
-# Repo-local Codex compatibility settings.
-# Keep this file intentionally small and portable.
-
-project_doc_fallback_filenames = ["CLAUDE.md"]
